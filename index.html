@@ -306,14 +306,14 @@ footer a{color:inherit}
 
 <div class="toast" id="toast" data-on="false"></div>
 
-<script>window.BHANDAR_API="https://distributors-apart-brakes-folding.trycloudflare.com";</script>
+<script>window.BHANDAR_API="https://kings-macbook-pro.tail35a127.ts.net";</script>
 <script>
 (() => {
 "use strict";
 const API = (window.BHANDAR_API || "").replace(/\/$/, "");
 const url = (p) => API + p;
 // Photos: absolute from the live server, relative when this page is a static copy.
-const pic = (p) => API ? API + p : p.replace(/^\//, "");
+const pic = (p) => p.startsWith("/") ? API + p : p;   // bundled photos are relative, live ones absolute
 let LIVE = true;   // false when the shelves came from menu.json and no server answers
 const $ = (s, r = document) => r.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
