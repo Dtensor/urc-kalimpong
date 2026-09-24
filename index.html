@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#faf6ee">
 <title>URC Kalimpong</title>
 <meta name="description" content="Everything on the canteen shelves today. Heart what you fancy, fill a basket, and it is packed and waiting when you arrive.">
+<link rel="preload" href="menu.json" as="fetch" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -81,7 +82,7 @@ h1,h2,h3{margin:0;font-family:Fraunces,Georgia,serif;font-weight:600;letter-spac
 .ghead h2{font-size:28px;line-height:1.1}
 @media(min-width:760px){.ghead h2{font-size:34px}}
 .ghint{color:var(--muted);margin:3px 0 0;font-size:15px}
-.cat{margin-top:22px}
+.cat{margin-top:22px;content-visibility:auto;contain-intrinsic-size:auto 600px}
 .chead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .chead h3{font-family:Inter,sans-serif;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
 .chead .rule{flex:1;height:1px;background:var(--line)}
@@ -313,7 +314,8 @@ footer a{color:inherit}
 const API = (window.BHANDAR_API || "").replace(/\/$/, "");
 const url = (p) => API + p;
 // Photos: absolute from the live server, relative when this page is a static copy.
-const pic = (p) => p.startsWith("/") ? API + p : p;   // bundled photos are relative, live ones absolute
+let BUNDLED = {};   // id -> photo shipped with this static copy
+const pic = (it) => BUNDLED[it.id] || (it.img.startsWith("/") ? API + it.img : it.img);
 let LIVE = true;   // false when the shelves came from menu.json and no server answers
 const $ = (s, r = document) => r.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -359,39 +361,65 @@ function stockPill(it) {
 }
 function shotFor(it, cls) {
   const s = el("div", "shot" + (cls ? " " + cls : ""));
-  if (it.img) { const im = el("img"); im.src = pic(it.img); im.alt = it.name; im.loading = "lazy"; im.decoding = "async"; s.append(im); }
+  if (it.img) { const im = el("img"); im.src = pic(it); im.alt = it.name; im.loading = "lazy"; im.decoding = "async"; im.width = 200; im.height = 146; s.append(im); }
   else s.append(el("div", "mono", initials(it.name)));
   return s;
 }
 
 /* ---------- load ---------- */
 async function load() {
+  // Paint from whatever answers first. A static copy ships menu.json on the
+  // CDN, so the shelves appear at once; the live server then refreshes the
+  // numbers that move (stock, hearts, notices) without repainting the photos.
+  let snap = null;
+  try { const r = await fetch("menu.json", { cache: "no-store" }); if (r.ok) snap = await r.json(); } catch {}
+  if (snap) {
+    snap.items.forEach(i => { if (i.img && !i.img.startsWith("/")) BUNDLED[i.id] = i.img; });
+    DATA = snap; LIVE = false; paint();
+  }
   try {
-    if (!API && location.protocol !== "http:" && location.protocol !== "https:") throw 0;
     const r = await fetch(url("/api/menu"), { cache: "no-store" });
     if (!r.ok) throw 0;
-    DATA = await r.json();
-  } catch {
-    const r = await fetch("menu.json", { cache: "no-store" });
-    DATA = await r.json(); LIVE = false;
-  }
+    const live = await r.json();
+    if (!snap) { DATA = live; LIVE = true; paint(); return; }
+    LIVE = true; refresh(live);
+  } catch { if (!snap) throw 0; }
+}
+function paint() {
   const o = DATA.outlet;
   $("#name").textContent = o.name || "The canteen";
   $("#kicker").textContent = o.subtitle || "Canteen Stores Department";
   document.title = o.name || "Canteen";
+  $("#line").textContent = greeting() + " " + (o.line || "Everything on our shelves, as it stands today.");
+  $("#pricenote").textContent = priced() ? (o.price_note || "") : "";
+  paintStats(); paintChips(); paintShelves(); paintRail(); paintNotices(); paintBar(); loadComments();
+  BASKET = Object.fromEntries(Object.entries(BASKET).filter(([id]) => byId()[id] && byId()[id].status === "in"));
+  store.set("basket", BASKET);
+}
+function paintStats() {
   const inStock = DATA.items.filter(i => i.status === "in" && i.qty !== 0).length;
   const soon = DATA.items.filter(i => i.status === "incoming").length;
-  $("#line").textContent = greeting() + " " + (o.line || "Everything on our shelves, as it stands today.");
   const st = $("#stats"); st.innerHTML = "";
   const s1 = el("span", "stat"); s1.append(el("i", "dot"), el("b", null, inStock.toLocaleString("en-IN")), document.createTextNode(" on the shelves"));
   st.append(s1);
   if (soon) { const s2 = el("span", "stat"); s2.append(el("b", null, soon), document.createTextNode(" on the way")); st.append(s2); }
   const s3 = el("span", "stat"); s3.append(el("b", null, DATA.groups.length), document.createTextNode(" CSD groups")); st.append(s3);
-  $("#pricenote").textContent = priced() ? (o.price_note || "") : "";
   $("#stamp").textContent = "Shelves updated " + new Date(DATA.served).toLocaleDateString("en-IN", { day: "numeric", month: "long" });
-  paintChips(); paintShelves(); paintRail(); paintNotices(); paintBar(); loadComments();
-  BASKET = Object.fromEntries(Object.entries(BASKET).filter(([id]) => byId()[id] && byId()[id].status === "in"));
-  store.set("basket", BASKET);
+}
+function refresh(live) {
+  // Same shelves, fresher numbers. Only repaint if the list itself changed.
+  const oldIds = DATA.items.map(i => i.id).join(), newIds = live.items.map(i => i.id).join();
+  if (oldIds !== newIds || DATA.categories.length !== live.categories.length) { DATA = live; paint(); return; }
+  const m = byId();
+  live.items.forEach(li => {
+    const it = m[li.id]; if (!it) return;
+    const changed = it.qty !== li.qty || it.status !== li.status || it.wants !== li.wants || it.featured !== li.featured || it.price !== li.price;
+    Object.assign(it, { qty: li.qty, status: li.status, wants: li.wants, featured: li.featured, price: li.price, img: BUNDLED[li.id] || li.img });
+    if (!changed) return;
+    document.querySelectorAll('#shelves .card[data-id="' + it.id + '"]').forEach(c => c.replaceWith(card(it)));
+  });
+  DATA.notices = live.notices; DATA.served = live.served; DATA.outlet = live.outlet;
+  paintStats(); paintNotices(); watchAttention();
 }
 
 /* ---------- chips ---------- */
@@ -529,7 +557,7 @@ function paintSheet() {
   s.append(el("p", "sub", "We pack it, you collect it, the counter bills it as always."));
   rows.forEach(({ it, q }) => {
     const ln = el("div", "sline");
-    if (it.img) { const im = el("img"); im.src = pic(it.img); im.alt = ""; ln.append(im); } else ln.append(el("div", "mono", initials(it.name)));
+    if (it.img) { const im = el("img"); im.src = pic(it); im.alt = ""; ln.append(im); } else ln.append(el("div", "mono", initials(it.name)));
     const mid = el("div"); mid.append(el("div", "nm", it.name));
     if (it.price != null && priced()) mid.append(el("div", "sub2", money(it.price) + " each"));
     ln.append(mid);
@@ -560,10 +588,13 @@ async function reserve(name, btn, err) {
   err.textContent = "";
   if (name.length < 2) { err.textContent = "Just a name, so we know whose basket to hand over."; return; }
   store.set("who", name);
-  btn.disabled = true; btn.textContent = "Reserving…";
+  btn.disabled = true; btn.textContent = "Telling the counter…";
+  const slow = setTimeout(() => { btn.textContent = "Still telling the counter…"; }, 4000);
+  const ctl = new AbortController(); const kill = setTimeout(() => ctl.abort(), 20000);
   const items = Object.entries(BASKET).map(([id, qty]) => ({ id, qty }));
   try {
-    const r = await fetch(url("/api/cart"), { method: "POST", headers: { "Content-Type": "application/json", "X-Device": DEV }, body: JSON.stringify({ name, items }) });
+    const r = await fetch(url("/api/cart"), { method: "POST", headers: { "Content-Type": "application/json", "X-Device": DEV }, body: JSON.stringify({ name, items }), signal: ctl.signal });
+    clearTimeout(slow); clearTimeout(kill);
     const j = await r.json();
     if (!r.ok || j.error) { err.textContent = j.error || "That did not go through. Try once more."; btn.disabled = false; btn.textContent = "Reserve my basket"; return; }
     const mine = store.get("mine", []).filter(m => m.day === new Date().toISOString().slice(0, 10));
@@ -573,7 +604,7 @@ async function reserve(name, btn, err) {
     document.querySelectorAll(".card.inbasket").forEach(c => { c.classList.remove("inbasket"); const it = byId()[c.dataset.id]; if (it) c.lastElementChild.replaceWith(control(it)); });
     paintBar();
     ticket(j, name);
-  } catch { err.textContent = "The counter is not reachable just now. Your basket is kept on this phone, try again in a little while."; btn.disabled = false; btn.textContent = "Reserve my basket"; }
+  } catch { clearTimeout(slow); clearTimeout(kill); err.textContent = "The counter did not answer in time. Your basket is kept on this phone, try again in a little while."; btn.disabled = false; btn.textContent = "Reserve my basket"; }
 }
 
 function ticket(j, name) {
