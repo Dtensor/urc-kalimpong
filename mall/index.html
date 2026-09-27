@@ -84,11 +84,12 @@ button{cursor:pointer}
 .btn.warm{background:var(--warm);color:#fff;border-color:var(--warm)}
 .btn:disabled{opacity:.5;cursor:default}
 /* trolley */
-#trolley{position:fixed;right:16px;bottom:calc(64px + env(safe-area-inset-bottom));z-index:4;display:flex;align-items:center;gap:10px;border-radius:16px;padding:10px 14px}
+#trolley{position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:4;display:flex;align-items:center;gap:10px;border-radius:16px;padding:10px 14px}
 #trolley b{font:600 18px var(--display)}
 #trolley small{display:block;font-size:11.5px;color:var(--muted);line-height:1.1}
 #trolley .n{position:absolute;top:-6px;left:-6px;min-width:22px;height:22px;border-radius:11px;background:var(--warm);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 5px}
 #trolley.bump{animation:bump .45s}
+#credit{position:fixed;right:18px;bottom:calc(60px + env(safe-area-inset-bottom));z-index:3;font-size:10.5px;letter-spacing:.02em;color:var(--muted);opacity:.78;pointer-events:none;text-shadow:0 1px 2px rgba(255,255,255,.7)}
 @keyframes bump{30%{transform:scale(1.12)}}
 .fly{position:fixed;z-index:30;width:64px;height:64px;object-fit:contain;pointer-events:none;transition:transform .7s cubic-bezier(.5,-.3,.7,1),opacity .7s}
 /* hand overlay */
@@ -173,6 +174,7 @@ button{cursor:pointer}
   #where{top:70px;left:10px;padding:8px 12px}
   #where b{font-size:16px}
   #trolley{right:10px}
+  #credit{right:12px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -192,6 +194,7 @@ button{cursor:pointer}
 <div id="ret"></div>
 <div id="gaze" class="glass" hidden></div>
 <div id="map" class="glass" role="button" aria-label="Map of the canteen. Tap to enlarge; tap a wing to go there."><canvas id="mapc" width="360" height="360"></canvas><div class="cap">Tap a wing to walk there · tap outside to close</div></div>
+<div id="credit">E Mall Developed by Naveen</div>
 <button id="trolley" class="glass" aria-label="Open your trolley"><span class="n" id="tn">0</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><span><b id="tt">₹0</b><small>Your trolley</small></span></button>
 <nav id="wings" aria-label="Wings"></nav>
 <div id="stick" class="glass" aria-hidden="true"><i></i></div>
@@ -704,7 +707,33 @@ function hubDome(R) {
   const dome = new THREE.Mesh(new THREE.SphereGeometry(R + .3, COARSE ? 32 : 64, COARSE ? 12 : 20, 0, 6.283, 0, Math.PI / 2), new THREE.MeshBasicMaterial({ map: ctex(PAINT.dome(), [16, 1]), side: THREE.BackSide, fog: false }));
   dome.scale.y = .4; dome.position.y = HW - .1; scene.add(dome);
   const gilt = new THREE.MeshLambertMaterial({ color: "#d4a849", emissive: "#4a3610" });
-  const foot = new THREE.Mesh(new THREE.TorusGeometry(R + .12, .16, 6, COARSE ? 48 : 96), gilt); foot.rotation.x = Math.PI / 2; foot.position.y = HW - .05; scene.add(foot);
+  // the canteen's name, lettered in gilt on a drum round the foot of the dome. Four times
+  // round, one centred on the north wing, so it faces you from the doors and from anywhere after.
+  const nm = cvs(4096, 232, (g, W, H) => {
+    g.fillStyle = "#173f5c"; g.fillRect(0, 0, W, H);
+    for (const y of [0, H - 18]) { g.fillStyle = "#d4a849"; g.fillRect(0, y, W, 18); g.fillStyle = "#fff4d6"; for (let x = 9; x < W; x += 18) { g.beginPath(); g.arc(x, y + 9, 3.5, 0, 7); g.fill(); } }
+    g.fillStyle = "#c2571f"; g.fillRect(0, 22, W, 4); g.fillRect(0, H - 26, W, 4);
+    const t = "STATION CANTEEN  KALIMPONG"; g.font = `600 132px Fraunces, Georgia, serif`;
+    if ("letterSpacing" in g) g.letterSpacing = "10px";
+    const tw = g.measureText(t).width; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = "rgba(0,0,0,.45)"; g.fillText(t, W / 2 + 3, H / 2 + 6);
+    const gold = g.createLinearGradient(0, 50, 0, 180); gold.addColorStop(0, "#fbe3a0"); gold.addColorStop(.5, "#e0b24e"); gold.addColorStop(1, "#b8862f");
+    g.fillStyle = gold; g.fillText(t, W / 2, H / 2 + 3);
+    for (const d of [-1, 1]) {
+      lotus(g, W / 2 + d * (tw / 2 + 110), H / 2, 70, "#e0b24e", "#c2571f", "#fff4d6");
+      g.fillStyle = "#d4a849";
+      for (let x = W / 2 + d * (tw / 2 + 220), k = 0; d > 0 ? x < W - 40 : x > 40; x += d * 64, k++) {
+        const r = k % 2 ? 9 : 15; g.beginPath(); g.moveTo(x, H / 2 - r); g.lineTo(x + r * .8, H / 2); g.lineTo(x, H / 2 + r); g.lineTo(x - r * .8, H / 2); g.fill();
+      }
+    }
+    lotus(g, 0, H / 2, 44, "#f2b230", "#1f6f6a", "#fff4d6"); lotus(g, W, H / 2, 44, "#f2b230", "#1f6f6a", "#fff4d6");
+  });
+  const drumGeo = new THREE.CylinderGeometry(R - .5, R - .02, 1.3, COARSE ? 64 : 128, 1, true), duv = drumGeo.attributes.uv;
+  for (let i = 0; i < duv.count; i++) duv.setX(i, (1 - duv.getX(i)) * 4 + .5);
+  const drum = new THREE.Mesh(drumGeo, new THREE.MeshBasicMaterial({ map: ctex(nm, [1, 1]), side: THREE.BackSide, fog: false }));
+  // tapered to stay inside the dome's curve
+  drum.position.y = HW + .65; scene.add(drum);
+  const foot = new THREE.Mesh(new THREE.TorusGeometry(R - .48, .12, 6, COARSE ? 48 : 96), gilt); foot.rotation.x = Math.PI / 2; foot.position.y = HW + 1.3; scene.add(foot);
   const eye = new THREE.Mesh(new THREE.TorusGeometry(1.85, .12, 6, 32), gilt); eye.rotation.x = Math.PI / 2; eye.position.y = HW + h - .3; scene.add(eye);
   // oculus: the light that makes the hall feel like a hall
   plane(M.light, 3.4, 3.4, 0, HW + h - .12, 0, 0, Math.PI / 2);
