@@ -326,6 +326,43 @@ const DIRW = ["north", "north-east", "east", "south-east", "south", "south-west"
 const dirWord = (phi) => DIRW[Math.round(((phi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) / (Math.PI / 4)) % 8];
 const angDiff = (a, b) => Math.abs(((a - b + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI);
 
+/* Shelving hugs the three walls so the whole wing reads from its doorway: the
+   back wall first (it faces you), then the two sides. Only a wing whose stock
+   will not fit on its walls gets one island, running away from the doors so it
+   hides no more than a strip of the back wall; it is low, so you see over it
+   to the wall behind. Runs are in their own frames:
+   u along the shelf, v out from it. */
+const WALLD = .5, SIDE0 = .6;
+function wallRuns(W, D, isl) {
+  const hw = W / 2, side = D - .7 - SIDE0, r = [
+    { k: "back", u0: -(hw - .2), L: W - .4 },
+    { k: "right", u0: SIDE0, L: side }, { k: "left", u0: SIDE0, L: side },
+  ];
+  if (isl) { const u0 = SIDE0 + 2.4, L = D - .7 - 2.2 - u0; if (L > 1.5) r.push({ k: "isl", n: 1, u0, L }, { k: "isl", n: -1, u0, L }); }
+  return r;
+}
+const lowTiers = (tiers) => { const t = tiers.filter(y => y < 1); return t.length ? t : tiers.slice(0, 1); };
+function wingSize(need, slot, tiers) {
+  let best = null;
+  for (const isl of [0, 1]) for (let W = isl ? 9 : 6; W <= 12; W += .5) for (let D = 6; D <= Math.max(7, W * 1.35); D += .5) {
+    const runs = wallRuns(W, D, isl);
+    if (runs.reduce((t, r) => t + Math.floor(r.L / slot) * (r.k === "isl" ? lowTiers(tiers) : tiers).length, 0) < need) continue;
+    // wide and shallow reads best from the doors, but every metre of width widens the hall
+    const score = W * 1.1 + D + isl * 10;
+    if (!best || score < best.score) best = { W, D, runs, score };
+  }
+  return best || { W: 12, D: 16, runs: wallRuns(12, 16, 1) };
+}
+function runFace(w, r) {
+  const hw = w.hw;
+  if (r.k === "back") {
+    const fr = makeFrame(w.phi + Math.PI / 2, 0); [fr.px, fr.pz] = toW(w, w.D, 0);
+    return { ...r, fr, n: 1, vf: .15 + WALLD, vg: .2, wall: 1 };
+  }
+  if (r.k === "right") return { ...r, fr: w, n: -1, vf: hw - .15 - WALLD, vg: hw - .2, wall: 1 };
+  if (r.k === "left") return { ...r, fr: w, n: 1, vf: -(hw - .15 - WALLD), vg: -(hw - .2), wall: 1 };
+  return { ...r, fr: w, vf: r.n * .45, vg: 0 };
+}
 function brandKey(n) { const w = n.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(Boolean); return (w[w.length - 1] || "") + " " + n.toLowerCase(); }
 function layout() {
   DATA.categories.forEach(c => CATS.set(c.id, c));
@@ -339,14 +376,11 @@ function layout() {
     const g = DATA.groups.find(x => x.id === gid); const list = byGroup[gid] || []; if (!g || !list.length) continue;
     const st = WING_STYLE[gid] || { col: "#5b6470" }; const slot = st.slot || .3, tiers = st.tiers || [.42, .84, 1.26, 1.68];
     const cats = DATA.categories.filter(c => c.group === gid).map(c => ({ c, items: list.filter(i => i.category === c.id).sort((a, b) => brandKey(a.name) < brandKey(b.name) ? -1 : 1) })).filter(x => x.items.length);
-    const cols = cats.reduce((s, x) => s + Math.ceil(x.items.length / tiers.length), 0);
-    const L = Math.min(11, Math.max(4, Math.ceil(cols / 2 * slot))), perFace = Math.floor(L / slot);
-    // gondola count so the columns fit with categories starting clean
-    let faces = 0, used = perFace;
-    for (const x of cats) { let n = Math.ceil(x.items.length / tiers.length); while (n > 0) { if (used >= perFace) { faces++; used = 0; } const take = Math.min(n, perFace - used); used += take; n -= take; } }
-    const nG = Math.max(1, Math.ceil(faces / 2));
-    const W = 2 * 2.3 + (nG - 1) * GAP, D = FRONT + L + BACK;
-    slots.push({ id: gid, g, st, slot, tiers, L, perFace, nG, cats, items: list, W, D, hw: W / 2, col: st.col });
+    // the most photographed categories go first, onto the back wall that faces the doors
+    const shot = (x) => x.items.filter(i => i.img).length / x.items.length;
+    cats.sort((a, b) => shot(b) - shot(a));
+    const { W, D, runs } = wingSize(list.length + cats.length * tiers.length, slot, tiers);
+    slots.push({ id: gid, g, st, slot, tiers, cats, items: list, W, D, runs, hw: W / 2, col: st.col });
   }
   // The hall is only as wide as it must be: grow it until every stretch of
   // wall left between two shopfronts is worth standing in front of.
@@ -391,26 +425,44 @@ function layout() {
     ZONES.push({ f: w, u0: -1.2, u1: 1.2, v0: -w.dh, v1: w.dh, mu: 0, mv: 1 });
     // shopfront glass either side of the opening
     for (const sgn of [1, -1]) OBST.push({ f: w, u0: -.15, u1: .15, v0: Math.min(sgn * w.dh, sgn * w.hw), v1: Math.max(sgn * w.dh, sgn * w.hw) });
-    // gondolas + the items on them
-    let face = 0, col = 0;
-    const faceAt = (fi) => { const gi = fi >> 1, vg = w.hw - 2.3 - gi * GAP, nn = fi % 2 ? -1 : 1; return { gi, vg, n: nn, vf: vg + nn * .45 }; };
-    w.faces = [];
-    for (let i = 0; i < w.nG; i++) { const vg = w.hw - 2.3 - i * GAP; OBST.push({ f: w, u0: FRONT - .15, u1: FRONT + w.L + .15, v0: vg - .5, v1: vg + .5 }); }
+    // wall runs + the items on them
+    w.faces = w.runs.map(r => ({ ...runFace(w, r), w, perFace: Math.floor(r.L / w.slot), tiers: r.k === "isl" ? lowTiers(w.tiers) : w.tiers, cols: [], cats: [] }));
+    w.isl = w.faces.find(f => !f.wall) || null;
+    for (const f of w.faces) {
+      if (f.wall) { const a = f.vf, b = f.vf - f.n * (WALLD + .15); OBST.push({ f: f.fr, u0: f.u0 - .1, u1: f.u0 + f.L + .1, v0: Math.min(a, b), v1: Math.max(a, b) }); }
+      else if (f.n > 0) OBST.push({ f: w, u0: f.u0 - .15, u1: f.u0 + f.L + .15, v0: -.5, v1: .5 });
+    }
+    // Photographed packs first, and within each run of columns the rows nearest
+    // the eye fill first, so pictures sit at eye level and the rest go high, low
+    // or onto the island.
+    // Spread the stock over the walls by length, so no wall stands empty while
+    // another is packed; the island only takes what the walls cannot.
+    const need = w.cats.reduce((a, x) => a + Math.ceil(x.items.length / w.tiers.length), 0);
+    const walls = w.faces.filter(f => f.wall), room = walls.reduce((a, f) => a + f.perFace, 0);
+    for (const f of w.faces) f.cap = f.wall && need < room && f !== walls[walls.length - 1] ? Math.min(f.perFace, Math.ceil(need * f.perFace / room)) : f.perFace;
+    const plan = []; let fi = 0, col = 0;
     for (const x of w.cats) {
-      let k = 0; const ncol = Math.ceil(x.items.length / w.tiers.length);
-      for (let c = 0; c < ncol; c++) {
-        if (col >= w.perFace) { face++; col = 0; }
-        const F = faceAt(face); if (!w.faces[face]) w.faces[face] = { ...F, w, cols: [], cats: [] };
-        const fc = w.faces[face]; if (c === 0 || col === 0) fc.cats.push({ c: x.c, from: col });
-        const u = FRONT + (col + .5) * w.slot;
-        const colItems = [];
-        for (let t = 0; t < w.tiers.length && k < x.items.length; t++, k++) {
-          const it = x.items[k];
-          const v = { it, w, face: fc, u, y: w.tiers[t], t, vf: F.vf, vg: F.vg, n: F.n, shape: shapeOf(it.category), h: hash(it.id) };
-          ITEMS.push(v); BYID.set(it.id, v); colItems.push(v);
-        }
-        fc.cols[col] = colItems; col++;
+      const its = x.items.slice().sort((a, b) => !!b.img - !!a.img); let k = 0, first = true;
+      while (k < its.length) {
+        if (col >= w.faces[fi].cap && fi < w.faces.length - 1) { fi++; col = 0; }
+        const fc = w.faces[fi], T = fc.tiers, rows = T.map((y, t) => t).sort((a, b) => Math.abs(T[a] - 1.2) - Math.abs(T[b] - 1.2));
+        const nc = Math.max(1, Math.min(Math.ceil((its.length - k) / T.length), fc.cap - col)), grid = Array.from({ length: nc }, () => []);
+        for (const t of rows) for (let c = 0; c < nc && k < its.length; c++) grid[c][t] = its[k++];
+        if (first || col === 0) fc.cats.push({ c: x.c, from: col }); first = false;
+        for (const g of grid) plan.push({ fc, col: col++, g });
       }
+    }
+    // a wall that is not full keeps its stock where the doorway sees it: the
+    // back wall in the middle, straight ahead; a side wall at its far end
+    for (const f of w.faces) { const used = plan.filter(q => q.fc === f).length; f.off = f.k === "back" ? Math.floor((f.perFace - used) / 2) : f.wall ? f.perFace - used : 0; }
+    for (const { fc, col: c, g } of plan) {
+      const u = fc.u0 + (c + fc.off + .5) * w.slot, colItems = [];
+      g.forEach((it, t) => {
+        if (!it) return;
+        const v = { it, w, face: fc, fr: fc.fr, u, y: fc.tiers[t], t, vf: fc.vf, vg: fc.vg, n: fc.n, shape: shapeOf(it.category), h: hash(it.id) };
+        ITEMS.push(v); BYID.set(it.id, v); colItems[t] = v;
+      });
+      fc.cols[c + fc.off] = colItems;
     }
   }
   // ---- what stands in the middle of the hall, and against its wall
@@ -840,7 +892,7 @@ function wingTile(col) {
   });
 }
 function buildWing(w) {
-  const hw = w.hw, W = hw * 2, D = w.D, L = w.L, cellar = w.st.cellar;
+  const hw = w.hw, W = hw * 2, D = w.D, cellar = w.st.cellar;
   const wallC = cellar ? "#433026" : tint(w.col, .76), dadoC = cellar ? "#2f211a" : tint(w.col, .38), ceil = cellar ? "#31231c" : tint(w.col, .88);
   const floorMat = new THREE.MeshLambertMaterial({
     map: cellar ? (() => { const t = TX.wood.clone(); t.needsUpdate = true; t.repeat.set(D / 2.6, W / 2.6); return t; })() : ctex(wingTile(w.col), [Math.max(1, Math.round(D / 2.4)), Math.max(1, Math.round(W / 2.4))]),
@@ -859,8 +911,6 @@ function buildWing(w) {
       lbox(w, 0, .3, (a + b) / 2, .3, .6, b - a, "#2e3338"); lplane(w, M.glass, b - a, 2.7, 0, 1.95, (a + b) / 2, Math.PI / 2);
       lbox(w, 0, 3.55, (a + b) / 2, .3, .5, b - a, "#2e3338");
     }
-    // a pot in each back corner
-    const [px, pz] = toW(w, D - .9, sgn * (hw - .9)); if (!cellar) pot(px, pz, { kind: "urn", col: tint(w.col, .25), s: 1.05, plant: "bush", leaf: "#40733c" });
   }
   lbox(w, 0, 3.95, 0, .3, .3, W, "#2e3338");
   // wallpaper above the dado, a crown moulding, and beams that coffer the ceiling round the lights
@@ -885,31 +935,41 @@ function buildWing(w) {
     if (cellar) { lplane(w, M.glow, 3, 3, k * 3, .02, v, 0, -Math.PI / 2); lbox(w, k * 3, 3.4, v, .25, .25, .25, "#f4c46a"); }
     else lplane(w, M.light, 1.6, .5, k * 3, WALLH - .01, v, 0, Math.PI / 2);
   }
-  // gondolas, running away from the hall so you look straight down them
+  // shelving against the walls, and the island when there is one
   const body = cellar ? "#6a4630" : w.st.counter ? "#2f2a24" : "#f5f2ec", edge = w.st.counter ? "#e9dcc0" : w.col;
-  for (let i = 0; i < w.nG; i++) {
-    const vg = hw - 2.3 - i * GAP, cu = FRONT + L / 2;
+  for (const f of w.faces) {
+    if (!f.wall && f.n < 0) continue;
+    if (!f.cols.some(Boolean) && !(f.wall ? 0 : w.faces.some(o => !o.wall && o !== f && o.cols.some(Boolean)))) continue;   // nothing on it: leave the floor open
+    // a wall is shelved only as far as its stock runs, so no empty bays
+    const a0 = f.wall ? f.u0 + f.off * w.slot - .05 : f.u0, L = f.wall ? (f.cols.length - f.off) * w.slot + .1 : f.L;
+    const top = f.tiers[f.tiers.length - 1] + .45, fr = f.fr, cu = a0 + L / 2, dp = f.wall ? WALLD : .9, vc = f.wall ? f.vf - f.n * WALLD / 2 : 0;
     if (w.st.counter) {
-      lbox(w, cu, .5, vg, L, 1, .9, body); lplane(w, M.glass, L, .5, cu, 1.3, vg + .45, 0); lplane(w, M.glass, L, .5, cu, 1.3, vg - .45, Math.PI); lbox(w, cu, 1.56, vg, L, .03, .9, "#dfe9ec");
+      lbox(fr, cu, .5, vc, L, 1, dp, body); lbox(fr, cu, 1.56, vc, L, .03, dp, "#dfe9ec");
+      for (const nn of f.wall ? [f.n] : [1, -1]) lplane(fr, M.glass, L, .5, cu, 1.3, vc + nn * dp / 2, nn > 0 ? 0 : Math.PI);
       continue;
     }
-    const top = w.tiers[w.tiers.length - 1] + .45;
-    lbox(w, cu, top / 2, vg, L, top, .12, body);                                          // spine
-    lbox(w, cu, .06, vg, L, .12, .9, "#3a3f45");                                          // kick plate
-    for (const y of w.tiers) { lbox(w, cu, y - .02, vg, L, .04, .9, body); lbox(w, cu, y - .05, vg + .45, L, .06, .02, edge); lbox(w, cu, y - .05, vg - .45, L, .06, .02, edge); }
-    for (let k = 0; k <= Math.round(L / 1.2); k++) lbox(w, FRONT + Math.min(L, k * 1.2), top / 2, vg, .06, top, .9, "#c9c3b7");
-    lbox(w, FRONT - .03, top / 2, vg, .06, top, .9, w.col);                               // end cap on the aisle
+    if (f.wall) lbox(fr, cu, top / 2, f.vf - f.n * (WALLD - .03), L, top, .06, body);   // back panel
+    else lbox(fr, cu, top / 2, 0, L, top, .12, body);                                  // spine
+    lbox(fr, cu, .06, vc, L, .12, dp, "#3a3f45");                                       // kick plate
+    for (const y of f.tiers) {
+      lbox(fr, cu, y - .02, vc, L, .04, dp, body);
+      for (const nn of f.wall ? [f.n] : [1, -1]) lbox(fr, cu, y - .05, vc + nn * dp / 2, L, .06, .02, edge);
+    }
+    for (let k = 0; k <= Math.round(L / 1.2); k++) lbox(fr, a0 + Math.min(L, k * 1.2), top / 2, vc, .06, top, dp, "#c9c3b7");
+    lbox(fr, cu, top + .04, vc, L + .06, .08, dp + .04, w.col);                         // cornice in the wing's colour
+    if (!f.wall) for (const e of [f.u0 - .03, f.u0 + L + .03]) lbox(fr, e, top / 2, 0, .06, top, .9, w.col);   // end caps
   }
   // category signs hanging over each run
   for (const f of w.faces) if (f) f.cats.forEach((cc, j) => {
-    const next = f.cats[j + 1] ? f.cats[j + 1].from : f.cols.length; const span = Math.max(1, next - cc.from) * w.slot;
-    const u = FRONT + cc.from * w.slot + span / 2, wd = Math.min(span - .05, 3.2);
+    const next = f.cats[j + 1] ? f.cats[j + 1].from : f.cols.length - f.off; const span = Math.max(1, next - cc.from) * w.slot;
+    const u = f.u0 + (cc.from + f.off) * w.slot + span / 2, wd = Math.min(span - .05, 3.2);
     if (wd < .5) return;
-    lplane(w, sign(cc.c.label, null, cellar ? "#2b1a14" : "#fff", wd, .32, { ink: cellar ? "#f3d9a4" : w.col }), wd, .32, u, w.tiers[w.tiers.length - 1] + .75, f.vf + f.n * .02, f.n > 0 ? 0 : Math.PI);
+    const ty = f.tiers[f.tiers.length - 1] + .45;
+    lplane(f.fr, sign(cc.c.label, null, cellar ? "#2b1a14" : "#fff", wd, .32, { ink: cellar ? "#f3d9a4" : w.col }), wd, .32, u, f.wall ? ty + .42 : ty + .22, f.wall ? f.vf - f.n * .2 : f.vf + f.n * .01, f.n > 0 ? 0 : Math.PI);
   });
   // posters: never in the liquor wing
   if (!cellar) wingAds(w);
-  else lplane(w, sign("Liquor is issued against your entitlement card.", "Please bring your card. No advertising in this wing.", "#2b1a14", 4, 1.2, { ink: "#f3d9a4" }), 4, 1.2, D - .17, 2.4, 0, IN);
+  else lplane(w, sign("Liquor is issued against your entitlement card.", "Please bring your card. No advertising in this wing.", "#2b1a14", 3.6, .5, { ink: "#f3d9a4" }), 3.6, .5, D - .3, 3.82, 0, IN);   // in the frieze, clear of the category signs
 }
 
 /* ---------- ads: our own data, never brands' money ---------- */
@@ -942,14 +1002,11 @@ function adFor(w) {
   return picks;
 }
 function wingAds(w) {
-  const hw = w.hw, vg = Array.from({ length: w.nG }, (_, i) => hw - 2.3 - i * GAP);
-  // the middle of every aisle: between gondolas, and between the outer ones and the walls
-  const aisles = [(vg[0] + .45 + hw) / 2, ...vg.slice(1).map((v, i) => (v + vg[i]) / 2), (vg[vg.length - 1] - .45 - hw) / 2];
-  aisles.sort((a, b) => Math.abs(a) - Math.abs(b));
-  // one on the back wall at the end of each aisle, facing the way you came in
-  adFor(w).slice(0, Math.min(3, aisles.length)).forEach((p, i) => {
+  // up on the back wall above the shelving, facing the way you came in
+  const q = w.hw / 2, spots = w.hw > 3.4 ? [0, q, -q] : [0];
+  adFor(w).slice(0, spots.length).forEach((p, i) => {
     const c = adCanvas(p[0], p[1], p[2], w.col), mat = new THREE.MeshBasicMaterial({ map: ctex(c), transparent: true });
-    const m = lplane(w, mat, 1.1, 1.55, w.D - .22, 2.55, aisles[i], IN);
+    const m = lplane(w, mat, .98, 1.38, w.D - .22, 3.36, spots[i], IN);
     const ad = { mesh: m, c, it: p[1], mat }; ADS.push(ad); gated(m); PICKABLE.push({ mesh: m, act: () => visitItem(BYID.get(p[1].id)) });
   });
 }
@@ -1142,7 +1199,7 @@ const DIMS = { box: [.2, .26, .14], bottle: [.09, .3, .09], can: [.08, .15, .08]
 let IBox, ICyl, IHit, ILow;
 const _o = new THREE.Object3D(), _c = new THREE.Color();
 // every product lives in its wing's frame: u along the shelf run, v across it
-const at = (v, k) => toW(v.w, v.u, v.vf + v.n * k);
+const at = (v, k) => toW(v.fr, v.u, v.vf + v.n * k);
 function dimsOf(v) {
   const d = DIMS[v.shape].slice(), w = v.w; const k = .8 + v.h * .4;
   if (w.id === "g7") { d[0] = .5; d[1] = .7 * k; d[2] = .45; }
@@ -1161,9 +1218,9 @@ function products() {
     if (v.shape === "bottle" || v.shape === "can") { v.mesh = ICyl; v.k = ci++; } else { v.mesh = IBox; v.k = bi++; }
     const base = new THREE.Color(v.w.col); base.lerp(new THREE.Color(v.h > .5 ? "#ffffff" : "#222222"), Math.abs(v.h - .5) * .7);
     v.mesh.setColorAt(v.k, base);
-    v.ry = v.w.ry + (v.n > 0 ? 0 : Math.PI);
+    v.ry = v.fr.ry + (v.n > 0 ? 0 : Math.PI);
     [v.x, v.z] = at(v, v.d[2] / 2 + .02); v.yc = v.y + v.d[1] / 2;
-    [v.vx, v.vz] = toW(v.w, v.u, v.vg + v.n * 1.6);                                       // where you stand to look at it
+    [v.vx, v.vz] = toW(v.fr, v.u, v.vg + v.n * 1.6);                                       // where you stand to look at it
     _o.position.set(v.x, v.yc, v.z); _o.rotation.set(0, v.ry, 0); _o.scale.set(v.d[0], v.d[1], v.d[2]); _o.updateMatrix(); IHit.setMatrixAt(i, _o.matrix);
   });
   scene.add(IBox, ICyl, IHit, ILow);
@@ -1253,26 +1310,26 @@ const strips = new Map();
 function streamStrips() {
   for (const w of WINGS) for (const f of w.faces) {
     if (!f) continue;
-    const [pu, pv] = toL(w, pos.x, pos.z), d = Math.hypot(Math.max(0, Math.abs(pu - (FRONT + w.L / 2)) - w.L / 2), pv - f.vf);
+    const [pu, pv] = toL(f.fr, pos.x, pos.z), d = Math.hypot(Math.max(0, Math.abs(pu - (f.u0 + f.L / 2)) - f.L / 2), pv - f.vf);
     const want = d < (COARSE ? 6 : 9);
     if (want && !strips.has(f)) strips.set(f, makeStrip(f));
     else if (!want && strips.has(f)) { const g = strips.get(f); g.children.forEach(m => { m.material.map.dispose(); m.material.dispose(); }); scene.remove(g); strips.delete(f); }
   }
 }
 function makeStrip(f) {
-  const w = f.w, n = w.perFace, SH = .045, H = 34, px = Math.min(Math.round(H * w.slot / SH), Math.floor(4096 / n)), grp = new THREE.Group();
-  w.tiers.forEach((y, t) => {
+  const w = f.w, o = f.off || 0, n = Math.max(1, f.cols.length - o), SH = .045, H = 34, px = Math.min(Math.round(H * w.slot / SH), Math.floor(4096 / n)), grp = new THREE.Group();
+  f.tiers.forEach((y, t) => {
     const c = cvs(n * px, H, (g, W) => {
       g.fillStyle = w.st.cellar ? "#1d130f" : "#fffdf8"; g.fillRect(0, 0, W, H); g.textAlign = "center"; g.textBaseline = "middle";
-      f.cols.forEach((col, ci) => { const v = col && col[t]; if (!v) return; const x = f.n > 0 ? ci : n - 1 - ci;
+      f.cols.forEach((col, ci) => { const v = col && col[t]; if (!v) return; const x = f.n > 0 ? ci - o : n - 1 - (ci - o);
         g.fillStyle = v.gone ? "#999" : v.it.qty != null && v.it.qty <= 5 ? "#c62d22" : w.st.cellar ? "#f3d9a4" : "#1d1e21";
         fitText(g, v.gone ? "sold out" : money(v.it.price), px - 8, 24, 700); g.fillText(v.gone ? "sold out" : money(v.it.price), x * px + px / 2, H / 2);
         g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(x * px, 6, 1, H - 12); });
     });
     const t2 = ctex(c); t2.anisotropy = Math.min(8, MAXANISO);
     const m = new THREE.Mesh(PLANE, new THREE.MeshBasicMaterial({ map: t2 }));
-    const [sx, sz] = toW(w, FRONT + n * w.slot / 2, f.vf + f.n * .014);
-    m.scale.set(n * w.slot, .045, 1); m.position.set(sx, y - .05, sz); m.rotation.y = w.ry + (f.n > 0 ? 0 : Math.PI); grp.add(m);
+    const [sx, sz] = toW(f.fr, f.u0 + (o + n / 2) * w.slot, f.vf + f.n * .014);   // only as long as the stocked run
+    m.scale.set(n * w.slot, .045, 1); m.position.set(sx, y - .05, sz); m.rotation.y = f.fr.ry + (f.n > 0 ? 0 : Math.PI); grp.add(m);
   });
   scene.add(grp); return grp;
 }
@@ -1311,14 +1368,28 @@ function hubPath(pts) {
   }
   return out;
 }
+// the way round a wing's island, if a straight walk from (pu,pv) to (tu,tv) would cross it
+function skirt(w, pu, pv, tu, tv) {
+  const I = w.isl; if (!I) return [];
+  const a = I.u0 - .45, b = I.u0 + I.L + .45, crosses = () => {
+    for (let k = 0; k <= 24; k++) { const u = pu + (tu - pu) * k / 24, v = pv + (tv - pv) * k / 24; if (u > a && u < b && Math.abs(v) < .85) return true; }
+    return false;
+  };
+  if (!crosses()) return [];
+  const s = Math.sign(pv + tv) || 1, sv = s * 1.6, fore = I.u0 - .7, aft = I.u0 + I.L + .8, out = [];
+  const near = (u) => Math.abs(u - fore) < Math.abs(u - aft) ? fore : aft;
+  out.push(toW(w, near(pu), sv)); const e = near(tu); if (e !== near(pu)) out.push(toW(w, e, sv));
+  return out;
+}
 function route(tx, tz) {
   const a = zoneAt(pos.x, pos.z), b = zoneAt(tx, tz), pts = [];
   const aisle = (w, v) => toW(w, 1.3, Math.max(-w.dh + .5, Math.min(w.dh - .5, v)));
-  if (a && a !== b) { const [, pv] = toL(a, pos.x, pos.z); pts.push(aisle(a, pv)); pts.push(toW(a, -1.8, 0)); }
-  if (b && a !== b) { const [, tv] = toL(b, tx, tz); pts.push(toW(b, -1.8, 0)); pts.push(aisle(b, 0)); pts.push(aisle(b, tv)); }
+  const lim = (w, v) => Math.max(-w.dh + .5, Math.min(w.dh - .5, v));
+  if (a && a !== b) { const [pu, pv] = toL(a, pos.x, pos.z); pts.push(...skirt(a, pu, pv, 1.3, lim(a, pv))); pts.push(aisle(a, pv)); pts.push(toW(a, -1.8, 0)); }
+  if (b && a !== b) { const [tu, tv] = toL(b, tx, tz); pts.push(toW(b, -1.8, 0)); pts.push(aisle(b, 0)); pts.push(aisle(b, tv)); pts.push(...skirt(b, 1.3, lim(b, tv), tu, tv)); }
   else if (b && a === b) {
-    const [pu, pv] = toL(b, pos.x, pos.z), [, tv] = toL(b, tx, tz);
-    if (Math.abs(pv - tv) > 1.2 && pu > FRONT * .7) { pts.push(aisle(b, pv)); pts.push(aisle(b, tv)); }
+    const [pu, pv] = toL(b, pos.x, pos.z), [tu, tv] = toL(b, tx, tz);
+    pts.push(...skirt(b, pu, pv, tu, tv));
   }
   pts.push([tx, tz]); return hubPath(pts);
 }
@@ -1419,9 +1490,10 @@ function animateLift(dt) {
   const wob = RM ? 0 : Math.sin(performance.now() / 500) * .06 * e;
   if (v.photo && !v.isLabel) { const [hx, hz] = at(v, .1 + .28 * e); v.photo.visible = true; v.photo.scale.set(v.pw * (1 + .55 * e), v.ph * (1 + .55 * e), 1); v.photo.position.set(hx, v.photoY + .1 * e, hz); v.photo.rotation.y = v.ry + wob; }
   else {
-    if (v.photo) { const k = 1 + .5 * e; v.photo.scale.set(v.pw * k, v.ph * k, 1); v.photo.rotation.y = (v.n > 0 ? 0 : Math.PI) + wob;
-      v.photo.position.set(v.x + Math.sin(wob) * v.n * v.d[2] * k / 2, v.yc + .1 * e + (v.photoY - v.yc) * k, v.z + v.n * (.28 * e + Math.cos(wob) * v.d[2] * k / 2 + .003)); }
-    _o.position.set(v.x, v.yc + .1 * e, v.z + v.n * .28 * e); _o.rotation.set(0, wob, 0); _o.scale.set(v.d[0] * (1 + .5 * e), v.d[1] * (1 + .5 * e), v.d[2] * (1 + .5 * e)); _o.updateMatrix(); v.mesh.setMatrixAt(v.k, _o.matrix); v.mesh.instanceMatrix.needsUpdate = true; }
+    const [bx, bz] = at(v, v.d[2] / 2 + .02 + .28 * e);
+    if (v.photo) { const k = 1 + .5 * e, [fx, fz] = at(v, v.d[2] / 2 + .02 + .28 * e + v.d[2] * k / 2 + .003); v.photo.scale.set(v.pw * k, v.ph * k, 1); v.photo.rotation.y = v.ry + wob;
+      v.photo.position.set(fx, v.yc + .1 * e + (v.photoY - v.yc) * k, fz); }
+    _o.position.set(bx, v.yc + .1 * e, bz); _o.rotation.set(0, v.ry + wob, 0); _o.scale.set(v.d[0] * (1 + .5 * e), v.d[1] * (1 + .5 * e), v.d[2] * (1 + .5 * e)); _o.updateMatrix(); v.mesh.setMatrixAt(v.k, _o.matrix); v.mesh.instanceMatrix.needsUpdate = true; }
 }
 
 /* ================================================================ picking + input */
@@ -1583,7 +1655,7 @@ function visitItem(v, { pick = false } = {}) {
 }
 // Arrive in the first aisle, just inside the shopfront, looking straight down the shelves.
 // arrive in an aisle between two gondola runs where there is one, so you look down shelves, not a blank side wall
-function goWing(w) { closeHold(); setMap(false); const v = w.nG > 1 ? w.hw - 2.3 - GAP / 2 : w.hw - .95; const [x, z] = toW(w, 1.0, v); teleport(x, z, faceYaw(w.ox, w.oz), -.08); }
+function goWing(w) { closeHold(); setMap(false); const [x, z] = toW(w, 1.0, 0); teleport(x, z, faceYaw(w.ox, w.oz), -.08); }
 function goHall() { closeHold(); setMap(false); teleport(0, HUB_R - 3.2, 0, -.06); }
 
 /* ================================================================ basket */
@@ -1731,7 +1803,7 @@ function drawMap() {
     mg.font = `600 ${Math.max(11, k * 2.2)}px Fraunces, Georgia, serif`; mg.fillText(w.g.mark, cx, cz - (mapBig ? k * 1.1 : 0));
     if (mapBig) { mg.font = `600 ${Math.max(9, k * .95)}px Instrument Sans, system-ui`; mg.fillText(w.g.label.split(/[—&,]/)[0].trim(), cx, cz + k * 1.2); }
     // gondolas
-    for (let i = 0; i < w.nG; i++) quad(w, FRONT, FRONT + w.L, w.hw - 2.75 - i * GAP, w.hw - 1.85 - i * GAP, "rgba(255,255,255,.35)");
+    for (const f of w.faces) if (f.wall || f.n > 0) { const a = f.wall ? f.vf : .45, b = f.wall ? f.vf - f.n * WALLD : -.45; quad(f.fr, f.u0, f.u0 + f.L, Math.min(a, b), Math.max(a, b), "rgba(255,255,255,.35)"); }
   }
   if (FEAT.counter) { quad(FEAT.counter.f, -2.3, -.2, -3.2, 3.2, "#1f5f4a"); if (mapBig) { const [a, b, k2] = m2c(...toW(FEAT.counter.f, -1.25, 0), S); mg.fillStyle = "#fff"; mg.font = `600 ${Math.max(9, k2)}px Instrument Sans`; mg.fillText("Counter", a, b); } }
   if (HL) { mg.fillStyle = "#ffb347"; HL.children.forEach(m => { if (m.userData.pulse) { const [a, b] = m2c(m.position.x, m.position.z, S); mg.beginPath(); mg.arc(a, b, 3, 0, 7); mg.fill(); } }); }
