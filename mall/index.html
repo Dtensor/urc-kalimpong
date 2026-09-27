@@ -577,6 +577,31 @@ function sign(text, sub, col, w, h, opt = {}) {
   return new THREE.MeshBasicMaterial({ map: ctex(c), transparent: !!opt.transparent, fog: opt.fog !== false });
 }
 
+// The island's end cap faces the doors: a tall, narrow sign listing what is
+// round the island, so nobody has to walk behind it to find out.
+function capSign(w) {
+  const isl = w.faces.filter(f => !f.wall), cats = [...new Set(isl.flatMap(f => f.cats.map(c => c.c.label)))];
+  const n = isl.reduce((a, f) => a + f.cols.reduce((b, col) => b + (col ? col.filter(Boolean).length : 0), 0), 0);
+  const c = cvs(360, 620, (g, W, H) => {
+    g.fillStyle = w.col; g.fillRect(0, 0, W, H);
+    g.strokeStyle = "rgba(255,255,255,.55)"; g.lineWidth = 3; g.strokeRect(14, 14, W - 28, H - 28);
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = "500 22px Instrument Sans, system-ui"; g.globalAlpha = .85; g.fillText("ROUND THIS ISLAND", W / 2, 62); g.globalAlpha = 1;
+    g.fillRect(W / 2 - 40, 88, 80, 2);
+    // a long name wraps onto two lines at the space nearest its middle, rather than shrinking
+    const FAM = "Fraunces, Georgia, serif", lines = cats.map(t => {
+      g.font = `600 30px ${FAM}`; if (g.measureText(t).width <= W - 60) return [t];
+      const sp = [...t.matchAll(/ /g)].map(m => m.index).sort((a, b) => Math.abs(a - t.length / 2) - Math.abs(b - t.length / 2))[0];
+      return sp == null ? [t] : [t.slice(0, sp), t.slice(sp + 1)];
+    });
+    const rows = lines.reduce((a, l) => a + l.length, 0) + (cats.length - 1) * .6, top = 120, bot = H - 90, lh = Math.min(44, (bot - top) / Math.max(1, rows));
+    let y = top + ((bot - top) - rows * lh) / 2 + lh / 2;
+    lines.forEach(l => { l.forEach(t => { fitText(g, t, W - 60, Math.min(30, lh * .75), 600, FAM); g.fillText(t, W / 2, y); y += lh; }); y += lh * .6; });
+    g.font = "500 22px Instrument Sans, system-ui"; g.globalAlpha = .85; g.fillText(`${n} items · both sides`, W / 2, H - 52);
+  });
+  return new THREE.MeshBasicMaterial({ map: ctex(c) });
+}
+
 /* ---------- pots, planters and the green things in them ---------- */
 const lathePot = (pts, seg) => new THREE.LatheGeometry(pts.map(p => new THREE.Vector2(p[0], p[1])), seg || (COARSE ? 9 : 14));
 const DG = {
@@ -958,6 +983,7 @@ function buildWing(w) {
     for (let k = 0; k <= Math.round(L / 1.2); k++) lbox(fr, a0 + Math.min(L, k * 1.2), top / 2, vc, .06, top, dp, "#c9c3b7");
     lbox(fr, cu, top + .04, vc, L + .06, .08, dp + .04, w.col);                         // cornice in the wing's colour
     if (!f.wall) for (const e of [f.u0 - .03, f.u0 + L + .03]) lbox(fr, e, top / 2, 0, .06, top, .9, w.col);   // end caps
+    if (!f.wall) lplane(fr, capSign(w), .8, top - .16, f.u0 - .065, top / 2 + .02, 0, IN);                     // what is on it, facing the doors
   }
   // category signs hanging over each run
   for (const f of w.faces) if (f) f.cats.forEach((cc, j) => {
