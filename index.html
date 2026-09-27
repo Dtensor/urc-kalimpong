@@ -49,6 +49,8 @@ h1,h2,h3{margin:0;font-family:Fraunces,Georgia,serif;font-weight:600;letter-spac
 .mast h1{font-size:40px;line-height:1.05;margin-top:8px;font-weight:700}
 @media(min-width:760px){.mast h1{font-size:54px}}
 .mast .line{color:var(--ink-2);margin:10px auto 0;max-width:520px;font-size:17px}
+.walkin{display:inline-flex;gap:8px;align-items:center;margin-top:16px;padding:11px 20px;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:600;font-size:15px;text-decoration:none}
+.walkin:hover{opacity:.88}
 .stats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-size:13px;color:var(--ink-2);
   display:inline-flex;gap:6px;align-items:center}
@@ -82,7 +84,22 @@ h1,h2,h3{margin:0;font-family:Fraunces,Georgia,serif;font-weight:600;letter-spac
 .ghead h2{font-size:28px;line-height:1.1}
 @media(min-width:760px){.ghead h2{font-size:34px}}
 .ghint{color:var(--muted);margin:3px 0 0;font-size:15px}
-.cat{margin-top:22px;content-visibility:auto;contain-intrinsic-size:auto 600px}
+.cat{margin-top:22px;scroll-margin-top:136px}
+.group{scroll-margin-top:120px}
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+.jump a{font-size:12.5px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 11px;min-height:32px;display:inline-flex;align-items:center;gap:6px}
+.jump a:hover{border-color:var(--brass);color:var(--brass-ink)}
+.jump a span{color:var(--muted);font-size:11.5px}
+.more{display:flex;justify-content:center;margin-top:12px}
+.more button{height:44px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:14px;color:var(--ink-2)}
+.more button:hover{border-color:var(--brass);color:var(--brass-ink)}
+.gnext{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:26px;padding-top:16px;border-top:1px dashed var(--line)}
+.gnext button{min-height:44px;padding:0 16px;border-radius:12px;font-size:14px;font-weight:600;color:var(--ink-2);border:1px solid var(--line);background:var(--paper-2);text-align:left}
+.gnext button.go{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.totop{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:25;width:48px;height:48px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--ink);
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:all .2s}
+.totop[data-on="true"]{opacity:1;transform:none;pointer-events:auto}
 .chead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .chead h3{font-family:Inter,sans-serif;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
 .chead .rule{flex:1;height:1px;background:var(--line)}
@@ -239,6 +256,7 @@ footer a{color:inherit}
   <h1 id="name">URC Kalimpong</h1>
   <p class="line" id="line">Everything on our shelves, as it stands today.</p>
   <div class="stats" id="stats"></div>
+  <a class="walkin" href="mall/">Walk into the canteen in 3D <span aria-hidden="true">→</span></a>
 </header>
 
 <div class="bar">
@@ -294,6 +312,7 @@ footer a{color:inherit}
   <div id="pricenote"></div>
   <div id="stamp"></div>
   <div>Hearts tell us what to stock more of. Baskets are packed for you, and billed at the counter as always.</div>
+  <div>We count visits, the town they come from, time spent and what is searched for, to stock what people look for. No names are kept and nothing is shared.</div>
 </footer>
 
 <div class="bbar" id="bbar" data-on="false">
@@ -306,6 +325,7 @@ footer a{color:inherit}
 </div>
 
 <div class="toast" id="toast" data-on="false"></div>
+<button class="totop" id="totop" data-on="false" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script>window.BHANDAR_API="https://kings-macbook-pro.tail35a127.ts.net";</script>
 <script>
@@ -331,6 +351,7 @@ const DEV = (() => {
 const HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.3-9A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.3 5.6C19 16.4 12 21 12 21z"/></svg>';
 
 let DATA = null, GROUP = "all", Q = "";
+const OPEN = new Set();   // shelves showing every item, not just the first two rows
 let BASKET = store.get("basket", {});          // id -> qty
 let LOVED = new Set(store.get("loved", []));    // ids hearted from this device
 let observer = null;
@@ -426,42 +447,90 @@ function refresh(live) {
 function paintChips() {
   const box = $("#chips"); box.innerHTML = "";
   const all = el("button", "chip", "Everything"); all.setAttribute("aria-pressed", GROUP === "all");
-  all.onclick = () => { GROUP = "all"; paintChips(); paintShelves(); };
+  all.onclick = () => { GROUP = "all"; paintChips(); paintShelves(); toShelves(); };
   box.append(all);
   DATA.groups.forEach(g => {
     const c = el("button", "chip"); c.setAttribute("aria-pressed", GROUP === g.id);
     c.append(el("span", "rm", g.mark), document.createTextNode(g.label));
-    c.onclick = () => { GROUP = g.id; paintChips(); paintShelves(); window.scrollTo({ top: $("#shelves").offsetTop - 120, behavior: "smooth" }); };
+    c.onclick = () => { GROUP = g.id; paintChips(); paintShelves(); toShelves(); };
     box.append(c);
   });
 }
 
 /* ---------- shelves ---------- */
+// A shelf shows a row or two until asked for more, so no section runs on
+// forever: one row when browsing everything, two once a group is chosen.
+function preview() {
+  const w = innerWidth, cols = w >= 1180 ? 5 : w >= 900 ? 4 : w >= 560 ? 3 : 2;
+  return cols * (GROUP === "all" ? 1 : 2);
+}
+function toShelves() { window.scrollTo({ top: $("#shelves").offsetTop - 120, behavior: "smooth" }); }
+function jumpTo(id) { const t = document.getElementById(id); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function shelfItems(c, q) {
+  return DATA.items.filter(i => i.category === c.id && (!q || i.name.toLowerCase().includes(q)))
+    .sort((a, b) => (b.featured - a.featured) || ((a.qty === 0) - (b.qty === 0)));
+}
+function buildCat(c, items, cap) {
+  const cat = el("div", "cat"); cat.id = "c-" + c.id;
+  const ch = el("div", "chead"); ch.append(el("h3", null, c.label), el("span", "rule"), el("span", "n", String(items.length)));
+  const grid = el("div", "grid");
+  const long = items.length > cap + 2;   // never hide just one or two cards
+  const open = !long || OPEN.has(c.id);
+  (open ? items : items.slice(0, cap)).forEach(it => grid.append(card(it)));
+  cat.append(ch, grid);
+  if (long) {
+    const m = el("div", "more");
+    const b = el("button", null, open ? "Show fewer" : "Show all " + items.length + " in " + c.label);
+    b.setAttribute("aria-expanded", open);
+    b.onclick = () => {
+      open ? OPEN.delete(c.id) : OPEN.add(c.id);
+      cat.replaceWith(buildCat(c, items, cap));
+      if (open) jumpTo("c-" + c.id);
+      watchAttention();
+    };
+    m.append(b); cat.append(m);
+  }
+  return cat;
+}
 function paintShelves() {
   const box = $("#shelves"); box.innerHTML = "";
   const q = Q.trim().toLowerCase();
-  const cats = DATA.categories;
+  const cap = q ? Infinity : preview();
+  const stocked = new Set(DATA.items.map(i => i.category));
+  const groups = DATA.groups.filter(g => DATA.categories.some(c => c.group === g.id && stocked.has(c.id)));
   let shown = 0;
-  DATA.groups.forEach(g => {
+  groups.forEach((g, gi) => {
     if (GROUP !== "all" && GROUP !== g.id) return;
-    const gcats = cats.filter(c => c.group === g.id);
     const sec = el("section", "group"); sec.id = "g-" + g.id;
     const gh = el("div", "ghead"); gh.append(el("div", "gmark", g.mark));
     const t = el("div"); t.append(el("h2", null, g.label), el("p", "ghint", g.hint || "")); gh.append(t);
-    sec.append(gh);
-    let any = false;
-    gcats.forEach(c => {
-      const items = DATA.items.filter(i => i.category === c.id && (!q || i.name.toLowerCase().includes(q)));
+    const jump = el("nav", "jump"); jump.setAttribute("aria-label", g.label + " sections");
+    sec.append(gh, jump);
+    DATA.categories.filter(c => c.group === g.id).forEach(c => {
+      const items = shelfItems(c, q);
       if (!items.length) return;
-      any = true;
-      const cat = el("div", "cat");
-      const ch = el("div", "chead"); ch.append(el("h3", null, c.label), el("span", "rule"), el("span", "n", String(items.length)));
-      const grid = el("div", "grid");
-      items.sort((a, b) => (b.featured - a.featured) || (a.status === "in") - (b.status === "in") * 1 || 0);
-      items.forEach(it => { grid.append(card(it)); shown++; });
-      cat.append(ch, grid); sec.append(cat);
+      shown += items.length;
+      sec.append(buildCat(c, items, cap));
+      const a = el("a"); a.href = "#c-" + c.id; a.append(document.createTextNode(c.label), el("span", null, String(items.length)));
+      a.onclick = (e) => { e.preventDefault(); jumpTo("c-" + c.id); };
+      jump.append(a);
     });
-    if (any) box.append(sec);
+    if (!jump.children.length) return;
+    if (jump.children.length < 2) jump.remove();
+    const nav = el("div", "gnext");
+    const up = el("button", null, "↑ Back to " + g.label); up.onclick = () => jumpTo("g-" + g.id);
+    nav.append(up);
+    const nxt = groups[gi + 1];
+    if (nxt && !q) {
+      const b = el("button", "go", "Next: " + nxt.mark + " " + nxt.label + " →");
+      b.onclick = () => {
+        if (GROUP === "all") return jumpTo("g-" + nxt.id);
+        GROUP = nxt.id; paintChips(); paintShelves(); toShelves();
+      };
+      nav.append(b);
+    }
+    sec.append(nav);
+    box.append(sec);
   });
   if (!shown) { const e = el("div", "empty"); e.append(el("div", "big", "🔍"), el("div", null, "Nothing by that name today. Try a brand, or leave us a line below.")); box.append(e); }
   watchAttention();
@@ -693,9 +762,15 @@ $("#csend").onclick = async () => {
 
 /* ---------- search ---------- */
 let qt = null;
-$("#q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { Q = e.target.value; if (Q && GROUP !== "all") { GROUP = "all"; paintChips(); } paintShelves(); }, 140); });
+$("#q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { Q = e.target.value; if (Q && GROUP !== "all") { GROUP = "all"; paintChips(); } paintShelves(); noteSearch(); }, 140); });
 
 /* ---------- attention ---------- */
+const totop = $("#totop");
+totop.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+addEventListener("scroll", () => { totop.dataset.on = scrollY > 900; }, { passive: true });
+let lastCap = preview();
+addEventListener("resize", () => { const c = preview(); if (DATA && c !== lastCap) { lastCap = c; paintShelves(); } });
+
 function watchAttention() {
   if (observer) observer.disconnect();
   observer = new IntersectionObserver(entries => {
@@ -721,6 +796,37 @@ function flush(beacon) {
 setInterval(() => flush(false), 25000);
 addEventListener("pagehide", () => flush(true));
 document.addEventListener("visibilitychange", () => { if (document.hidden) flush(true); });
+
+/* ---------- visits ----------
+   One visit per page load. The server turns the address into a town and keeps
+   only that. Time counts only while the page is in front of someone who has
+   touched it in the last two minutes, so a phone left open is not an hour. */
+const SID = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+const BACK = store.get("seen", false); store.set("seen", true);
+function beat(ev, extra) {
+  // Plain text keeps it a simple request: no preflight, and it survives the tab closing.
+  const body = JSON.stringify({ sid: SID, dev: DEV, ev, ...extra });
+  try { if (navigator.sendBeacon && navigator.sendBeacon(url("/api/visit"), body)) return; } catch {}
+  fetch(url("/api/visit"), { method: "POST", body, keepalive: true }).catch(() => {});
+}
+let active = 0, lastAct = performance.now(), sentSecs = -1;
+["pointerdown", "keydown", "scroll", "touchstart"].forEach(t => addEventListener(t, () => { lastAct = performance.now(); }, { passive: true }));
+setInterval(() => { if (!document.hidden && performance.now() - lastAct < 120000) active += 5; }, 5000);
+function sendTime() { const s = Math.min(active, 7200); if (s !== sentSecs) { sentSecs = s; beat("time", { secs: s }); } }
+setInterval(() => { if (!document.hidden) sendTime(); }, 30000);
+addEventListener("pagehide", sendTime);
+document.addEventListener("visibilitychange", () => { if (document.hidden) sendTime(); else lastAct = performance.now(); });
+let sq = null, lastQ = "";
+function noteSearch() {
+  clearTimeout(sq);
+  sq = setTimeout(() => {
+    const q = Q.trim();
+    if (q.length < 2 || q.toLowerCase() === lastQ) return;
+    lastQ = q.toLowerCase();
+    beat("search", { q: q.slice(0, 60), hits: document.querySelectorAll("#shelves .card").length });
+  }, 1500);
+}
+beat("open", { ref: document.referrer, w: innerWidth, back: BACK, copy: API ? "site" : "live" });
 
 load().catch(() => { $("#shelves").innerHTML = ""; const e = el("div", "empty"); e.append(el("div", "big", "☕"), el("div", null, "The shelves are not answering just now. Give it a moment and pull to refresh.")); $("#shelves").append(e); });
 })();
