@@ -1,0 +1,828 @@
+{
+ "shop": {
+  "id": "bakery",
+  "name": "Station Bakehouse",
+  "tagline": "Warm loaves, rose-pink cakes and a window full of Kanchenjunga.",
+  "sample": true,
+  "asOf": null,
+  "note": "Sample items: real list and rates coming soon"
+ },
+ "sections": [
+  {
+   "id": "breads",
+   "name": "Breads",
+   "color": "#c2743a"
+  },
+  {
+   "id": "cakes",
+   "name": "Cakes & Pastries",
+   "color": "#c46a7a"
+  },
+  {
+   "id": "cookies",
+   "name": "Cookies & Biscuits",
+   "color": "#b8893a"
+  },
+  {
+   "id": "savouries",
+   "name": "Savouries",
+   "color": "#b5543a"
+  },
+  {
+   "id": "locals",
+   "name": "Local Specials",
+   "color": "#5b7f6e"
+  },
+  {
+   "id": "festive",
+   "name": "Festive & Made to Order",
+   "color": "#a8445e"
+  }
+ ],
+ "items": [
+  {
+   "id": "milk-bread-400g",
+   "name": "Milk Bread 400 g",
+   "section": "breads",
+   "price": 45,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#e0b27a"
+   }
+  },
+  {
+   "id": "brown-bread-400g",
+   "name": "Brown Bread 400 g",
+   "section": "breads",
+   "price": 55,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#a86a3c"
+   }
+  },
+  {
+   "id": "multigrain-loaf",
+   "name": "Multigrain Loaf",
+   "section": "breads",
+   "price": 85,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#9b6b43"
+   }
+  },
+  {
+   "id": "fruit-bread",
+   "name": "Fruit Bread",
+   "section": "breads",
+   "price": 60,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#d49a5c"
+   }
+  },
+  {
+   "id": "ladi-pav-6",
+   "name": "Ladi Pav (6)",
+   "section": "breads",
+   "price": 40,
+   "unit": "pack",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "bun",
+    "tint": "#e2ad6b"
+   }
+  },
+  {
+   "id": "burger-buns-4",
+   "name": "Burger Buns (4)",
+   "section": "breads",
+   "price": 50,
+   "unit": "pack",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "bun",
+    "tint": "#d8964f"
+   }
+  },
+  {
+   "id": "sweet-bun",
+   "name": "Tutti-frutti Sweet Bun",
+   "section": "breads",
+   "price": 20,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "bun",
+    "tint": "#e6b877"
+   }
+  },
+  {
+   "id": "garlic-baguette",
+   "name": "Garlic Baguette",
+   "section": "breads",
+   "price": 90,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "baguette",
+    "tint": "#d6a15e"
+   }
+  },
+  {
+   "id": "hill-sourdough",
+   "name": "Hill Sourdough Boule",
+   "section": "breads",
+   "price": 180,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#b98552"
+   }
+  },
+  {
+   "id": "toast-rusk-200g",
+   "name": "Toast Rusk 200 g",
+   "section": "breads",
+   "price": 60,
+   "unit": "pack",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "box",
+    "tint": "#e4b36f"
+   }
+  },
+  {
+   "id": "black-forest-500g",
+   "name": "Black Forest Cake 500 g",
+   "section": "cakes",
+   "price": 450,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#4a2c22"
+   }
+  },
+  {
+   "id": "pineapple-cake-500g",
+   "name": "Pineapple Cake 500 g",
+   "section": "cakes",
+   "price": 380,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#f2d27a"
+   }
+  },
+  {
+   "id": "red-velvet-slice",
+   "name": "Red Velvet Slice",
+   "section": "cakes",
+   "price": 90,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "slice",
+    "tint": "#b3263a"
+   }
+  },
+  {
+   "id": "truffle-slice",
+   "name": "Chocolate Truffle Slice",
+   "section": "cakes",
+   "price": 95,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "slice",
+    "tint": "#3e2418"
+   }
+  },
+  {
+   "id": "butter-croissant",
+   "name": "Butter Croissant",
+   "section": "cakes",
+   "price": 70,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "croissant",
+    "tint": "#e0a55a"
+   }
+  },
+  {
+   "id": "chocolate-eclair",
+   "name": "Chocolate Eclair",
+   "section": "cakes",
+   "price": 60,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pastry",
+    "tint": "#5a3322"
+   }
+  },
+  {
+   "id": "cream-roll",
+   "name": "Cream Roll",
+   "section": "cakes",
+   "price": 30,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pastry",
+    "tint": "#e8c38a"
+   }
+  },
+  {
+   "id": "strawberry-cupcake",
+   "name": "Strawberry Cupcake",
+   "section": "cakes",
+   "price": 45,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cupcake",
+    "tint": "#f2a2b5"
+   }
+  },
+  {
+   "id": "glazed-doughnut",
+   "name": "Pink Glazed Doughnut",
+   "section": "cakes",
+   "price": 50,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "doughnut",
+    "tint": "#f0b6c6"
+   }
+  },
+  {
+   "id": "fruit-danish",
+   "name": "Mixed-fruit Danish",
+   "section": "cakes",
+   "price": 75,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pastry",
+    "tint": "#e7a85a"
+   }
+  },
+  {
+   "id": "choco-chip-cookies",
+   "name": "Choco-chip Cookies 250 g",
+   "section": "cookies",
+   "price": 180,
+   "unit": "250g",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#c98d4e"
+   }
+  },
+  {
+   "id": "butter-cookies",
+   "name": "Butter Cookies 250 g",
+   "section": "cookies",
+   "price": 160,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#e9c27f"
+   }
+  },
+  {
+   "id": "coconut-macaroons",
+   "name": "Coconut Macaroons 200 g",
+   "section": "cookies",
+   "price": 140,
+   "unit": "200g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#f1e2c4"
+   }
+  },
+  {
+   "id": "nankhatai",
+   "name": "Nankhatai 250 g",
+   "section": "cookies",
+   "price": 150,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#e8c893"
+   }
+  },
+  {
+   "id": "jeera-biscuits",
+   "name": "Jeera Biscuits 250 g",
+   "section": "cookies",
+   "price": 120,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#d7a86a"
+   }
+  },
+  {
+   "id": "almond-biscotti",
+   "name": "Almond Biscotti 200 g",
+   "section": "cookies",
+   "price": 220,
+   "unit": "200g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#c89660"
+   }
+  },
+  {
+   "id": "salt-biscuits",
+   "name": "Salt Biscuits 250 g",
+   "section": "cookies",
+   "price": 100,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#e0b779"
+   }
+  },
+  {
+   "id": "oat-raisin-cookies",
+   "name": "Oat & Raisin Cookies 250 g",
+   "section": "cookies",
+   "price": 170,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#b98a55"
+   }
+  },
+  {
+   "id": "assorted-cookie-jar",
+   "name": "Assorted Cookie Jar 500 g",
+   "section": "cookies",
+   "price": 360,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "jar",
+    "tint": "#c98d4e"
+   }
+  },
+  {
+   "id": "veg-puff",
+   "name": "Veg Puff",
+   "section": "savouries",
+   "price": 25,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "puff",
+    "tint": "#e2a857"
+   }
+  },
+  {
+   "id": "egg-puff",
+   "name": "Egg Puff",
+   "section": "savouries",
+   "price": 30,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "puff",
+    "tint": "#dca04e"
+   }
+  },
+  {
+   "id": "chicken-patty",
+   "name": "Chicken Patty",
+   "section": "savouries",
+   "price": 45,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "puff",
+    "tint": "#d6953f"
+   }
+  },
+  {
+   "id": "paneer-roll",
+   "name": "Paneer Roll",
+   "section": "savouries",
+   "price": 60,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pastry",
+    "tint": "#d9a05a"
+   }
+  },
+  {
+   "id": "veg-momos-8",
+   "name": "Veg Momos (8)",
+   "section": "savouries",
+   "price": 80,
+   "unit": "plate",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "momo",
+    "tint": "#f3ecdc"
+   }
+  },
+  {
+   "id": "chicken-momos-8",
+   "name": "Chicken Momos (8)",
+   "section": "savouries",
+   "price": 100,
+   "unit": "plate",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "momo",
+    "tint": "#efe4cf"
+   }
+  },
+  {
+   "id": "sausage-roll",
+   "name": "Chicken Sausage Roll",
+   "section": "savouries",
+   "price": 55,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pastry",
+    "tint": "#d49449"
+   }
+  },
+  {
+   "id": "cheese-garlic-bun",
+   "name": "Cheese Garlic Bun",
+   "section": "savouries",
+   "price": 40,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "bun",
+    "tint": "#e6b35e"
+   }
+  },
+  {
+   "id": "pizza-bun",
+   "name": "Pizza Bun",
+   "section": "savouries",
+   "price": 45,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "bun",
+    "tint": "#e39c52"
+   }
+  },
+  {
+   "id": "kalimpong-lollipops-10",
+   "name": "Kalimpong Lollipops (10)",
+   "section": "locals",
+   "price": 120,
+   "unit": "pack",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "lollipop",
+    "tint": "#efd9a8"
+   }
+  },
+  {
+   "id": "kalimpong-ginger-biscuits",
+   "name": "Kalimpong Ginger Biscuits 200 g",
+   "section": "locals",
+   "price": 90,
+   "unit": "200g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cookie",
+    "tint": "#c7883e"
+   }
+  },
+  {
+   "id": "kalimpong-cheese-200g",
+   "name": "Kalimpong Cheese 200 g",
+   "section": "locals",
+   "price": 260,
+   "unit": "200g",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "wheel",
+    "tint": "#f2dca0"
+   }
+  },
+  {
+   "id": "hard-churpi-100g",
+   "name": "Hard Churpi 100 g",
+   "section": "locals",
+   "price": 150,
+   "unit": "100g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "jar",
+    "tint": "#efe8d6"
+   }
+  },
+  {
+   "id": "soft-churpi-250g",
+   "name": "Soft Churpi 250 g",
+   "section": "locals",
+   "price": 120,
+   "unit": "250g",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "jar",
+    "tint": "#f4efe2"
+   }
+  },
+  {
+   "id": "darjeeling-tea-cake",
+   "name": "Darjeeling Tea Cake 300 g",
+   "section": "locals",
+   "price": 240,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "loaf",
+    "tint": "#b87a45"
+   }
+  },
+  {
+   "id": "mandarin-marmalade",
+   "name": "Mandarin Marmalade 350 g",
+   "section": "locals",
+   "price": 180,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "jar",
+    "tint": "#e98a2a"
+   }
+  },
+  {
+   "id": "cardamom-rusk-200g",
+   "name": "Large Cardamom Rusk 200 g",
+   "section": "locals",
+   "price": 90,
+   "unit": "pack",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "box",
+    "tint": "#c89a5e"
+   }
+  },
+  {
+   "id": "dalle-chilli-pickle",
+   "name": "Dalle Chilli Pickle 200 g",
+   "section": "locals",
+   "price": 150,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "jar",
+    "tint": "#c0392b"
+   }
+  },
+  {
+   "id": "mandarin-muffin",
+   "name": "Mandarin Muffin",
+   "section": "locals",
+   "price": 50,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cupcake",
+    "tint": "#f0a040"
+   }
+  },
+  {
+   "id": "kanchenjunga-cake-1kg",
+   "name": "Kanchenjunga Celebration Cake 1 kg",
+   "section": "festive",
+   "price": 1200,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#f3c9d3"
+   }
+  },
+  {
+   "id": "christmas-plum-cake",
+   "name": "Christmas Plum Cake 500 g",
+   "section": "festive",
+   "price": 420,
+   "unit": "each",
+   "qty": 12,
+   "feature": true,
+   "photo": "photo-sample.jpg",
+   "look": {
+    "kind": "cake",
+    "tint": "#5a2e1e"
+   }
+  },
+  {
+   "id": "birthday-cake-1kg",
+   "name": "Birthday Cake 1 kg (to order)",
+   "section": "festive",
+   "price": 900,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#f2a2b5"
+   }
+  },
+  {
+   "id": "losar-khapse-box",
+   "name": "Losar Khapse Box",
+   "section": "festive",
+   "price": 250,
+   "unit": "box",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "box",
+    "tint": "#e7b06a"
+   }
+  },
+  {
+   "id": "diwali-cookie-hamper",
+   "name": "Diwali Cookie Hamper",
+   "section": "festive",
+   "price": 450,
+   "unit": "box",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "box",
+    "tint": "#d4a24c"
+   }
+  },
+  {
+   "id": "photo-cake-1kg",
+   "name": "Photo Cake 1 kg (to order)",
+   "section": "festive",
+   "price": 1100,
+   "unit": "each",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#f7efe6"
+   }
+  },
+  {
+   "id": "cupcake-dozen",
+   "name": "Cupcake Dozen (to order)",
+   "section": "festive",
+   "price": 520,
+   "unit": "dozen",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cupcake",
+    "tint": "#c46a7a"
+   }
+  },
+  {
+   "id": "tiered-wedding-cake",
+   "name": "Tiered Wedding Cake (to order)",
+   "section": "festive",
+   "price": 1500,
+   "unit": "kg",
+   "qty": 12,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "cake",
+    "tint": "#fbf5ef"
+   }
+  }
+ ]
+}

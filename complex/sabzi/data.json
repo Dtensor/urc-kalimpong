@@ -1,0 +1,884 @@
+{
+ "shop": {
+  "id": "sabzi",
+  "name": "Sabzi Mandi",
+  "tagline": "Fresh from the hill terraces, weighed while you watch",
+  "sample": true,
+  "asOf": null,
+  "note": "Sample items: real list and rates coming soon"
+ },
+ "sections": [
+  {
+   "id": "everyday",
+   "name": "Everyday Vegetables",
+   "color": "#d9731f"
+  },
+  {
+   "id": "greens",
+   "name": "Leafy Greens",
+   "color": "#3f8a3a"
+  },
+  {
+   "id": "hill",
+   "name": "Hill Specials",
+   "color": "#8a5a2b"
+  },
+  {
+   "id": "fruits",
+   "name": "Fruits",
+   "color": "#e0a21a"
+  },
+  {
+   "id": "herbs",
+   "name": "Herbs & Aromatics",
+   "color": "#4f9a6e"
+  },
+  {
+   "id": "dry",
+   "name": "Dry & Pulses by Weight",
+   "color": "#9b6b3c"
+  }
+ ],
+ "items": [
+  {
+   "id": "tomato",
+   "name": "Tomato",
+   "section": "everyday",
+   "price": 40,
+   "unit": "kg",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#d8352a"
+   },
+   "sample": true
+  },
+  {
+   "id": "potato",
+   "name": "Potato",
+   "section": "everyday",
+   "price": 30,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#c9a26a"
+   },
+   "sample": true
+  },
+  {
+   "id": "onion",
+   "name": "Onion",
+   "section": "everyday",
+   "price": 45,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#a8475a"
+   },
+   "sample": true
+  },
+  {
+   "id": "cauliflower",
+   "name": "Cauliflower",
+   "section": "everyday",
+   "price": 50,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#efe6c8"
+   },
+   "sample": true
+  },
+  {
+   "id": "cabbage",
+   "name": "Cabbage",
+   "section": "everyday",
+   "price": 35,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#a6cf7a"
+   },
+   "sample": true
+  },
+  {
+   "id": "carrot",
+   "name": "Carrot",
+   "section": "everyday",
+   "price": 60,
+   "unit": "kg",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "root",
+    "tint": "#e8761e"
+   },
+   "sample": true
+  },
+  {
+   "id": "brinjal",
+   "name": "Brinjal (Baingan)",
+   "section": "everyday",
+   "price": 50,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#5a2a64"
+   },
+   "sample": true
+  },
+  {
+   "id": "okra",
+   "name": "Okra (Bhindi)",
+   "section": "everyday",
+   "price": 70,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#5d9a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "green-peas",
+   "name": "Green Peas",
+   "section": "everyday",
+   "price": 80,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#6fb14a"
+   },
+   "sample": true
+  },
+  {
+   "id": "french-beans",
+   "name": "French Beans",
+   "section": "everyday",
+   "price": 70,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#4f9a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "cucumber",
+   "name": "Cucumber",
+   "section": "everyday",
+   "price": 40,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#3f7a32"
+   },
+   "sample": true
+  },
+  {
+   "id": "capsicum",
+   "name": "Capsicum",
+   "section": "everyday",
+   "price": 90,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#2f8a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "bottle-gourd",
+   "name": "Bottle Gourd (Lauki)",
+   "section": "everyday",
+   "price": 40,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "gourd",
+    "tint": "#9fcf6a"
+   },
+   "sample": true
+  },
+  {
+   "id": "pumpkin",
+   "name": "Pumpkin (Kaddu)",
+   "section": "everyday",
+   "price": 35,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "gourd",
+    "tint": "#e38a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "radish",
+   "name": "Radish (Mooli)",
+   "section": "everyday",
+   "price": 40,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "root",
+    "tint": "#f3efe6"
+   },
+   "sample": true
+  },
+  {
+   "id": "beetroot",
+   "name": "Beetroot",
+   "section": "everyday",
+   "price": 60,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "root",
+    "tint": "#8a1f3f"
+   },
+   "sample": true
+  },
+  {
+   "id": "spinach",
+   "name": "Spinach (Palak)",
+   "section": "greens",
+   "price": 30,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#2f7a32"
+   },
+   "sample": true
+  },
+  {
+   "id": "methi",
+   "name": "Fenugreek (Methi)",
+   "section": "greens",
+   "price": 25,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#4f9a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "mustard-greens",
+   "name": "Mustard Greens (Sarson)",
+   "section": "greens",
+   "price": 30,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#3f8a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "lettuce",
+   "name": "Lettuce",
+   "section": "greens",
+   "price": 40,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#8fcf5a"
+   },
+   "sample": true
+  },
+  {
+   "id": "pak-choi",
+   "name": "Pak Choi",
+   "section": "greens",
+   "price": 35,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#6fbf5a"
+   },
+   "sample": true
+  },
+  {
+   "id": "spring-onion",
+   "name": "Spring Onion",
+   "section": "greens",
+   "price": 20,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#5faf4a"
+   },
+   "sample": true
+  },
+  {
+   "id": "amaranth",
+   "name": "Red Amaranth (Lal Saag)",
+   "section": "greens",
+   "price": 25,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#a8364a"
+   },
+   "sample": true
+  },
+  {
+   "id": "broccoli",
+   "name": "Broccoli",
+   "section": "greens",
+   "price": 60,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#2f6a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "iskus",
+   "name": "Iskus (Squash)",
+   "section": "hill",
+   "price": 30,
+   "unit": "kg",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "gourd",
+    "tint": "#b5d98a"
+   },
+   "sample": true
+  },
+  {
+   "id": "dalle",
+   "name": "Dalle Chilli",
+   "section": "hill",
+   "price": 60,
+   "unit": "250g",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#c8141e"
+   },
+   "sample": true
+  },
+  {
+   "id": "ginger",
+   "name": "Ginger (Aduwa)",
+   "section": "hill",
+   "price": 120,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "root",
+    "tint": "#d4a760"
+   },
+   "sample": true
+  },
+  {
+   "id": "large-cardamom",
+   "name": "Large Cardamom (Alaichi)",
+   "section": "hill",
+   "price": 400,
+   "unit": "250g",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#5a2a22"
+   },
+   "sample": true
+  },
+  {
+   "id": "rayo-saag",
+   "name": "Rayo Saag",
+   "section": "hill",
+   "price": 25,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#2f6a32"
+   },
+   "sample": true
+  },
+  {
+   "id": "bamboo-shoot",
+   "name": "Bamboo Shoot (Tama)",
+   "section": "hill",
+   "price": 100,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#e2d3a0"
+   },
+   "sample": true
+  },
+  {
+   "id": "yam",
+   "name": "Yam (Tarul)",
+   "section": "hill",
+   "price": 60,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "root",
+    "tint": "#8a5a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "ningro",
+   "name": "Ningro (Fiddlehead Fern)",
+   "section": "hill",
+   "price": 40,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#4f7a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "bhatmas",
+   "name": "Local Soybean (Bhatmas)",
+   "section": "hill",
+   "price": 140,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#c9b070"
+   },
+   "sample": true
+  },
+  {
+   "id": "mandarin",
+   "name": "Darjeeling Mandarin",
+   "section": "fruits",
+   "price": 120,
+   "unit": "dozen",
+   "qty": 20,
+   "feature": true,
+   "photo": "photos/mandarin.png",
+   "look": {
+    "kind": "citrus",
+    "tint": "#f08a1a"
+   },
+   "sample": true
+  },
+  {
+   "id": "kiwi",
+   "name": "Kiwi",
+   "section": "fruits",
+   "price": 30,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#8a6a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "banana",
+   "name": "Banana",
+   "section": "fruits",
+   "price": 60,
+   "unit": "dozen",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "bunch",
+    "tint": "#f2cf3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "apple",
+   "name": "Apple",
+   "section": "fruits",
+   "price": 180,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#c42a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "pear",
+   "name": "Pear (Nashpati)",
+   "section": "fruits",
+   "price": 140,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#b9c94a"
+   },
+   "sample": true
+  },
+  {
+   "id": "papaya",
+   "name": "Papaya",
+   "section": "fruits",
+   "price": 50,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "gourd",
+    "tint": "#f09a3a"
+   },
+   "sample": true
+  },
+  {
+   "id": "pineapple",
+   "name": "Pineapple",
+   "section": "fruits",
+   "price": 70,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#d9a32a"
+   },
+   "sample": true
+  },
+  {
+   "id": "guava",
+   "name": "Guava",
+   "section": "fruits",
+   "price": 80,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#9fcf5a"
+   },
+   "sample": true
+  },
+  {
+   "id": "pomegranate",
+   "name": "Pomegranate",
+   "section": "fruits",
+   "price": 200,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#b3263a"
+   },
+   "sample": true
+  },
+  {
+   "id": "lemon",
+   "name": "Lemon",
+   "section": "fruits",
+   "price": 10,
+   "unit": "piece",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "citrus",
+    "tint": "#f2e23a"
+   },
+   "sample": true
+  },
+  {
+   "id": "coriander",
+   "name": "Coriander (Dhaniya)",
+   "section": "herbs",
+   "price": 15,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#4faf4a"
+   },
+   "sample": true
+  },
+  {
+   "id": "mint",
+   "name": "Mint (Pudina)",
+   "section": "herbs",
+   "price": 15,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#3f9a5a"
+   },
+   "sample": true
+  },
+  {
+   "id": "curry-leaf",
+   "name": "Curry Leaves",
+   "section": "herbs",
+   "price": 10,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "leafy",
+    "tint": "#2f6a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "green-chilli",
+   "name": "Green Chilli",
+   "section": "herbs",
+   "price": 20,
+   "unit": "250g",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#3f9a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "garlic",
+   "name": "Garlic",
+   "section": "herbs",
+   "price": 200,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "round",
+    "tint": "#efe8d8"
+   },
+   "sample": true
+  },
+  {
+   "id": "lemongrass",
+   "name": "Lemongrass",
+   "section": "herbs",
+   "price": 20,
+   "unit": "bunch",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#a8c96a"
+   },
+   "sample": true
+  },
+  {
+   "id": "timur",
+   "name": "Timur (Sichuan Pepper)",
+   "section": "herbs",
+   "price": 150,
+   "unit": "250g",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#8a3a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "toor-dal",
+   "name": "Toor Dal",
+   "section": "dry",
+   "price": 160,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#e0b13a"
+   },
+   "sample": true
+  },
+  {
+   "id": "masoor-dal",
+   "name": "Masoor Dal",
+   "section": "dry",
+   "price": 120,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#e0703a"
+   },
+   "sample": true
+  },
+  {
+   "id": "rajma",
+   "name": "Rajma (Local Red)",
+   "section": "dry",
+   "price": 170,
+   "unit": "kg",
+   "qty": 20,
+   "feature": true,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#8a2a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "chana",
+   "name": "Kala Chana",
+   "section": "dry",
+   "price": 100,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#6a4a2a"
+   },
+   "sample": true
+  },
+  {
+   "id": "groundnut",
+   "name": "Groundnut",
+   "section": "dry",
+   "price": 150,
+   "unit": "kg",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "pod",
+    "tint": "#c9a06a"
+   },
+   "sample": true
+  },
+  {
+   "id": "dry-chilli",
+   "name": "Dry Red Chilli",
+   "section": "dry",
+   "price": 90,
+   "unit": "250g",
+   "qty": 20,
+   "feature": false,
+   "photo": null,
+   "look": {
+    "kind": "long",
+    "tint": "#a3141a"
+   },
+   "sample": true
+  }
+ ]
+}
