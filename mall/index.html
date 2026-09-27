@@ -827,6 +827,23 @@ function entrance() {
   // the wall above the doors, and a word of welcome under the dome
   lbox(f, 0, (4.6 + HW) / 2 + .1, 0, .38, HW - 4.7, hw * 2 + .4, "#f6ddb4");
   lplane(f, sign("Welcome", "Every department opens off this hall", "#1f6f6a", 5.2, .8), 5.2, .8, -.22, (4.7 + HW) / 2, 0, IN);
+  // one leaf of the doors leads out to the rest of Station Complex
+  const door = cvs(512, 720, (g, w, h) => {
+    archPath(g, 8, w - 8, h - 8, 250, 8); g.fillStyle = "#fbf3e4"; g.fill();
+    g.lineWidth = 10; g.strokeStyle = "#b8862b"; g.stroke();
+    lotus(g, w / 2, 170, 58, "#c2571f", "#f2b230", "#7a1f2b");
+    g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#1d1e21";
+    g.font = "600 30px Instrument Sans, system-ui, sans-serif"; g.fillText("OUT THIS WAY TO", w / 2, 262);
+    g.font = "600 56px Fraunces, Georgia, serif"; g.fillText("Station Complex", w / 2, 316, w - 50);
+    [["Bakery", "#c46a7a"], ["Sabzi Mandi", "#4f8a3a"], ["Grocery", "#34467a"], ["Cinema", "#7a1f2b"]].forEach(([n, c], i) => {
+      const y = 396 + i * 62; g.fillStyle = c; g.beginPath(); g.arc(120, y, 17, 0, 7); g.fill();
+      g.fillStyle = "#1d1e21"; g.textAlign = "left"; g.font = "500 36px Instrument Sans, system-ui, sans-serif"; g.fillText(n, 156, y + 1);
+    });
+    g.fillStyle = "#1f5f4a"; g.beginPath(); g.roundRect ? g.roundRect(96, 634, w - 192, 58, 29) : g.rect(96, 634, w - 192, 58); g.fill();
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.font = "600 30px Instrument Sans, system-ui, sans-serif"; g.fillText("Tap to go  →", w / 2, 664);
+  });
+  const dm = lplane(f, new THREE.MeshBasicMaterial({ map: ctex(door), transparent: true }), 1.5, 2.1, -.08, 1.95, .9, IN);
+  PICKABLE.push({ mesh: dm, act: () => { toast("Out to Station Complex…"); setTimeout(() => { location.href = ROOT + "complex/"; }, 450); } });
 }
 function fountain() {
   const basin = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.25, .55, COARSE ? 16 : 32), dmat("#e7d2ab")); basin.position.y = .27; scene.add(basin);
