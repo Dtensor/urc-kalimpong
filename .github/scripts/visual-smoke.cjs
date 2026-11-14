@@ -10,6 +10,12 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
    if(process.env.KALIMPONG_CASES&&!process.env.KALIMPONG_CASES.split(',').includes(`${venue}:${device}`))continue;
    const row={venue,device,errors:[],missing:[]};
    const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:device==='phone',hasTouch:device==='phone',reducedMotion:'reduce',acceptDownloads:true});
+   await ctx.addInitScript(()=>{
+    const getContext=HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext=function(kind,options){
+     return getContext.call(this,kind,/^(webgl2?|experimental-webgl)$/.test(kind)?{...options,preserveDrawingBuffer:true}:options);
+    };
+   });
    const page=await ctx.newPage();page.setDefaultTimeout(30000);
    const takeScreenshot=page.screenshot.bind(page);
    page.screenshot=async options=>{
@@ -53,6 +59,7 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
     if(venue==='urc'){
      await page.locator('#q').fill('shampoo');
      row.shampoo=await page.locator('#results [data-id]').count();assert.equal(row.shampoo,28);
+     if(device==='phone')assert((await page.locator('#results').boundingBox()).width>width*.9,'Phone results should use full width');
      await page.screenshot({path:`${out}/urc-${device}-search.jpg`,type:'jpeg',quality:78});
      await page.locator('#results [data-id]').first().click();
      await page.waitForFunction(()=>window.__mall&&!window.__mall.auto,{},{timeout:45000});

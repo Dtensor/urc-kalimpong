@@ -282,7 +282,7 @@ body.nogl #list .close{display:none}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="kalimpong-release" content="visual-extension-20261114">
+<meta name="kalimpong-release" content="visual-extension-20261114">
 </head>
 <body data-venue="bakery" data-material-root="../shared/">
 <canvas id="gl" tabindex="0" aria-label="3D walk-through of Station Bakehouse"></canvas>
@@ -420,7 +420,9 @@ body.nogl #list .close{display:none}
     html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
     html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
     @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
-      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}}
+      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}
+      body[data-venue="urc"] .results{position:fixed;left:10px;right:10px;top:calc(60px + env(safe-area-inset-top));width:auto;max-height:min(65dvh,520px)}
+      body[data-venue="grocery"] #where{top:calc(154px + env(safe-area-inset-top))}}
   `;
   function updateUI() {
     document.documentElement.classList.toggle('kx-calm', state.calm);

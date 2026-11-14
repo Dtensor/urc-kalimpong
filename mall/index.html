@@ -179,7 +179,7 @@ button{cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .search-count{position:sticky;top:-6px;background:var(--panel);margin:0;padding:10px 8px;font-size:12px;border-bottom:1px solid var(--line);z-index:1}.results .search-more{display:block;text-align:center;min-height:44px;font-weight:600}.results button{min-height:56px}.results b{white-space:normal}.results{overscroll-behavior:contain;scrollbar-gutter:stable}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="kalimpong-release" content="visual-extension-20261114">
+<meta name="kalimpong-release" content="visual-extension-20261114">
 </head>
 <body data-venue="urc" data-material-root="../complex/shared/">
 <canvas id="gl" aria-label="The canteen, in 3D. Drag to look around, tap the floor to walk, tap a product to pick it up."></canvas>
@@ -303,7 +303,9 @@ button{cursor:pointer}
     html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
     html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
     @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
-      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}}
+      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}
+      body[data-venue="urc"] .results{position:fixed;left:10px;right:10px;top:calc(60px + env(safe-area-inset-top));width:auto;max-height:min(65dvh,520px)}
+      body[data-venue="grocery"] #where{top:calc(154px + env(safe-area-inset-top))}}
   `;
   function updateUI() {
     document.documentElement.classList.toggle('kx-calm', state.calm);
@@ -465,7 +467,7 @@ button{cursor:pointer}
 })();
 
 </script>
-<script>window.BHANDAR_API="https://kings-macbook-pro.tail35a127.ts.net";</script>
+<script>window.BHANDAR_API="";</script>
 <script>
 (() => {
 "use strict";
@@ -501,7 +503,7 @@ async function load() {
   let snap = null;
   try { const r = await fetch(ROOT + "menu.json", { cache: "no-store" }); if (r.ok) snap = await r.json(); } catch {}
   let live = null;
-  try { const r = await fetch(url("/api/menu"), { cache: "no-store" }); if (r.ok) live = await r.json(); } catch {}
+  try { if (!API) throw new Error("Public display"); const r = await fetch(url("/api/menu"), { cache: "no-store" }); if (r.ok) live = await r.json(); } catch {}
   if (!snap && !live) throw new Error("no shelves");
   DATA = snap || live; LIVE = !!live;
   if (snap && live) merge(live);
@@ -517,6 +519,7 @@ function merge(live) {
   if (live.notices) DATA.notices = live.notices;
 }
 async function poll() {
+  if (!API) return;
   if (document.hidden) return;
   try {
     const r = await fetch(url("/api/menu"), { cache: "no-store" }); if (!r.ok) throw 0;
@@ -2034,6 +2037,7 @@ async function love(it, btn) {
   const was = LOVED.has(it.id);
   if (was) { toast("Already loved from this phone"); return; }
   LOVED.add(it.id); store.set("loved", [...LOVED]); btn.setAttribute("aria-pressed", "true"); btn.querySelector("span").textContent = "Loved"; chime(true);
+  if (!API) { toast("Saved on this phone."); return; }
   try { const r = await fetch(url("/api/want"), { method: "POST", headers: { "Content-Type": "application/json", "X-Device": DEV }, body: JSON.stringify({ id: it.id }) }); const j = await r.json(); if (j.wants != null) it.wants = j.wants; toast(r.ok ? "Loved. The counter sees what people want." : (j.error || "Could not reach the counter")); } catch { toast("Saved on this phone. The counter is offline just now."); }
 }
 function sheet(html) { $("#sheet").innerHTML = html; $("#sheetbg").hidden = false; }
@@ -2044,16 +2048,17 @@ function openBasket() {
   let tot = 0;
   const rows = ids.map(id => { const v = BYID.get(id), it = v.it, q = BASKET[id]; tot += q * it.price; return `<div class="line">${it.img ? `<img src="${esc(pic(it))}" alt="">` : `<span class="ph" style="background:${v.w.col}">${esc(it.name.slice(0, 2))}</span>`}<div><b>${esc(it.name)}</b><small>${money(it.price)} each${!available(it) ? " · <span class=low>sold out</span>" : ""}</small></div><div class="qty"><button data-id="${esc(id)}" data-q="-1">−</button><span>${q}</span><button data-id="${esc(id)}" data-q="1">+</button></div></div>`; }).join("");
   const mine = store.get("mine", []).filter(m => m.day === new Date().toISOString().slice(0, 10));
-  sheet(`<button class="close" aria-label="Close">✕</button><h2>Your trolley</h2><p class="fine">Reserve it and the counter packs it. You pay when you collect.</p>
+  sheet(`<button class="close" aria-label="Close">✕</button><h2>Your trolley</h2><p class="fine">Your trolley is saved on this device. Contact the counter to confirm stock and place an order.</p>
   ${ids.length ? rows + `<div class="tot"><span>About</span><span>${money(tot)}</span></div>
   <label class="fine" for="who">Your name, so the counter knows whose basket</label><input id="who" autocomplete="name" value="${esc(store.get("who", ""))}" placeholder="e.g. Sub Maj Tamang">
   <div class="err" id="err"></div><button class="btn warm" id="res" style="width:100%;padding:13px">Reserve my basket</button>` : '<p>Nothing in it yet. Look at anything on a shelf and pick it up.</p>'}
   ${mine.length ? `<div class="sec">Your baskets today</div>${mine.map(m => `<div class="fine">${esc(m.say)} · ${m.count} items${m.total != null ? " · " + money(m.total) : ""}</div>`).join("")}` : ""}`);
   $("#sheet .close").onclick = closeSheet;
   $("#sheet").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const id = b.dataset.id, n = (BASKET[id] || 0) + +b.dataset.q; if (n <= 0) delete BASKET[id]; else BASKET[id] = Math.min(99, n); saveBasket(); openBasket(); });
-  const rb = $("#res"); if (rb) rb.onclick = () => reserve($("#who").value.trim(), rb, $("#err"));
+  const rb = $("#res"); if (rb && !API) { rb.disabled = true; rb.textContent = "Contact the counter to order"; $("#who").hidden = true; const label = document.querySelector('[for="who"]'); if (label) label.hidden = true; } if (rb) rb.onclick = () => reserve($("#who").value.trim(), rb, $("#err"));
 }
 async function reserve(name, btn, err) {
+  if (!API) { err.textContent = "This public display keeps your trolley on this device. Contact the counter to order."; return; }
   err.textContent = "";
   if (name.length < 2) { err.textContent = "Just a name, so we know whose basket to hand over."; return; }
   const items = Object.entries(BASKET).filter(([id]) => BYID.has(id) && available(BYID.get(id).it)).map(([id, qty]) => ({ id, qty }));
@@ -2079,6 +2084,7 @@ $("#trolley").onclick = openBasket;
 /* ================================================================ attention */
 const dwell = new Map();
 function flush(beacon) {
+  if (!API) { dwell.clear(); return; }
   const seen = [...dwell.entries()].filter(([, ms]) => ms >= 300).map(([id, ms]) => ({ id, ms: Math.min(120000, Math.round(ms)) }));
   dwell.clear(); if (!seen.length || !API && location.protocol === "file:") return;
   const body = JSON.stringify({ seen });

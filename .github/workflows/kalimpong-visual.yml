@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
@@ -24,7 +24,7 @@ jobs:
       - name: Check all six venues on desktop and phone
         env:
           NODE_PATH: ${{ runner.temp }}/kalimpong-check/node_modules
-          KALIMPONG_CASES: ${{ github.ref_name == 'kalimpong-visual-20261114' && 'plaza:desktop,plaza:phone,grocery:desktop' || '' }}
+          KALIMPONG_CASES: ${{ github.ref_name == 'kalimpong-visual-20261114' && 'urc:desktop,urc:phone,plaza:desktop,plaza:phone,grocery:desktop,grocery:phone,sabzi:desktop,sabzi:phone' || '' }}
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/kalimpong-http.log" 2>&1 &
           node .github/scripts/visual-smoke.cjs
@@ -35,8 +35,9 @@ jobs:
           path: browser-evidence/
           retention-days: 7
   review-captures:
-    if: github.ref_name == 'kalimpong-visual-20261114'
-    runs-on: ubuntu-latest
+    needs: browser
+    if: always() && github.ref_name == 'kalimpong-visual-20261114'
+    runs-on: ubuntu-24.04
     timeout-minutes: 4
     permissions:
       contents: write
@@ -46,7 +47,7 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: kalimpong-browser-evidence
-          run-id: 43612271534
+          run-id: ${{ github.run_id }}
           github-token: ${{ github.token }}
           path: browser-evidence
       - name: Save public-page captures on isolated evidence branch
