@@ -181,7 +181,7 @@ body.pre .hud{opacity:0;pointer-events:none}
 @media (max-width:420px){ #lgrid .lc:not(.big) p{display:none} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-<meta name="kalimpong-release" content="visual-extension-20261114">
+<meta name="kalimpong-release" content="plaza-showcase-20261114">
 </head>
 <body data-venue="plaza" data-material-root="shared/" class="pre">
 <div id="scene" aria-label="The plaza, a 3D courtyard with five shop doors"></div>
@@ -344,7 +344,7 @@ body.pre .hud{opacity:0;pointer-events:none}
     panel = document.createElement('dialog'); panel.id = 'kx-panel'; panel.setAttribute('aria-labelledby', 'kx-title');
     panel.innerHTML = `<h2 id="kx-title">Make yourself comfortable</h2>
       <p>Choose how this place looks and moves. Your choices follow you between shops.</p>
-      <label>Visual detail<select name="quality"><option value="original">Original · compare</option><option value="balanced">Balanced</option><option value="detail">Extra detail</option></select></label>
+      <label>Visual detail<select name="quality"><option value="original">Basic lighting</option><option value="balanced">Balanced</option><option value="detail">Extra detail</option></select></label>
       <label>Light<select name="light"><option value="original">Designed light</option><option value="warm">Warm afternoon</option><option value="clear">Clear daylight</option></select></label>
       <label>Calm ambient motion<input name="calm" type="checkbox"></label>
       <label>Show the map<input name="map" type="checkbox"></label>
@@ -486,6 +486,7 @@ body.pre .hud{opacity:0;pointer-events:none}
 })();
 
 </script>
+<script src="shared/plaza-showcase.js"></script>
 <script>
 (function () {
 'use strict';
@@ -1350,7 +1351,7 @@ function closeCard(silent) {
 }
 
 /* ───────────────────────── the 3D plaza ───────────────────────── */
-let renderer, scene, camera, T3;
+let renderer, scene, camera, T3, SHOWCASE;
 const LC = h => new THREE.Color(h).convertSRGBToLinear();
 function ctex(c, o = {}) {
   const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = o.aniso || 4;
@@ -1399,6 +1400,8 @@ function buildScene() {
   layer(90, 7, -6, -Math.PI, Math.PI, 4096, 384, -7, (g, V) => drawRidge(g, V, kalE, ['#7f8d80', '#6f7c6c', '#5f6c5b'], { eHi: 4, rim: '#c4b384', houses: true, houseS: 3.2, houseGap: 5, trees: 'rgba(52,70,50,.7)', treeH: 5, treeGap: 5, seed: 'lk', haze: '#e6c8a8', hazeA: .3 }));
   layer(62, 4, -22, -Math.PI, Math.PI, 4096, 640, -6, (g, V) => drawRidge(g, V, nearE, ['#4c6547', '#3b5139', '#2d3f2d'], { eHi: 1, rim: '#9aa15c', trees: '#2b3d2a', treeH: 18, treeGap: 2.2, seed: 'ln' }));
 
+  SHOWCASE = PlazaShowcase.create(THREE, scene, renderer, 'shared/');
+  SHOWCASE.paving(FAC);
   // ground
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(FWm, FDm), new THREE.MeshLambertMaterial({ map: ctex(paintFloor(), { aniso: 8 }) }));
   floor.rotation.x = -Math.PI / 2; floor.position.set(FX0 + FWm / 2, 0, FZ0 + FDm / 2); scene.add(floor); floor.name = 'floor'; floor.material.userData.kxSurface = {kind:'stone', repeats:[FWm / 1.5, FDm / 1.5]};
@@ -1412,7 +1415,7 @@ function buildScene() {
   FAC.forEach(f => {
     const grp = new THREE.Group(), [ox, oz] = outv(f.phi); grp.position.set(ox * R, 0, oz * R); grp.rotation.y = -f.phi; scene.add(grp);
     const face = new THREE.Mesh(new THREE.PlaneGeometry(f.w, f.h), new THREE.MeshLambertMaterial({ map: ctex(faceC(f), { aniso: 8 }), alphaTest: .5 }));
-    face.position.y = f.h / 2; face.userData.id = f.id; grp.add(face); f.mesh = face;
+    face.position.y = f.h / 2; face.userData.id = f.id; grp.add(face); f.mesh = face; SHOWCASE.facade(grp, f, openings(f));
     const iw = f.w + 2 * f.D, it = new THREE.Mesh(new THREE.PlaneGeometry(iw, f.h), new THREE.MeshBasicMaterial({ map: ctex(intC(f)), toneMapped: false }));
     it.position.set(0, f.h / 2, -f.D); grp.add(it);
     // side walls of the room so oblique views stay inside
@@ -1421,7 +1424,7 @@ function buildScene() {
     const dt = ctex(paintDoor(f.id === 'cinema' ? '#4a0f18' : f.dado)), dh = f.door.h - f.door.rise, lw = f.door.w / 2;
     const leaves = [-1, 1].map(s => {
       const hinge = new THREE.Group(); hinge.position.set(s * lw, 0, -.12); grp.add(hinge);
-      const leaf = new THREE.Mesh(new THREE.PlaneGeometry(lw, dh), new THREE.MeshLambertMaterial({ map: dt, side: THREE.DoubleSide }));
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(lw, dh, .065), new THREE.MeshLambertMaterial({ map: dt, side: THREE.DoubleSide }));
       leaf.position.set(-s * lw / 2, dh / 2, 0); if (s > 0) leaf.scale.x = -1; hinge.add(leaf); return hinge;
     });
     DOORS.push({ id: f.id, leaves, a: .35, aT: .35 });
@@ -1537,17 +1540,19 @@ function buildScene() {
   });
   // pines
   const pine = (x, y0, z, h, r) => {
-    put(CYL, [x, y0 + h * .12, z], [.12 * h / 8, h * .24, .12 * h / 8], '#4a3526');
-    const cs = ['#2d4a33', '#35573a', '#3f6541'].map(c => mix(c, '#6b7d4a', r() * .25));
-    put(CONE, [x, y0 + h * .425, z], [h * .3, h * .45, h * .3], cs[0], [0, r() * 6]);
-    put(CONE, [x, y0 + h * .6, z], [h * .23, h * .4, h * .23], cs[1], [0, r() * 6]);
-    put(CONE, [x, y0 + h * .795, z], [h * .15, h * .35, h * .15], cs[2], [0, r() * 6]);
+    put(CYL, [x, y0 + h * .38, z], [.11 * h / 8, h * .76, .11 * h / 8], '#4a3526');
+    SHOWCASE.tree(x, y0, z, h, r);
   };
   const pr = rng('pines');
   for (let i = 0; i < 30; i++) { const b = -2.6 + pr() * 5.2, rr = 19.5 + pr() * 6.5, [ox, oz] = outv(b); pine(ox * rr, 0, oz * rr, 8 + pr() * 5.5, pr); }
   for (let i = 0; i < 14; i++) pine(-26 + pr() * 52, -6, 16 + pr() * 22, 8 + pr() * 4, pr);
   PLANTERS.forEach(([x, z]) => { put(BOX, [x, .3, z], [1.4, .6, 1.4], '#c2a27a'); put(BOX, [x, .63, z], [1.5, .08, 1.5], '#c2571f'); pine(x, .6, z, 4.4, pr); });
 
+  SHOWCASE.contact(0, 0, 3.5, 3.5);
+  BENCHES.forEach(([x,z,a]) => SHOWCASE.contact(x,z,2.4,1.25,a));
+  LAMPS.forEach(([x,z]) => SHOWCASE.contact(x,z,.9,.9));
+  PLANTERS.forEach(([x,z]) => SHOWCASE.contact(x,z,2.1,2.1));
+  SHOWCASE.finish();
   // commit the instanced batches
   const lam = new THREE.MeshLambertMaterial({ color: 0xffffff });
   const glowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
@@ -1869,10 +1874,10 @@ function loop(now) {
   if (frames % 5 === 0) proximity();
   if (frames % 3 === 0) drawMap();
   if (now - clockT > 30000) { clockT = now; paintClock(clockCanvas); clockTex.needsUpdate = true; }
-  window.KalimpongExperience.render(renderer, scene, camera); frames++; fcount++;
+  window.KalimpongExperience.render(renderer, scene, camera); window.__plazaDeviceCheck?.frame(now); frames++; fcount++;
   if (now - fpsT >= 1000) {
     window.__fps = Math.round(fcount * 1000 / (now - fpsT) * 10) / 10; fcount = 0; fpsT = now;
-    if (window.__fps < 28 && PR > 1) { PR = Math.max(1, PR - .25); renderer.setPixelRatio(PR); renderer.setSize(innerWidth, innerHeight); }
+    if (window.__fps < 28 && renderer.getPixelRatio() > 1) { PR = Math.max(1, renderer.getPixelRatio() - .25); renderer.setPixelRatio(PR); renderer.setSize(innerWidth, innerHeight); }
   }
 }
 function boot() {
