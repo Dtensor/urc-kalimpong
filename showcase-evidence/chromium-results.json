@@ -1,0 +1,31 @@
+[
+  {
+    "engine": "chromium",
+    "device": "desktop",
+    "viewport": [
+      1366,
+      820
+    ],
+    "kind": "software-rendered lab; not an actual iPhone",
+    "errors": [],
+    "missing": [],
+    "geometry": {
+      "version": "plaza-showcase-20261114",
+      "mapsLoaded": 6,
+      "mapErrors": [],
+      "openings": 13,
+      "trees": 46,
+      "addedTriangles": 54018,
+      "addedDrawCalls": 7
+    },
+    "render": {
+      "entered": true,
+      "pr": 1,
+      "calls": 65,
+      "tris": 72032,
+      "card": null
+    },
+    "controlCheckPaused": true,
+    "pass": true
+  }
+]
