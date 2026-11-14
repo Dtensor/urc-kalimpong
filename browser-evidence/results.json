@@ -1,0 +1,153 @@
+{
+  "cases": [
+    {
+      "venue": "urc",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 601,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "shampoo": 28,
+      "pass": true
+    },
+    {
+      "venue": "plaza",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 92,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": false,
+      "failure": "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+    },
+    {
+      "venue": "bakery",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 56,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "sabzi",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 82,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "grocery",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 77,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": false,
+      "failure": "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+    },
+    {
+      "venue": "cinema",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 38,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "urc",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 509,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "shampoo": 28,
+      "pass": true
+    },
+    {
+      "venue": "plaza",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 92,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": false,
+      "failure": "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+    },
+    {
+      "venue": "bakery",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 56,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "sabzi",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 82,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "grocery",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 77,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    },
+    {
+      "venue": "cinema",
+      "device": "phone",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 38,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    }
+  ]
+}
