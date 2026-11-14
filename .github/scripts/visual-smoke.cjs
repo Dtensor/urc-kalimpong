@@ -59,9 +59,11 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
     if(venue==='urc'){
      await page.locator('#q').fill('shampoo');
      row.shampoo=await page.locator('#results [data-id]').count();assert.equal(row.shampoo,28);
+     assert.equal(await page.locator('#kx-trigger').isVisible(),false,'Settings must not obscure search results');
      if(device==='phone')assert((await page.locator('#results').boundingBox()).width>width*.9,'Phone results should use full width');
      await page.screenshot({path:`${out}/urc-${device}-search.jpg`,type:'jpeg',quality:78});
      await page.locator('#results [data-id]').first().click();
+     assert.equal(await page.locator('#kx-trigger').isVisible(),true,'Settings return after selecting a result');
      await page.waitForFunction(()=>window.__mall&&!window.__mall.auto,{},{timeout:45000});
      await page.waitForTimeout(1000);
      await page.screenshot({path:`${out}/urc-${device}-shelf.jpg`,type:'jpeg',quality:78});

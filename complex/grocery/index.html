@@ -356,10 +356,12 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
     :focus-visible{outline:3px solid var(--accent,#1f5f4a)!important;outline-offset:3px!important}
     html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
     html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+    body[data-venue="urc"]:has(#q[aria-expanded="true"]) #kx-trigger{visibility:hidden;pointer-events:none}
     @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
       .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}
       body[data-venue="urc"] .results{position:fixed;left:10px;right:10px;top:calc(60px + env(safe-area-inset-top));width:auto;max-height:min(65dvh,520px)}
-      body[data-venue="grocery"] #where{top:calc(154px + env(safe-area-inset-top))}}
+      body[data-venue="grocery"] #where{top:calc(154px + env(safe-area-inset-top))}
+      body[data-venue="plaza"] #where{top:calc(124px + env(safe-area-inset-top))}}
   `;
   function updateUI() {
     document.documentElement.classList.toggle('kx-calm', state.calm);
