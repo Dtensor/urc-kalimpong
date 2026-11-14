@@ -7,9 +7,18 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
  const browser=await chromium.launch({headless:true,args:['--enable-webgl','--enable-unsafe-swiftshader','--use-angle=swiftshader']});
  try {
   for(const [device,width,height] of [['desktop',1366,820],['phone',390,844]])for(const [venue,route,enter] of venues){
+   if(process.env.KALIMPONG_CASES&&!process.env.KALIMPONG_CASES.split(',').includes(`${venue}:${device}`))continue;
    const row={venue,device,errors:[],missing:[]};
    const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:device==='phone',hasTouch:device==='phone',reducedMotion:'reduce',acceptDownloads:true});
    const page=await ctx.newPage();page.setDefaultTimeout(30000);
+   const takeScreenshot=page.screenshot.bind(page);
+   page.screenshot=async options=>{
+    // Let the last visible WebGL frame drain before readback on software GPUs.
+    // The page's normal visibility-aware loop resumes immediately afterwards.
+    await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
+    try{await page.waitForTimeout(350);return await takeScreenshot({...options,timeout:60000});}
+    finally{await page.evaluate(()=>{delete document.hidden;}).catch(()=>{});}
+   };
    // Keep this read-only verification isolated from any optional live counter.
    await page.route('**/api/**',r=>r.fulfill({status:404,body:'Offline acceptance'}));
    page.on('pageerror',e=>row.errors.push(e.message));
@@ -57,5 +66,6 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
    cases.push(row);fs.writeFileSync(`${out}/results.json`,JSON.stringify({cases},null,2));console.log('KALIMPONG_CASE '+JSON.stringify(row));await ctx.close();
   }
  }finally{await browser.close()}
- if(cases.length!==12||cases.some(r=>!r.pass))process.exitCode=1;
+ const expected=process.env.KALIMPONG_CASES?process.env.KALIMPONG_CASES.split(',').length:12;
+ if(cases.length!==expected||cases.some(r=>!r.pass))process.exitCode=1;
 })();

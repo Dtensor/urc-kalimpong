@@ -24,6 +24,7 @@ jobs:
       - name: Check all six venues on desktop and phone
         env:
           NODE_PATH: ${{ runner.temp }}/kalimpong-check/node_modules
+          KALIMPONG_CASES: ${{ github.ref_name == 'kalimpong-visual-20261114' && 'plaza:desktop,plaza:phone,grocery:desktop' || '' }}
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/kalimpong-http.log" 2>&1 &
           node .github/scripts/visual-smoke.cjs
@@ -33,3 +34,25 @@ jobs:
           name: kalimpong-browser-evidence
           path: browser-evidence/
           retention-days: 7
+  review-captures:
+    if: github.ref_name == 'kalimpong-visual-20261114'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: kalimpong-browser-evidence
+          run-id: 43612271534
+          github-token: ${{ github.token }}
+          path: browser-evidence
+      - name: Save public-page captures on isolated evidence branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add browser-evidence
+          git commit -m 'Archive public Kalimpong browser acceptance captures'
+          git push origin "HEAD:refs/heads/kalimpong-evidence-${{ github.run_id }}-${{ github.run_attempt }}"
