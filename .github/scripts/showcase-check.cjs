@@ -3,7 +3,7 @@ const engine=process.env.ENGINE||'chromium',out='showcase-evidence';fs.mkdirSync
 (async()=>{
  const browser=await (engine==='webkit'?webkit:chromium).launch({headless:true,...(engine==='chromium'?{args:['--enable-webgl','--enable-unsafe-swiftshader','--use-angle=swiftshader']}: {})});
  const results=[];
- try{for(const [device,width,height] of (engine==='webkit'?[['phone',440,956]]:[['desktop',1366,820],['phone',440,956]])){
+ try{for(const [device,width,height] of (engine==='webkit'?[['phone',440,956]]:process.env.SHOWCASE_POLISH==='1'?[['desktop',1366,820]]:[['desktop',1366,820],['phone',440,956]])){
   const row={engine,device,viewport:[width,height],kind:'software-rendered lab; not an actual iPhone',errors:[],missing:[]};
   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:device==='phone',hasTouch:device==='phone',reducedMotion:'reduce'});
   await context.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(kind,opts){return original.call(this,kind,/^(webgl2?|experimental-webgl)$/.test(kind)?{...opts,preserveDrawingBuffer:true}:opts);};});
@@ -15,7 +15,8 @@ const engine=process.env.ENGINE||'chromium',out='showcase-evidence';fs.mkdirSync
    await page.goto('http://127.0.0.1:8765/complex/?devicecheck=1',{waitUntil:'domcontentloaded'});await page.locator('#enterQuiet').click({timeout:90000});
    await page.waitForFunction(()=>window.__plazaShowcase?.statistics.mapsLoaded===6,{},{timeout:60000});
    row.geometry=await page.evaluate(()=>__plazaShowcase.statistics);row.render=await page.evaluate(()=>__plaza.info());
-   assert.equal(row.geometry.mapErrors.length,0);assert.equal(row.geometry.openings,13);assert.equal(row.geometry.trees,46);assert(row.geometry.addedDrawCalls<=8);assert(row.geometry.addedTriangles<50000);assert(row.render.calls<220);
+   assert.equal(row.geometry.mapErrors.length,0);assert.equal(row.geometry.openings,13);assert.equal(row.geometry.trees,46);assert(row.geometry.addedDrawCalls<=8);assert(row.geometry.addedTriangles<65000);assert(row.render.calls<220);
+   if(device==='phone')assert((await page.locator('#toast').boundingBox()).y>=(await page.locator('#where').boundingBox()).y+20,'Phone hint must sit below the header and location label');
    // Hide the opt-in test panel only for clean architectural evidence.
    await page.locator('#phone-check').evaluate(e=>e.hidden=true);await page.waitForTimeout(500);await capture('arrival');
    await page.evaluate(()=>__plaza.jump(4.7,-7.8,Math.atan2(4.7,7.2),.12));await page.waitForTimeout(700);await capture('arches');

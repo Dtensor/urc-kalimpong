@@ -85,18 +85,23 @@
     }
     function tree(x,y,z,h,random){trees.push({x,y,z,h,angle:random()*Math.PI*2,tint:.78+random()*.2});statistics.trees++;}
     function needleTexture(){
-      const c=document.createElement('canvas');c.width=256;c.height=128;const g=c.getContext('2d');
-      g.strokeStyle='#647457';g.lineWidth=2;g.beginPath();g.moveTo(8,64);g.lineTo(247,64);g.stroke();
-      for(let i=0;i<62;i++){const x=12+i*3.7,len=10+24*Math.sin(i/62*Math.PI);for(const sign of [-1,1]){g.strokeStyle=i%3?'#46674a':'#7e9466';g.lineWidth=1.8;g.beginPath();g.moveTo(x,64);g.lineTo(x+len*.55,64+sign*len);g.stroke();}}
+      const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d');
+      g.strokeStyle='#485943';g.lineWidth=4;g.beginPath();g.moveTo(10,128);g.lineTo(498,128);g.stroke();
+      // Dense secondary sprays break the ladder-like silhouette of a single needle row.
+      for(let i=0;i<42;i++){const x=16+i*11.2,len=(24+65*Math.sin(i/42*Math.PI))*(.88+.12*Math.sin(i*7.1));for(const sign of [-1,1]){
+        const ex=x+len*.4,ey=128+sign*len;g.strokeStyle='#3d5c40';g.lineWidth=2.4;g.beginPath();g.moveTo(x,128);g.lineTo(ex,ey);g.stroke();
+        for(let j=0;j<12;j++){const t=j/12,nx=x+(ex-x)*t,ny=128+(ey-128)*t,needle=12+12*(1-t);g.strokeStyle=(i+j)%4?'#3d6243':'#74905e';g.lineWidth=2;g.beginPath();g.moveTo(nx,ny);g.lineTo(nx+needle,ny+sign*needle*.7);g.moveTo(nx,ny);g.lineTo(nx-needle*.55,ny+sign*needle);g.stroke();}
+      }}
       const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
     }
     function foliage(){
       const parts=[];
-      for(let tier=0;tier<13;tier++){
-        const y=.2+tier*.057, radius=.24*Math.pow(1-y,.65), count=7;
+      for(let tier=0;tier<20;tier++){
+        const y=.16+tier*.041, radius=.26*Math.pow(1-y,.8), count=7;
         for(let b=0;b<count;b++)for(let cross=0;cross<2;cross++){
-          const a=b/count*Math.PI*2+tier*2.399;const g=new THREE.PlaneGeometry(radius*1.65,.085*(1-y)+.022);
-          g.rotateX(cross?1.25:.15);g.rotateZ(-.13);g.translate(radius*.62,y,0);g.rotateY(a);parts.push(g.toNonIndexed());g.dispose();
+          const jitter=Math.sin(tier*7.3+b*4.7),a=b/count*Math.PI*2+tier*2.399+jitter*.23;
+          const g=new THREE.PlaneGeometry(radius*(1.7+jitter*.16),.19*(1-y)+.038);
+          g.rotateX(cross?1.05:.24);g.rotateZ(-.12+jitter*.1);g.translate(radius*.58,y+jitter*.009,0);g.rotateY(a);parts.push(g.toNonIndexed());g.dispose();
         }
       }
       const geometry=merge(parts), material=new THREE.MeshStandardMaterial({map:needleTexture(),alphaTest:.3,side:THREE.DoubleSide,roughness:.95,envMapIntensity:.12});

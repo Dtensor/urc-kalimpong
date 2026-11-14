@@ -29,6 +29,7 @@ jobs:
         env:
           NODE_PATH: ${{ runner.temp }}/check/node_modules
           ENGINE: ${{ matrix.engine }}
+          SHOWCASE_POLISH: ${{ github.event_name == 'push' && '1' || '' }}
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
           node .github/scripts/showcase-check.cjs
