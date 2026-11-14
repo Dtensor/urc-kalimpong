@@ -256,8 +256,9 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
-<body>
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="kalimpong-release" content="visual-extension-20261114">
+</head>
+<body data-venue="sabzi" data-material-root="../shared/">
 <canvas id="gl" aria-label="The sabzi mandi, in 3D. Drag to look around, tap the floor to walk, tap a crate to pick something up."></canvas>
 
 <div id="top">
@@ -321,7 +322,247 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
 </div>
 
 <script src="../shared/nav.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../shared/vendor/three-r128.min.js"></script>
+<script>
+/* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
+ * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
+ * Existing labels, product photographs, picking meshes and catalogue data stay intact.
+ */
+(() => {
+  'use strict';
+  const KEY = 'kalimpong.experience.v1';
+  const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const defaults = { quality: 'balanced', light: 'original', calm: media.matches, map: !coarse };
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (_) {}
+  const state = { ...defaults };
+  if (['original', 'balanced', 'detail'].includes(saved.quality)) state.quality = saved.quality;
+  if (['original', 'warm', 'clear'].includes(saved.light)) state.light = saved.light;
+  for (const k of ['calm', 'map']) if (typeof saved[k] === 'boolean') state[k] = saved[k];
+  if (media.matches) state.calm = true;
+  const contexts = new WeakMap();
+  const assetRoot = document.body.dataset.materialRoot;
+  const surfaceTextures = new Map();
+  function surfaceTexture(THREE, kind, repeats) {
+    const key = `${kind}:${repeats.join(',')}`;
+    if (surfaceTextures.has(key)) return surfaceTextures.get(key);
+    // r128 shares the colour-map UV transform with bump maps. Tile the image
+    // into its own canvas so the authored floor artwork keeps its original UVs.
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1024;
+    const g = canvas.getContext('2d'); g.fillStyle = '#888'; g.fillRect(0, 0, 1024, 1024);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    const img = new Image();
+    img.onload = () => {
+      const [rx, ry] = repeats.map(n => Math.max(1, Math.min(32, Math.round(n))));
+      for (let y = 0; y < ry; y++) for (let x = 0; x < rx; x++)
+        g.drawImage(img, x * 1024 / rx, y * 1024 / ry, 1024 / rx, 1024 / ry);
+      texture.needsUpdate = true;
+    };
+    img.onerror = () => { texture.userData = {...texture.userData, loadFailed: true}; };
+    img.src = `${assetRoot}materials/${kind === 'wood' ? 'oak' : 'limestone'}.jpg`;
+    surfaceTextures.set(key, texture); return texture;
+  }
+  function roundedBox(THREE, width, height, depth) {
+    const radius = Math.min(.035, width * .22, height * .22, depth * .22);
+    const geo = new THREE.BoxGeometry(1, 1, 1, 4, 4, 4);
+    const p = geo.attributes.position, n = geo.attributes.normal;
+    const v = new THREE.Vector3(), inner = new THREE.Vector3(), normal = new THREE.Vector3();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i); inner.copy(v).clampScalar(-.49999, .49999);
+      normal.copy(v).sub(inner).normalize();
+      p.setXYZ(i, v.x * (width - 2 * radius) + normal.x * radius,
+        v.y * (height - 2 * radius) + normal.y * radius,
+        v.z * (depth - 2 * radius) + normal.z * radius);
+      n.setXYZ(i, normal.x, normal.y, normal.z);
+    }
+    geo.computeBoundingBox(); geo.computeBoundingSphere(); return geo;
+  }
+  let active, panel, trigger, status;
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
+  const css = `
+    #kx-trigger{position:fixed;right:16px;top:46%;z-index:22;border:1px solid var(--line,#ddd);background:var(--panel,#fff);
+      color:var(--ink,#222);border-radius:10px;min-height:44px;padding:8px 12px;font:600 12px var(--sans,system-ui);cursor:pointer}
+    #kx-panel{position:fixed;z-index:80;inset:0;margin:auto;width:min(390px,calc(100vw - 24px));
+      height:fit-content;max-height:calc(100dvh - 32px);overflow:auto;padding:24px;
+      border:1px solid var(--line,#ddd);border-radius:18px;background:var(--panel,#fff);color:var(--ink,#222);
+      box-shadow:0 24px 90px #0006;font:14px/1.5 var(--sans,system-ui)}
+    #kx-panel::backdrop{background:#10182080;backdrop-filter:blur(4px)}
+    #kx-panel h2{font:600 27px var(--display,Georgia);margin:0 0 5px}
+    #kx-panel p{color:var(--muted,#666);margin:0 0 18px}
+    #kx-panel label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0}
+    #kx-panel select,#kx-panel button{min-height:44px;border:1px solid var(--line,#ddd);border-radius:9px;
+      background:var(--panel-2,#f3f0ea);color:inherit;font:inherit;padding:8px 12px}
+    #kx-panel select{max-width:62%}#kx-panel input{width:22px;height:22px;accent-color:var(--accent,#1f5f4a)}
+    #kx-panel .kx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    #kx-panel .kx-close{margin-left:auto}#kx-panel #kx-status{margin:12px 0 0;min-height:1.5em;font-size:12px}
+    :focus-visible{outline:3px solid var(--accent,#1f5f4a)!important;outline-offset:3px!important}
+    html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
+    html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+    @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
+      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}}
+  `;
+  function updateUI() {
+    document.documentElement.classList.toggle('kx-calm', state.calm);
+    document.documentElement.classList.toggle('kx-map-off', !state.map);
+    if (panel) for (const [k, v] of Object.entries(state)) {
+      const el = panel.querySelector(`[name="${k}"]`);
+      if (el) { if (el.type === 'checkbox') el.checked = v; else el.value = v; }
+    }
+  }
+  function mount() {
+    if (trigger) return;
+    const style = document.createElement('style'); style.textContent = css; document.head.append(style);
+    trigger = document.createElement('button'); trigger.id = 'kx-trigger'; trigger.type = 'button';
+    trigger.textContent = 'View settings'; trigger.setAttribute('aria-haspopup', 'dialog');
+    trigger.setAttribute('aria-controls', 'kx-panel');
+    document.body.append(trigger);
+    panel = document.createElement('dialog'); panel.id = 'kx-panel'; panel.setAttribute('aria-labelledby', 'kx-title');
+    panel.innerHTML = `<h2 id="kx-title">Make yourself comfortable</h2>
+      <p>Choose how this place looks and moves. Your choices follow you between shops.</p>
+      <label>Visual detail<select name="quality"><option value="original">Original · compare</option><option value="balanced">Balanced</option><option value="detail">Extra detail</option></select></label>
+      <label>Light<select name="light"><option value="original">Designed light</option><option value="warm">Warm afternoon</option><option value="clear">Clear daylight</option></select></label>
+      <label>Calm ambient motion<input name="calm" type="checkbox"></label>
+      <label>Show the map<input name="map" type="checkbox"></label>
+      <div class="kx-actions"><button type="button" id="kx-save">Save view</button><button type="button" id="kx-full">Full screen</button><button type="button" class="kx-close">Done</button></div>
+      <p id="kx-status" role="status" aria-live="polite"></p>`;
+    document.body.append(panel); status = panel.querySelector('#kx-status');
+    trigger.onclick = () => { updateUI(); panel.showModal(); };
+    panel.querySelector('.kx-close').onclick = () => panel.close();
+    panel.addEventListener('close', () => trigger.focus({ preventScroll: true }));
+    panel.addEventListener('pointerdown', e => e.stopPropagation());
+    panel.addEventListener('keydown', e => e.stopPropagation());
+    panel.addEventListener('change', e => {
+      const el = e.target; if (!(el.name in state)) return;
+      state[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      if (media.matches && el.name === 'calm' && !state.calm) {
+        state.calm = true; status.textContent = 'Your system’s reduced-motion preference is active.';
+      } else status.textContent = 'View updated.';
+      persist(); updateUI(); if (active) apply(active);
+    });
+    panel.querySelector('#kx-save').onclick = () => {
+      if (!active) { status.textContent = 'Enter the 3D view first.'; return; }
+      try {
+        const { renderer, scene, camera } = active; renderer.render(scene, camera);
+        renderer.domElement.toBlob(blob => {
+          if (!blob) { status.textContent = 'This browser could not save the view.'; return; }
+          const url = URL.createObjectURL(blob), a = document.createElement('a');
+          a.href = url; a.download = `kalimpong-${document.body.dataset.venue || 'view'}.png`; a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1500);
+          status.textContent = 'Saved the scene image. Interface controls are excluded.';
+        }, 'image/png');
+      } catch (_) { status.textContent = 'Saving is unavailable for this view. Try a browser screenshot.'; }
+    };
+    panel.querySelector('#kx-full').onclick = async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else throw new Error('unsupported');
+        status.textContent = document.fullscreenElement ? 'Full screen. Press Escape to leave.' : 'Window view restored.';
+      } catch (_) { status.textContent = 'Full screen is unavailable in this browser.'; }
+    };
+    media.addEventListener('change', e => { if (e.matches) { state.calm = true; updateUI(); persist(); } });
+    updateUI();
+  }
+  // A deterministic, original softbox environment, not a photographic HDRI.
+  function environment(renderer, THREE) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+    const g = c.getContext('2d'), grad = g.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, '#cad8e3'); grad.addColorStop(.48, '#eee8db'); grad.addColorStop(1, '#4c4941');
+    g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
+    g.fillStyle = '#fffaf0'; g.fillRect(60, 48, 75, 75); g.fillRect(350, 60, 100, 60);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const target = pmrem.fromEquirectangular(t); t.dispose(); pmrem.dispose(); return target;
+  }
+  function attach(renderer, scene, camera) {
+    const THREE = window.THREE;
+    const ctx = { renderer, scene, camera, materials: [], lights: [], originalEnv: scene.environment, pixelRatio: renderer.getPixelRatio(),
+      exposure: renderer.toneMappingExposure, sun: null, environment: null, failed: false };
+    contexts.set(renderer, ctx); active = ctx;
+    const cache = new Map();
+    scene.traverse(mesh => {
+      if (mesh.isDirectionalLight || mesh.isHemisphereLight) ctx.lights.push({ light: mesh, color: mesh.color.clone(), intensity: mesh.intensity });
+      if (!mesh.isMesh || !mesh.material) return;
+      const replace = m => {
+        if (!m.isMeshLambertMaterial || m.transparent || m.opacity < 1) return m;
+        if (cache.has(m)) return cache.get(m);
+        const n = new THREE.MeshStandardMaterial();
+        for (const k of ['color','emissive']) n[k].copy(m[k]);
+        for (const k of ['map','alphaMap','alphaTest','aoMap','aoMapIntensity','emissiveMap','emissiveIntensity','side','vertexColors','fog','depthWrite','depthTest','toneMapped','visible','polygonOffset','polygonOffsetFactor','polygonOffsetUnits']) {
+          if (m[k] !== undefined) n[k] = m[k];
+        }
+        n.roughness = .76; n.metalness = 0; n.envMapIntensity = .3;
+        if (m.userData.kxSurface && assetRoot) {
+          const spec = m.userData.kxSurface;
+          n.bumpMap = surfaceTexture(THREE, spec.kind, spec.repeats || [1, 1]);
+          n.bumpScale = spec.kind === 'wood' ? .008 : .015;
+          n.roughness = spec.kind === 'wood' ? .67 : .88;
+        }
+        n.name = `${m.name || 'surface'} · refined`; cache.set(m, n); return n;
+      };
+      const original = mesh.material, enhanced = Array.isArray(original) ? original.map(replace) : replace(original);
+      ctx.materials.push({ mesh, original, enhanced, cast: mesh.castShadow, receive: mesh.receiveShadow });
+    });
+    try { ctx.environment = environment(renderer, THREE); } catch (_) { /* PBR works without IBL. */ }
+    // Exterior only: a roof above an indoor room must not turn every shelf into a silhouette.
+    if (document.body.dataset.venue === 'plaza') {
+      ctx.sun = ctx.lights.find(x => x.light.isDirectionalLight)?.light;
+      if (ctx.sun) {
+        const s = ctx.sun.shadow; s.mapSize.set(1024, 1024);
+        Object.assign(s.camera, { left: -30, right: 30, top: 30, bottom: -30, near: .5, far: 150 });
+        s.camera.updateProjectionMatrix(); s.bias = -.0003; s.normalBias = .035;
+      }
+    }
+    mount(); apply(ctx); return ctx;
+  }
+  function apply(ctx) {
+    const original = state.quality === 'original';
+    ctx.scene.environment = original ? ctx.originalEnv : (ctx.environment?.texture || ctx.originalEnv);
+    for (const x of ctx.materials) {
+      x.mesh.material = original ? x.original : x.enhanced;
+      // Alpha-cut facade openings retain their alpha test in shadow passes.
+      x.mesh.castShadow = x.cast; x.mesh.receiveShadow = x.receive;
+      if (state.quality === 'detail' && ctx.sun && !coarse) {
+        const m = x.mesh.material;
+        if (!Array.isArray(m) && m.isMeshStandardMaterial) { x.mesh.castShadow = true; x.mesh.receiveShadow = true; }
+      }
+    }
+    if (ctx.sun) {
+      ctx.sun.castShadow = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.enabled = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      // The plaza's solid architecture is static; do not render another scene every frame.
+      ctx.renderer.shadowMap.autoUpdate = false; ctx.renderer.shadowMap.needsUpdate = true;
+    }
+    for (const x of ctx.lights) {
+      x.light.color.copy(x.color); x.light.intensity = x.intensity;
+      if (state.light !== 'original' && document.body.dataset.venue !== 'cinema') {
+        const tint = new THREE.Color(state.light === 'warm' ? '#ffe0b5' : '#d8e9ff');
+        x.light.color.lerp(tint, .22);
+      }
+    }
+    ctx.renderer.toneMappingExposure = ctx.exposure;
+    ctx.renderer.setPixelRatio(original ? ctx.pixelRatio : Math.min(devicePixelRatio || 1, state.quality === 'detail' ? 2 : coarse ? 1.25 : 1.5));
+    ctx.renderer.setSize(innerWidth, innerHeight, false);
+    if (document.body.dataset.venue === 'cinema' && panel) panel.querySelector('[name="light"]').disabled = true;
+  }
+  window.KalimpongExperience = {
+    roundedBox,
+    get calm() { return state.calm; },
+    get settings() { return { ...state }; },
+    get modalOpen() { return !!panel?.open; },
+    get diagnostics() { return active ? { materials: active.materials.length, environment: !!active.environment, quality: state.quality } : null; },
+    render(renderer, scene, camera) {
+      if (!contexts.has(renderer)) attach(renderer, scene, camera);
+      renderer.render(scene, camera);
+    }
+  };
+  updateUI();
+})();
+
+</script>
 <script>
 (() => {
 "use strict";
@@ -565,7 +806,7 @@ function addToBasket(it, q, fromEl) {
   setQty(it, (BASKET[it.id] || 0) + q);
   const b = $("#basket"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
   toast(`Added ${U(it).fmt(q)} of ${it.name}`);
-  if (fromEl && !RM) {
+  if (fromEl && !(RM || window.KalimpongExperience.calm)) {
     const r0 = fromEl.getBoundingClientRect(), r1 = b.getBoundingClientRect();
     const f = document.createElement("img"); f.className = "fly"; f.src = picURL(it); f.style.left = (r0.left + r0.width / 2 - 32) + "px"; f.style.top = (r0.top + r0.height / 2 - 32) + "px"; document.body.appendChild(f);
     requestAnimationFrame(() => { f.style.transform = `translate(${r1.left + 24 - r0.left - r0.width / 2}px,${r1.top + 10 - r0.top - r0.height / 2}px) scale(.35)`; f.style.opacity = .3; });
@@ -621,7 +862,7 @@ function refreshBoardCounts() {
 }
 $("#board").addEventListener("click", (e) => {
   const t = e.target.closest("button, a"); if (!t) return;
-  if (t.tagName === "A" && t.hash) { e.preventDefault(); const s = document.getElementById(t.hash.slice(1)); if (s) s.scrollIntoView({ behavior: RM ? "auto" : "smooth" }); return; }
+  if (t.tagName === "A" && t.hash) { e.preventDefault(); const s = document.getElementById(t.hash.slice(1)); if (s) s.scrollIntoView({ behavior: (RM || window.KalimpongExperience.calm) ? "auto" : "smooth" }); return; }
   const id = t.dataset.bm || t.dataset.bp || t.dataset.badd || t.dataset.hold; const it = BY.get(id); if (!it) return;
   const u = U(it);
   if (t.dataset.hold) return hold(it);
@@ -638,7 +879,7 @@ function setListing(on) {
 }
 $("#listbtn").onclick = () => setListing(!listing);
 $("#bclose").onclick = () => setListing(false);
-function flashCard(it) { setListing(true); const c = document.getElementById("bc-" + it.id); if (!c) return; c.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "center" }); c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); }
+function flashCard(it) { setListing(true); const c = document.getElementById("bc-" + it.id); if (!c) return; c.scrollIntoView({ behavior: (RM || window.KalimpongExperience.calm) ? "auto" : "smooth", block: "center" }); c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); }
 
 /* ---- pick-up view with weight stepper ---- */
 let HOLD = null, holdQ = 1, rotX = -8, rotY = -18, zoom = 1;
@@ -690,7 +931,7 @@ $("#card").addEventListener("click", (e) => {
   else if (t.hasAttribute("data-back")) closeHold();
   else if (t.dataset.go) hold(BY.get(t.dataset.go));
 });
-function swingSVG() { if (RM) return; let t0 = performance.now(); const f = (now) => { const t = (now - t0) / 1000; if (t > 1.6 || !HOLD) { tiltSVG(0); return; } tiltSVG(-14 * Math.exp(-t * 2.6) * Math.cos(t * 9)); requestAnimationFrame(f); }; requestAnimationFrame(f); }
+function swingSVG() { if ((RM || window.KalimpongExperience.calm)) return; let t0 = performance.now(); const f = (now) => { const t = (now - t0) / 1000; if (t > 1.6 || !HOLD) { tiltSVG(0); return; } tiltSVG(-14 * Math.exp(-t * 2.6) * Math.cos(t * 9)); requestAnimationFrame(f); }; requestAnimationFrame(f); }
 (() => {
   const st = $("#stagehand"); let d = null; const pts = new Map(); let pinch0 = 0, z0 = 1;
   st.addEventListener("pointerdown", (e) => { pts.set(e.pointerId, [e.clientX, e.clientY]); st.setPointerCapture(e.pointerId); if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); z0 = zoom; d = null; } else d = { x: e.clientX, y: e.clientY, rx: rotX, ry: rotY }; st.classList.add("drag"); });
@@ -853,6 +1094,7 @@ function build3D() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(HW * 2 + 2, LEN + 6), new THREE.MeshLambertMaterial({ map: earthT }));
   floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, ZM); scene.add(floor);
   const path = new THREE.Mesh(new THREE.PlaneGeometry(EDGE * 2 - .5, LEN - 1), new THREE.MeshLambertMaterial({ map: flagT }));
+  path.material.userData.kxSurface = {kind:'stone'};
   path.rotation.x = -Math.PI / 2; path.position.set(0, .006, ZM + .4); scene.add(path);
   const dapT = ctex(cvs(512, 512, (g, w, h) => { g.clearRect(0, 0, w, h); const r = rng(21); for (let i = 0; i < 70; i++) { const x = r() * w, y = r() * h, rad = 8 + r() * 26; const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, "rgba(255,246,210,.9)"); gr.addColorStop(1, "rgba(255,246,210,0)"); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rad, rad * (.6 + r() * .5), r() * 3, 0, 7); g.fill(); } }), [HW / 2.2, LEN / 4.4]);
   const dapple = new THREE.Mesh(new THREE.PlaneGeometry(HW * 2, LEN), new THREE.MeshBasicMaterial({ map: dapT, transparent: true, opacity: .42, blending: THREE.AdditiveBlending, depthWrite: false }));
@@ -1068,7 +1310,9 @@ function build3D() {
   for (const sx of [-1, 1]) LINES.push([sx * BWd * .42, 3.05 + BWd * 150 / 2048, BZ], [sx * BWd * .42, roofY(BWd * .42) - .1, BZ]);
 
   /* ---------- flush instanced geometry ---------- */
-  flush(WOOD, new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ map: woodT }));
+  const woodMaterial = new THREE.MeshLambertMaterial({ map: woodT });
+  woodMaterial.userData.kxSurface = {kind:'wood'};
+  flush(WOOD, new THREE.BoxGeometry(1, 1, 1), woodMaterial);
   flush(PLAIN, new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial());
   flush(CYL, new THREE.CylinderGeometry(1, 1, 1, 8, 1), new THREE.MeshLambertMaterial({ map: bambooT }));
   const produceMat = new THREE.MeshStandardMaterial({ roughness: .55, metalness: 0 });
@@ -1156,7 +1400,7 @@ function build3D() {
     const f = $("#fade"); f.style.opacity = 1;
     setTimeout(() => { const [rx, rz] = resolve(x, z); pos.x = rx; pos.z = rz; if (yw != null) yaw = yw; if (pt != null) pitch = pt; glide = null; vel.set(0, 0); f.style.opacity = 0; cb && cb(); }, 260);
   }
-  function go(x, z, yw, pt, cb) { if (Math.hypot(x - pos.x, z - pos.z) > 14 && !RM) teleport(x, z, yw, pt, cb); else glideTo(x, z, yw, pt, cb); }
+  function go(x, z, yw, pt, cb) { if (Math.hypot(x - pos.x, z - pos.z) > 14 && !(RM || window.KalimpongExperience.calm)) teleport(x, z, yw, pt, cb); else glideTo(x, z, yw, pt, cb); }
   function step(dt) {
     let fz = 0, fx = 0, turn = 0;
     if (keys.has("w") || keys.has("arrowup")) fz += 1; if (keys.has("s") || keys.has("arrowdown")) fz -= 1;
@@ -1177,7 +1421,7 @@ function build3D() {
     if (yawT != null) { yaw = lerpA(yaw, yawT, 1 - Math.exp(-dt * 7)); if (Math.abs(lerpA(yaw, yawT, 1) - yaw) < .003) { yaw = yawT; yawT = null; } }
     if (pitchT != null) { pitch += (pitchT - pitch) * (1 - Math.exp(-dt * 5)); if (Math.abs(pitchT - pitch) < .003) pitchT = null; }
     const spd = Math.hypot(vel.x, vel.y); bob += spd * dt * 3.2;
-    pos.y = EYE + (RM ? 0 : Math.sin(bob * 2) * .018 * Math.min(1, spd));
+    pos.y = EYE + ((RM || window.KalimpongExperience.calm) ? 0 : Math.sin(bob * 2) * .018 * Math.min(1, spd));
     camera.position.copy(pos); camera.rotation.set(pitch, yaw, 0);
   }
 
@@ -1283,7 +1527,7 @@ function build3D() {
     const s = SLOT.get(it.id); if (!s) return;
     const pt = Math.atan2(s.y - EYE, Math.abs(s.x - s.stand.x));
     closeHold(); $("#sheetbg").hidden = true;
-    const far = Math.hypot(s.stand.x - pos.x, s.stand.z - pos.z) > 6 && !RM;
+    const far = Math.hypot(s.stand.x - pos.x, s.stand.z - pos.z) > 6 && !(RM || window.KalimpongExperience.calm);
     (far ? teleport : glideTo)(s.stand.x, s.stand.z, s.yaw, clamp(pt, -.75, .5), () => { highlight([it]); showGaze(it); gz.h = { it }; gz.t = 0; gz.pin = performance.now() + 5000; });
   }
   function similar(it) { const same = ITEMS.filter(x => x.section === it.section); highlight(same); toast(`${same.length} in ${secOf(it).name}: follow the rings`); const st = stalls.find(s => s.sec.id === it.section); if (st && Math.abs(pos.z - st.zc) > st.len / 2 + .5) { /* arrows lead the way */ } }
@@ -1297,15 +1541,16 @@ function build3D() {
   function loop(now) {
     requestAnimationFrame(loop);
     const raw = Math.max(0, (now - last) / 1000), dt = Math.min(.05, raw); last = now; const t = now / 1000; // rAF stamps can trail performance.now()
+    if (document.hidden || window.KalimpongExperience.modalOpen) return;
     step(dt);
     // brass scale swing
-    if (swing.t < 3) { swing.t += dt; placePans(swing.amp * Math.exp(-swing.t * 2.1) * Math.cos(swing.t * 8.5) - .06 * (1 - Math.exp(-swing.t * 3))); }
+    if (!window.KalimpongExperience.calm && swing.t < 3) { swing.t += dt; placePans(swing.amp * Math.exp(-swing.t * 2.1) * Math.cos(swing.t * 8.5) - .06 * (1 - Math.exp(-swing.t * 3))); }
     // dappled light + mist drift
-    if (!RM) {
+    if (!(RM || window.KalimpongExperience.calm)) {
       dapT.offset.set(Math.sin(t * .09) * .04, Math.cos(t * .07) * .03); dapple.material.opacity = .38 + Math.sin(t * .8) * .04;
       if (MB.length) { const a = mistGeo.attributes.position.array; for (let i = 0; i < MB.length; i++) { const b = MB[i]; a[i * 3] = b[0] + Math.sin(t * .35 + b[3]) * .16; a[i * 3 + 1] = b[1] + ((t * .05 + b[3]) % .5); a[i * 3 + 2] = b[2] + Math.cos(t * .3 + b[3]) * .12; } mistGeo.attributes.position.needsUpdate = true; mist.material.opacity = .26 + Math.sin(t * .5) * .05; }
     }
-    if (hlUntil) { const on = now < hlUntil; const pulse = .55 + Math.sin(t * 5) * .35; ringMat.opacity = pulse; RINGS.forEach((m, i) => { if (!on) m.visible = false; else m.scale.setScalar(1 + Math.sin(t * 4 + i) * .08); }); ARROWS.forEach((m, i) => { if (!on) m.visible = false; }); arrowMat.opacity = .5 + .4 * Math.sin(t * 6); if (!on) hlUntil = 0; }
+    if (hlUntil) { const on = now < hlUntil; const pulse = window.KalimpongExperience.calm ? .7 : .55 + Math.sin(t * 5) * .35; ringMat.opacity = pulse; RINGS.forEach((m, i) => { if (!on) m.visible = false; else m.scale.setScalar(window.KalimpongExperience.calm ? 1 : 1 + Math.sin(t * 4 + i) * .08); }); ARROWS.forEach((m, i) => { if (!on) m.visible = false; }); arrowMat.opacity = window.KalimpongExperience.calm ? .7 : .5 + .4 * Math.sin(t * 6); if (!on) hlUntil = 0; }
     // gaze-to-pick
     gazeT += dt;
     if (gazeT > .1) {
@@ -1320,7 +1565,7 @@ function build3D() {
       gazeT = 0;
     }
     mapT += dt; if (mapT > .15) { mapT = 0; drawMap(); where(); }
-    renderer.render(scene, camera);
+    window.KalimpongExperience.render(renderer, scene, camera);
     fN++; fT += raw; if (fT >= 1) { fps = fN / fT; fN = 0; fT = 0; window.__fps = fps;
       // adaptive resolution: step the pixel ratio down on slow devices, never back up mid-visit
       if (started && fps < 28 && renderer.getPixelRatio() > .75) { renderer.setPixelRatio(Math.max(.75, renderer.getPixelRatio() - .25)); resize(); } }

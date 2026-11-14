@@ -1,0 +1,35 @@
+name: Kalimpong browser acceptance
+on:
+  push:
+    branches: ["kalimpong-visual-20261114", "main"]
+    paths: ["mall/**", "complex/**", ".github/workflows/kalimpong-visual.yml", ".github/scripts/visual-smoke.cjs"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/kalimpong-check" --no-package-lock --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/kalimpong-check/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check all six venues on desktop and phone
+        env:
+          NODE_PATH: ${{ runner.temp }}/kalimpong-check/node_modules
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/kalimpong-http.log" 2>&1 &
+          node .github/scripts/visual-smoke.cjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: kalimpong-browser-evidence
+          path: browser-evidence/
+          retention-days: 7

@@ -206,8 +206,9 @@ body.seated #wings,body.seated #map,body.seated #where,body.seated #tickets,body
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
-<body>
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="kalimpong-release" content="visual-extension-20261114">
+</head>
+<body data-venue="cinema" data-material-root="../shared/">
 <canvas id="gl" aria-label="The cinema, in 3D. Drag to look around, tap the floor to walk, tap a poster, the ticket window or a seat."></canvas>
 
 <div id="top">
@@ -248,7 +249,247 @@ body.seated #wings,body.seated #map,body.seated #where,body.seated #tickets,body
 </div>
 
 <script src="../shared/nav.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../shared/vendor/three-r128.min.js"></script>
+<script>
+/* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
+ * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
+ * Existing labels, product photographs, picking meshes and catalogue data stay intact.
+ */
+(() => {
+  'use strict';
+  const KEY = 'kalimpong.experience.v1';
+  const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const defaults = { quality: 'balanced', light: 'original', calm: media.matches, map: !coarse };
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (_) {}
+  const state = { ...defaults };
+  if (['original', 'balanced', 'detail'].includes(saved.quality)) state.quality = saved.quality;
+  if (['original', 'warm', 'clear'].includes(saved.light)) state.light = saved.light;
+  for (const k of ['calm', 'map']) if (typeof saved[k] === 'boolean') state[k] = saved[k];
+  if (media.matches) state.calm = true;
+  const contexts = new WeakMap();
+  const assetRoot = document.body.dataset.materialRoot;
+  const surfaceTextures = new Map();
+  function surfaceTexture(THREE, kind, repeats) {
+    const key = `${kind}:${repeats.join(',')}`;
+    if (surfaceTextures.has(key)) return surfaceTextures.get(key);
+    // r128 shares the colour-map UV transform with bump maps. Tile the image
+    // into its own canvas so the authored floor artwork keeps its original UVs.
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1024;
+    const g = canvas.getContext('2d'); g.fillStyle = '#888'; g.fillRect(0, 0, 1024, 1024);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    const img = new Image();
+    img.onload = () => {
+      const [rx, ry] = repeats.map(n => Math.max(1, Math.min(32, Math.round(n))));
+      for (let y = 0; y < ry; y++) for (let x = 0; x < rx; x++)
+        g.drawImage(img, x * 1024 / rx, y * 1024 / ry, 1024 / rx, 1024 / ry);
+      texture.needsUpdate = true;
+    };
+    img.onerror = () => { texture.userData = {...texture.userData, loadFailed: true}; };
+    img.src = `${assetRoot}materials/${kind === 'wood' ? 'oak' : 'limestone'}.jpg`;
+    surfaceTextures.set(key, texture); return texture;
+  }
+  function roundedBox(THREE, width, height, depth) {
+    const radius = Math.min(.035, width * .22, height * .22, depth * .22);
+    const geo = new THREE.BoxGeometry(1, 1, 1, 4, 4, 4);
+    const p = geo.attributes.position, n = geo.attributes.normal;
+    const v = new THREE.Vector3(), inner = new THREE.Vector3(), normal = new THREE.Vector3();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i); inner.copy(v).clampScalar(-.49999, .49999);
+      normal.copy(v).sub(inner).normalize();
+      p.setXYZ(i, v.x * (width - 2 * radius) + normal.x * radius,
+        v.y * (height - 2 * radius) + normal.y * radius,
+        v.z * (depth - 2 * radius) + normal.z * radius);
+      n.setXYZ(i, normal.x, normal.y, normal.z);
+    }
+    geo.computeBoundingBox(); geo.computeBoundingSphere(); return geo;
+  }
+  let active, panel, trigger, status;
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
+  const css = `
+    #kx-trigger{position:fixed;right:16px;top:46%;z-index:22;border:1px solid var(--line,#ddd);background:var(--panel,#fff);
+      color:var(--ink,#222);border-radius:10px;min-height:44px;padding:8px 12px;font:600 12px var(--sans,system-ui);cursor:pointer}
+    #kx-panel{position:fixed;z-index:80;inset:0;margin:auto;width:min(390px,calc(100vw - 24px));
+      height:fit-content;max-height:calc(100dvh - 32px);overflow:auto;padding:24px;
+      border:1px solid var(--line,#ddd);border-radius:18px;background:var(--panel,#fff);color:var(--ink,#222);
+      box-shadow:0 24px 90px #0006;font:14px/1.5 var(--sans,system-ui)}
+    #kx-panel::backdrop{background:#10182080;backdrop-filter:blur(4px)}
+    #kx-panel h2{font:600 27px var(--display,Georgia);margin:0 0 5px}
+    #kx-panel p{color:var(--muted,#666);margin:0 0 18px}
+    #kx-panel label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0}
+    #kx-panel select,#kx-panel button{min-height:44px;border:1px solid var(--line,#ddd);border-radius:9px;
+      background:var(--panel-2,#f3f0ea);color:inherit;font:inherit;padding:8px 12px}
+    #kx-panel select{max-width:62%}#kx-panel input{width:22px;height:22px;accent-color:var(--accent,#1f5f4a)}
+    #kx-panel .kx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    #kx-panel .kx-close{margin-left:auto}#kx-panel #kx-status{margin:12px 0 0;min-height:1.5em;font-size:12px}
+    :focus-visible{outline:3px solid var(--accent,#1f5f4a)!important;outline-offset:3px!important}
+    html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
+    html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+    @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
+      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}}
+  `;
+  function updateUI() {
+    document.documentElement.classList.toggle('kx-calm', state.calm);
+    document.documentElement.classList.toggle('kx-map-off', !state.map);
+    if (panel) for (const [k, v] of Object.entries(state)) {
+      const el = panel.querySelector(`[name="${k}"]`);
+      if (el) { if (el.type === 'checkbox') el.checked = v; else el.value = v; }
+    }
+  }
+  function mount() {
+    if (trigger) return;
+    const style = document.createElement('style'); style.textContent = css; document.head.append(style);
+    trigger = document.createElement('button'); trigger.id = 'kx-trigger'; trigger.type = 'button';
+    trigger.textContent = 'View settings'; trigger.setAttribute('aria-haspopup', 'dialog');
+    trigger.setAttribute('aria-controls', 'kx-panel');
+    document.body.append(trigger);
+    panel = document.createElement('dialog'); panel.id = 'kx-panel'; panel.setAttribute('aria-labelledby', 'kx-title');
+    panel.innerHTML = `<h2 id="kx-title">Make yourself comfortable</h2>
+      <p>Choose how this place looks and moves. Your choices follow you between shops.</p>
+      <label>Visual detail<select name="quality"><option value="original">Original · compare</option><option value="balanced">Balanced</option><option value="detail">Extra detail</option></select></label>
+      <label>Light<select name="light"><option value="original">Designed light</option><option value="warm">Warm afternoon</option><option value="clear">Clear daylight</option></select></label>
+      <label>Calm ambient motion<input name="calm" type="checkbox"></label>
+      <label>Show the map<input name="map" type="checkbox"></label>
+      <div class="kx-actions"><button type="button" id="kx-save">Save view</button><button type="button" id="kx-full">Full screen</button><button type="button" class="kx-close">Done</button></div>
+      <p id="kx-status" role="status" aria-live="polite"></p>`;
+    document.body.append(panel); status = panel.querySelector('#kx-status');
+    trigger.onclick = () => { updateUI(); panel.showModal(); };
+    panel.querySelector('.kx-close').onclick = () => panel.close();
+    panel.addEventListener('close', () => trigger.focus({ preventScroll: true }));
+    panel.addEventListener('pointerdown', e => e.stopPropagation());
+    panel.addEventListener('keydown', e => e.stopPropagation());
+    panel.addEventListener('change', e => {
+      const el = e.target; if (!(el.name in state)) return;
+      state[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      if (media.matches && el.name === 'calm' && !state.calm) {
+        state.calm = true; status.textContent = 'Your system’s reduced-motion preference is active.';
+      } else status.textContent = 'View updated.';
+      persist(); updateUI(); if (active) apply(active);
+    });
+    panel.querySelector('#kx-save').onclick = () => {
+      if (!active) { status.textContent = 'Enter the 3D view first.'; return; }
+      try {
+        const { renderer, scene, camera } = active; renderer.render(scene, camera);
+        renderer.domElement.toBlob(blob => {
+          if (!blob) { status.textContent = 'This browser could not save the view.'; return; }
+          const url = URL.createObjectURL(blob), a = document.createElement('a');
+          a.href = url; a.download = `kalimpong-${document.body.dataset.venue || 'view'}.png`; a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1500);
+          status.textContent = 'Saved the scene image. Interface controls are excluded.';
+        }, 'image/png');
+      } catch (_) { status.textContent = 'Saving is unavailable for this view. Try a browser screenshot.'; }
+    };
+    panel.querySelector('#kx-full').onclick = async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else throw new Error('unsupported');
+        status.textContent = document.fullscreenElement ? 'Full screen. Press Escape to leave.' : 'Window view restored.';
+      } catch (_) { status.textContent = 'Full screen is unavailable in this browser.'; }
+    };
+    media.addEventListener('change', e => { if (e.matches) { state.calm = true; updateUI(); persist(); } });
+    updateUI();
+  }
+  // A deterministic, original softbox environment, not a photographic HDRI.
+  function environment(renderer, THREE) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+    const g = c.getContext('2d'), grad = g.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, '#cad8e3'); grad.addColorStop(.48, '#eee8db'); grad.addColorStop(1, '#4c4941');
+    g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
+    g.fillStyle = '#fffaf0'; g.fillRect(60, 48, 75, 75); g.fillRect(350, 60, 100, 60);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const target = pmrem.fromEquirectangular(t); t.dispose(); pmrem.dispose(); return target;
+  }
+  function attach(renderer, scene, camera) {
+    const THREE = window.THREE;
+    const ctx = { renderer, scene, camera, materials: [], lights: [], originalEnv: scene.environment, pixelRatio: renderer.getPixelRatio(),
+      exposure: renderer.toneMappingExposure, sun: null, environment: null, failed: false };
+    contexts.set(renderer, ctx); active = ctx;
+    const cache = new Map();
+    scene.traverse(mesh => {
+      if (mesh.isDirectionalLight || mesh.isHemisphereLight) ctx.lights.push({ light: mesh, color: mesh.color.clone(), intensity: mesh.intensity });
+      if (!mesh.isMesh || !mesh.material) return;
+      const replace = m => {
+        if (!m.isMeshLambertMaterial || m.transparent || m.opacity < 1) return m;
+        if (cache.has(m)) return cache.get(m);
+        const n = new THREE.MeshStandardMaterial();
+        for (const k of ['color','emissive']) n[k].copy(m[k]);
+        for (const k of ['map','alphaMap','alphaTest','aoMap','aoMapIntensity','emissiveMap','emissiveIntensity','side','vertexColors','fog','depthWrite','depthTest','toneMapped','visible','polygonOffset','polygonOffsetFactor','polygonOffsetUnits']) {
+          if (m[k] !== undefined) n[k] = m[k];
+        }
+        n.roughness = .76; n.metalness = 0; n.envMapIntensity = .3;
+        if (m.userData.kxSurface && assetRoot) {
+          const spec = m.userData.kxSurface;
+          n.bumpMap = surfaceTexture(THREE, spec.kind, spec.repeats || [1, 1]);
+          n.bumpScale = spec.kind === 'wood' ? .008 : .015;
+          n.roughness = spec.kind === 'wood' ? .67 : .88;
+        }
+        n.name = `${m.name || 'surface'} · refined`; cache.set(m, n); return n;
+      };
+      const original = mesh.material, enhanced = Array.isArray(original) ? original.map(replace) : replace(original);
+      ctx.materials.push({ mesh, original, enhanced, cast: mesh.castShadow, receive: mesh.receiveShadow });
+    });
+    try { ctx.environment = environment(renderer, THREE); } catch (_) { /* PBR works without IBL. */ }
+    // Exterior only: a roof above an indoor room must not turn every shelf into a silhouette.
+    if (document.body.dataset.venue === 'plaza') {
+      ctx.sun = ctx.lights.find(x => x.light.isDirectionalLight)?.light;
+      if (ctx.sun) {
+        const s = ctx.sun.shadow; s.mapSize.set(1024, 1024);
+        Object.assign(s.camera, { left: -30, right: 30, top: 30, bottom: -30, near: .5, far: 150 });
+        s.camera.updateProjectionMatrix(); s.bias = -.0003; s.normalBias = .035;
+      }
+    }
+    mount(); apply(ctx); return ctx;
+  }
+  function apply(ctx) {
+    const original = state.quality === 'original';
+    ctx.scene.environment = original ? ctx.originalEnv : (ctx.environment?.texture || ctx.originalEnv);
+    for (const x of ctx.materials) {
+      x.mesh.material = original ? x.original : x.enhanced;
+      // Alpha-cut facade openings retain their alpha test in shadow passes.
+      x.mesh.castShadow = x.cast; x.mesh.receiveShadow = x.receive;
+      if (state.quality === 'detail' && ctx.sun && !coarse) {
+        const m = x.mesh.material;
+        if (!Array.isArray(m) && m.isMeshStandardMaterial) { x.mesh.castShadow = true; x.mesh.receiveShadow = true; }
+      }
+    }
+    if (ctx.sun) {
+      ctx.sun.castShadow = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.enabled = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      // The plaza's solid architecture is static; do not render another scene every frame.
+      ctx.renderer.shadowMap.autoUpdate = false; ctx.renderer.shadowMap.needsUpdate = true;
+    }
+    for (const x of ctx.lights) {
+      x.light.color.copy(x.color); x.light.intensity = x.intensity;
+      if (state.light !== 'original' && document.body.dataset.venue !== 'cinema') {
+        const tint = new THREE.Color(state.light === 'warm' ? '#ffe0b5' : '#d8e9ff');
+        x.light.color.lerp(tint, .22);
+      }
+    }
+    ctx.renderer.toneMappingExposure = ctx.exposure;
+    ctx.renderer.setPixelRatio(original ? ctx.pixelRatio : Math.min(devicePixelRatio || 1, state.quality === 'detail' ? 2 : coarse ? 1.25 : 1.5));
+    ctx.renderer.setSize(innerWidth, innerHeight, false);
+    if (document.body.dataset.venue === 'cinema' && panel) panel.querySelector('[name="light"]').disabled = true;
+  }
+  window.KalimpongExperience = {
+    roundedBox,
+    get calm() { return state.calm; },
+    get settings() { return { ...state }; },
+    get modalOpen() { return !!panel?.open; },
+    get diagnostics() { return active ? { materials: active.materials.length, environment: !!active.environment, quality: state.quality } : null; },
+    render(renderer, scene, camera) {
+      if (!contexts.has(renderer)) attach(renderer, scene, camera);
+      renderer.render(scene, camera);
+    }
+  };
+  updateUI();
+})();
+
+</script>
 <script>
 (() => {
 "use strict";
@@ -671,7 +912,7 @@ function flushGlows(list, mat) {
 function mergeBoxes(parts) {
   const pos = [], nor = [], col = [];
   for (const [x, y, z, sx, sy, sz, rx, shade] of parts) {
-    const g = new THREE.BoxGeometry(sx, sy, sz).toNonIndexed(); if (rx) g.rotateX(rx); g.translate(x, y, z);
+    const g = window.KalimpongExperience.roundedBox(THREE, sx, sy, sz).toNonIndexed(); if (rx) g.rotateX(rx); g.translate(x, y, z);
     pos.push(...g.attributes.position.array); nor.push(...g.attributes.normal.array); for (let i = 0; i < g.attributes.position.count; i++) col.push(shade, shade, shade);
   }
   const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); return geo;
@@ -1195,6 +1436,7 @@ function step(dt) {
 }
 let whereT = 0, mapT = 0;
 function frame(dt) {
+  if (document.hidden || window.KalimpongExperience.modalOpen) return;
   tNow += dt; step(dt);
   camera.position.set(pos.x, pos.y, pos.z); camera.rotation.set(pitch, yaw, 0);
   // the show: lights down, curtain up, trailer
@@ -1203,6 +1445,7 @@ function frame(dt) {
     if (!showStarted && curtain > .93) startShow();
   }
   const houseTarget = seated ? .1 : 1; house += (houseTarget - house) * (1 - Math.exp(-dt * (seated ? 1.1 : 1.8)));
+  if (window.KalimpongExperience.calm) { curtain = curtainTarget; updateCurtain(curtain, 0); }
   const dc = curtainTarget - curtain; if (Math.abs(dc) > .0005) { curtain += Math.sign(dc) * Math.min(Math.abs(dc), dt / 3.2); updateCurtain(curtain, tNow); curtainT = tNow; }
   else if (curtain !== curtainTarget) { curtain = curtainTarget; updateCurtain(curtain, tNow); }
   hemi.intensity = .06 + .8 * house; sun.intensity = .5 * house;
@@ -1213,18 +1456,19 @@ function frame(dt) {
   if (screenMode === "leader") { pulse.set("#e8dcc4"); inten = .75 + Math.random() * .12; }
   else if (screenMode === "yt") { col1.set(c1); col2.set(c2); pulse.copy(col1).lerp(col2, .5 + .5 * Math.sin(tNow * .7)).lerp(col2.set(c0).offsetHSL(0, 0, .3), .25 + .25 * Math.sin(tNow * 1.9)); inten = .75 + .18 * Math.sin(tNow * 3.1) + .1 * Math.sin(tNow * 7.3); }
   else { pulse.set(c2).lerp(col1.set("#ffe2b0"), .5); inten = .45; }
+  if (window.KalimpongExperience.calm) { inten = .7; pulse.set(c1); }
   glowK += (curtain * inten - glowK) * (1 - Math.exp(-dt * 6));
   glowPulseMat.color.copy(pulse); glowPulseMat.opacity = clamp(glowK * (.35 + .55 * (1 - house)), 0, 1);
   spillMat.color.copy(pulse); spillMat.opacity = clamp(glowK * (1 - house) * .3, 0, 1);
   scrLight.color.copy(pulse); scrLight.intensity = glowK * (.2 + 1.6 * (1 - house));
   if (screenMode === "leader") { drawLeader(screenG, 1024, 576, (performance.now() - leaderT0) / 1000, film); TX.screen.needsUpdate = true; }
   // chasing bulbs on the marquee
-  if (!inHall(pos.z) && bulbMesh) { const n = bulbMesh.count, ph = Math.floor(tNow * 9), c = col1; for (let i = 0; i < n; i++) { c.set(((i >> 1) + ph) % 4 === 0 ? "#fff3cc" : "#8a5a22"); bulbMesh.setColorAt(i, c); } bulbMesh.instanceColor.needsUpdate = true; }
+  if (!window.KalimpongExperience.calm && !inHall(pos.z) && bulbMesh) { const n = bulbMesh.count, ph = Math.floor(tNow * 9), c = col1; for (let i = 0; i < n; i++) { c.set(((i >> 1) + ph) % 4 === 0 ? "#fff3cc" : "#8a5a22"); bulbMesh.setColorAt(i, c); } bulbMesh.instanceColor.needsUpdate = true; }
   // fov: wider on a portrait phone; seated, frame the screen so it fills most of the view
   let fov = innerWidth < innerHeight ? 74 : 66;
   if (seated) { const d = Math.hypot(pos.x - SCR.x, pos.y - SCR.y, pos.z - SCR.z), a = camera.aspect, frac = a < 1 ? .94 : .66; fov = clamp(2 * Math.atan(Math.max(SCR.w / 2 / frac / (d * a), SCR.h / 2 / .72 / d)) * 180 / PI, 34, 100); }
   if (Math.abs(camera.fov - fov) > .01) { camera.fov += (fov - camera.fov) * (1 - Math.exp(-dt * 3)); if (Math.abs(camera.fov - fov) < .02) camera.fov = fov; camera.updateProjectionMatrix(); }
-  renderer.render(scene, camera); alignYT();
+  window.KalimpongExperience.render(renderer, scene, camera); alignYT();
   whereT += dt; if (whereT > .5) { whereT = 0; if (!auto || !auto.seatWalk) updateWhere(); }
   mapT += dt; if (mapT > .12) { mapT = 0; drawMap(); }
 }
@@ -1248,7 +1492,7 @@ function build() {
   drawMarquee(); drawScreenIdle(); resize();
   let last = performance.now(), frames = 0, fpsT = 0; window.__fps = 0;
   const loop = (now) => { const dt = Math.min(.1, (now - last) / 1000); last = now; frames++; fpsT += dt; if (fpsT > 1) { window.__fps = +(frames / fpsT).toFixed(1); frames = 0; fpsT = 0; } frame(dt); requestAnimationFrame(loop); };
-  renderer.render(scene, camera); requestAnimationFrame(loop);
+  window.KalimpongExperience.render(renderer, scene, camera); requestAnimationFrame(loop);
   window.__cinema = {
     get room() { return inHall(pos.z) ? "hall" : "lobby"; }, get pos() { return { ...pos, yaw, pitch }; }, get seated() { return seated && { row: seated.row, seat: seated.seat }; },
     get curtain() { return curtain; }, get house() { return house; }, get screenMode() { return screenMode; }, get film() { return film.id; }, get duck() { return duckG ? duckG.gain.value : null; }, get ducked() { return ducked; },

@@ -1,0 +1,28 @@
+[
+  {
+    "name": "limestone",
+    "file": "source/complex/shared/materials/limestone.jpg",
+    "sha256": "b964ce80f95b59fd35d5c3b6ed706138e94bb104215cba79e37510d2d4e0f89a",
+    "bytes": 515137,
+    "source": "Original image generated with built-in image_gen in this task",
+    "use": "Approximate bump relief only; original venue colour artwork preserved",
+    "limitations": "Generated appearance, not a measured scan, physical height map, or verified local material. Tiling and strength need GPU inspection."
+  },
+  {
+    "name": "oak",
+    "file": "source/complex/shared/materials/oak.jpg",
+    "sha256": "e736ae52ee5d9d5b16f5599ce4779554f3c7eecacc1cd910ad9f0b98458584de",
+    "bytes": 389631,
+    "source": "Original image generated with built-in image_gen in this task",
+    "use": "Approximate bump relief only; original venue colour artwork preserved",
+    "limitations": "Generated appearance, not a measured scan, physical height map, or verified local material. Tiling and strength need GPU inspection."
+  },
+  {
+    "name": "Three.js r128",
+    "file": "source/complex/shared/vendor/three-r128.min.js",
+    "sha256": "f36957277d6ece3c6db2a5c0461319ef4a9b21611e4d7f987be6a42f5ffe456f",
+    "source": "https://github.com/mrdoob/three.js/blob/r128/build/three.min.js",
+    "license": "MIT; bundled LICENSE-three.txt",
+    "retrieval": "GitHub connector; exact engine revision checked in Node"
+  }
+]

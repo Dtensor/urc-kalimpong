@@ -179,9 +179,9 @@ button{cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .search-count{position:sticky;top:-6px;background:var(--panel);margin:0;padding:10px 8px;font-size:12px;border-bottom:1px solid var(--line);z-index:1}.results .search-more{display:block;text-align:center;min-height:44px;font-weight:600}.results button{min-height:56px}.results b{white-space:normal}.results{overscroll-behavior:contain;scrollbar-gutter:stable}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="urc-release" content="shelf-search-2026-11-14">
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="kalimpong-release" content="visual-extension-20261114">
 </head>
-<body>
+<body data-venue="urc" data-material-root="../complex/shared/">
 <canvas id="gl" aria-label="The canteen, in 3D. Drag to look around, tap the floor to walk, tap a product to pick it up."></canvas>
 
 <div id="top">
@@ -224,7 +224,247 @@ button{cursor:pointer}
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../complex/shared/vendor/three-r128.min.js"></script>
+<script>
+/* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
+ * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
+ * Existing labels, product photographs, picking meshes and catalogue data stay intact.
+ */
+(() => {
+  'use strict';
+  const KEY = 'kalimpong.experience.v1';
+  const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const defaults = { quality: 'balanced', light: 'original', calm: media.matches, map: !coarse };
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (_) {}
+  const state = { ...defaults };
+  if (['original', 'balanced', 'detail'].includes(saved.quality)) state.quality = saved.quality;
+  if (['original', 'warm', 'clear'].includes(saved.light)) state.light = saved.light;
+  for (const k of ['calm', 'map']) if (typeof saved[k] === 'boolean') state[k] = saved[k];
+  if (media.matches) state.calm = true;
+  const contexts = new WeakMap();
+  const assetRoot = document.body.dataset.materialRoot;
+  const surfaceTextures = new Map();
+  function surfaceTexture(THREE, kind, repeats) {
+    const key = `${kind}:${repeats.join(',')}`;
+    if (surfaceTextures.has(key)) return surfaceTextures.get(key);
+    // r128 shares the colour-map UV transform with bump maps. Tile the image
+    // into its own canvas so the authored floor artwork keeps its original UVs.
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1024;
+    const g = canvas.getContext('2d'); g.fillStyle = '#888'; g.fillRect(0, 0, 1024, 1024);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    const img = new Image();
+    img.onload = () => {
+      const [rx, ry] = repeats.map(n => Math.max(1, Math.min(32, Math.round(n))));
+      for (let y = 0; y < ry; y++) for (let x = 0; x < rx; x++)
+        g.drawImage(img, x * 1024 / rx, y * 1024 / ry, 1024 / rx, 1024 / ry);
+      texture.needsUpdate = true;
+    };
+    img.onerror = () => { texture.userData = {...texture.userData, loadFailed: true}; };
+    img.src = `${assetRoot}materials/${kind === 'wood' ? 'oak' : 'limestone'}.jpg`;
+    surfaceTextures.set(key, texture); return texture;
+  }
+  function roundedBox(THREE, width, height, depth) {
+    const radius = Math.min(.035, width * .22, height * .22, depth * .22);
+    const geo = new THREE.BoxGeometry(1, 1, 1, 4, 4, 4);
+    const p = geo.attributes.position, n = geo.attributes.normal;
+    const v = new THREE.Vector3(), inner = new THREE.Vector3(), normal = new THREE.Vector3();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i); inner.copy(v).clampScalar(-.49999, .49999);
+      normal.copy(v).sub(inner).normalize();
+      p.setXYZ(i, v.x * (width - 2 * radius) + normal.x * radius,
+        v.y * (height - 2 * radius) + normal.y * radius,
+        v.z * (depth - 2 * radius) + normal.z * radius);
+      n.setXYZ(i, normal.x, normal.y, normal.z);
+    }
+    geo.computeBoundingBox(); geo.computeBoundingSphere(); return geo;
+  }
+  let active, panel, trigger, status;
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
+  const css = `
+    #kx-trigger{position:fixed;right:16px;top:46%;z-index:22;border:1px solid var(--line,#ddd);background:var(--panel,#fff);
+      color:var(--ink,#222);border-radius:10px;min-height:44px;padding:8px 12px;font:600 12px var(--sans,system-ui);cursor:pointer}
+    #kx-panel{position:fixed;z-index:80;inset:0;margin:auto;width:min(390px,calc(100vw - 24px));
+      height:fit-content;max-height:calc(100dvh - 32px);overflow:auto;padding:24px;
+      border:1px solid var(--line,#ddd);border-radius:18px;background:var(--panel,#fff);color:var(--ink,#222);
+      box-shadow:0 24px 90px #0006;font:14px/1.5 var(--sans,system-ui)}
+    #kx-panel::backdrop{background:#10182080;backdrop-filter:blur(4px)}
+    #kx-panel h2{font:600 27px var(--display,Georgia);margin:0 0 5px}
+    #kx-panel p{color:var(--muted,#666);margin:0 0 18px}
+    #kx-panel label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0}
+    #kx-panel select,#kx-panel button{min-height:44px;border:1px solid var(--line,#ddd);border-radius:9px;
+      background:var(--panel-2,#f3f0ea);color:inherit;font:inherit;padding:8px 12px}
+    #kx-panel select{max-width:62%}#kx-panel input{width:22px;height:22px;accent-color:var(--accent,#1f5f4a)}
+    #kx-panel .kx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    #kx-panel .kx-close{margin-left:auto}#kx-panel #kx-status{margin:12px 0 0;min-height:1.5em;font-size:12px}
+    :focus-visible{outline:3px solid var(--accent,#1f5f4a)!important;outline-offset:3px!important}
+    html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
+    html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+    @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
+      .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}}
+  `;
+  function updateUI() {
+    document.documentElement.classList.toggle('kx-calm', state.calm);
+    document.documentElement.classList.toggle('kx-map-off', !state.map);
+    if (panel) for (const [k, v] of Object.entries(state)) {
+      const el = panel.querySelector(`[name="${k}"]`);
+      if (el) { if (el.type === 'checkbox') el.checked = v; else el.value = v; }
+    }
+  }
+  function mount() {
+    if (trigger) return;
+    const style = document.createElement('style'); style.textContent = css; document.head.append(style);
+    trigger = document.createElement('button'); trigger.id = 'kx-trigger'; trigger.type = 'button';
+    trigger.textContent = 'View settings'; trigger.setAttribute('aria-haspopup', 'dialog');
+    trigger.setAttribute('aria-controls', 'kx-panel');
+    document.body.append(trigger);
+    panel = document.createElement('dialog'); panel.id = 'kx-panel'; panel.setAttribute('aria-labelledby', 'kx-title');
+    panel.innerHTML = `<h2 id="kx-title">Make yourself comfortable</h2>
+      <p>Choose how this place looks and moves. Your choices follow you between shops.</p>
+      <label>Visual detail<select name="quality"><option value="original">Original · compare</option><option value="balanced">Balanced</option><option value="detail">Extra detail</option></select></label>
+      <label>Light<select name="light"><option value="original">Designed light</option><option value="warm">Warm afternoon</option><option value="clear">Clear daylight</option></select></label>
+      <label>Calm ambient motion<input name="calm" type="checkbox"></label>
+      <label>Show the map<input name="map" type="checkbox"></label>
+      <div class="kx-actions"><button type="button" id="kx-save">Save view</button><button type="button" id="kx-full">Full screen</button><button type="button" class="kx-close">Done</button></div>
+      <p id="kx-status" role="status" aria-live="polite"></p>`;
+    document.body.append(panel); status = panel.querySelector('#kx-status');
+    trigger.onclick = () => { updateUI(); panel.showModal(); };
+    panel.querySelector('.kx-close').onclick = () => panel.close();
+    panel.addEventListener('close', () => trigger.focus({ preventScroll: true }));
+    panel.addEventListener('pointerdown', e => e.stopPropagation());
+    panel.addEventListener('keydown', e => e.stopPropagation());
+    panel.addEventListener('change', e => {
+      const el = e.target; if (!(el.name in state)) return;
+      state[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      if (media.matches && el.name === 'calm' && !state.calm) {
+        state.calm = true; status.textContent = 'Your system’s reduced-motion preference is active.';
+      } else status.textContent = 'View updated.';
+      persist(); updateUI(); if (active) apply(active);
+    });
+    panel.querySelector('#kx-save').onclick = () => {
+      if (!active) { status.textContent = 'Enter the 3D view first.'; return; }
+      try {
+        const { renderer, scene, camera } = active; renderer.render(scene, camera);
+        renderer.domElement.toBlob(blob => {
+          if (!blob) { status.textContent = 'This browser could not save the view.'; return; }
+          const url = URL.createObjectURL(blob), a = document.createElement('a');
+          a.href = url; a.download = `kalimpong-${document.body.dataset.venue || 'view'}.png`; a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1500);
+          status.textContent = 'Saved the scene image. Interface controls are excluded.';
+        }, 'image/png');
+      } catch (_) { status.textContent = 'Saving is unavailable for this view. Try a browser screenshot.'; }
+    };
+    panel.querySelector('#kx-full').onclick = async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else throw new Error('unsupported');
+        status.textContent = document.fullscreenElement ? 'Full screen. Press Escape to leave.' : 'Window view restored.';
+      } catch (_) { status.textContent = 'Full screen is unavailable in this browser.'; }
+    };
+    media.addEventListener('change', e => { if (e.matches) { state.calm = true; updateUI(); persist(); } });
+    updateUI();
+  }
+  // A deterministic, original softbox environment, not a photographic HDRI.
+  function environment(renderer, THREE) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+    const g = c.getContext('2d'), grad = g.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, '#cad8e3'); grad.addColorStop(.48, '#eee8db'); grad.addColorStop(1, '#4c4941');
+    g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
+    g.fillStyle = '#fffaf0'; g.fillRect(60, 48, 75, 75); g.fillRect(350, 60, 100, 60);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const target = pmrem.fromEquirectangular(t); t.dispose(); pmrem.dispose(); return target;
+  }
+  function attach(renderer, scene, camera) {
+    const THREE = window.THREE;
+    const ctx = { renderer, scene, camera, materials: [], lights: [], originalEnv: scene.environment, pixelRatio: renderer.getPixelRatio(),
+      exposure: renderer.toneMappingExposure, sun: null, environment: null, failed: false };
+    contexts.set(renderer, ctx); active = ctx;
+    const cache = new Map();
+    scene.traverse(mesh => {
+      if (mesh.isDirectionalLight || mesh.isHemisphereLight) ctx.lights.push({ light: mesh, color: mesh.color.clone(), intensity: mesh.intensity });
+      if (!mesh.isMesh || !mesh.material) return;
+      const replace = m => {
+        if (!m.isMeshLambertMaterial || m.transparent || m.opacity < 1) return m;
+        if (cache.has(m)) return cache.get(m);
+        const n = new THREE.MeshStandardMaterial();
+        for (const k of ['color','emissive']) n[k].copy(m[k]);
+        for (const k of ['map','alphaMap','alphaTest','aoMap','aoMapIntensity','emissiveMap','emissiveIntensity','side','vertexColors','fog','depthWrite','depthTest','toneMapped','visible','polygonOffset','polygonOffsetFactor','polygonOffsetUnits']) {
+          if (m[k] !== undefined) n[k] = m[k];
+        }
+        n.roughness = .76; n.metalness = 0; n.envMapIntensity = .3;
+        if (m.userData.kxSurface && assetRoot) {
+          const spec = m.userData.kxSurface;
+          n.bumpMap = surfaceTexture(THREE, spec.kind, spec.repeats || [1, 1]);
+          n.bumpScale = spec.kind === 'wood' ? .008 : .015;
+          n.roughness = spec.kind === 'wood' ? .67 : .88;
+        }
+        n.name = `${m.name || 'surface'} · refined`; cache.set(m, n); return n;
+      };
+      const original = mesh.material, enhanced = Array.isArray(original) ? original.map(replace) : replace(original);
+      ctx.materials.push({ mesh, original, enhanced, cast: mesh.castShadow, receive: mesh.receiveShadow });
+    });
+    try { ctx.environment = environment(renderer, THREE); } catch (_) { /* PBR works without IBL. */ }
+    // Exterior only: a roof above an indoor room must not turn every shelf into a silhouette.
+    if (document.body.dataset.venue === 'plaza') {
+      ctx.sun = ctx.lights.find(x => x.light.isDirectionalLight)?.light;
+      if (ctx.sun) {
+        const s = ctx.sun.shadow; s.mapSize.set(1024, 1024);
+        Object.assign(s.camera, { left: -30, right: 30, top: 30, bottom: -30, near: .5, far: 150 });
+        s.camera.updateProjectionMatrix(); s.bias = -.0003; s.normalBias = .035;
+      }
+    }
+    mount(); apply(ctx); return ctx;
+  }
+  function apply(ctx) {
+    const original = state.quality === 'original';
+    ctx.scene.environment = original ? ctx.originalEnv : (ctx.environment?.texture || ctx.originalEnv);
+    for (const x of ctx.materials) {
+      x.mesh.material = original ? x.original : x.enhanced;
+      // Alpha-cut facade openings retain their alpha test in shadow passes.
+      x.mesh.castShadow = x.cast; x.mesh.receiveShadow = x.receive;
+      if (state.quality === 'detail' && ctx.sun && !coarse) {
+        const m = x.mesh.material;
+        if (!Array.isArray(m) && m.isMeshStandardMaterial) { x.mesh.castShadow = true; x.mesh.receiveShadow = true; }
+      }
+    }
+    if (ctx.sun) {
+      ctx.sun.castShadow = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.enabled = state.quality === 'detail' && !coarse;
+      ctx.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      // The plaza's solid architecture is static; do not render another scene every frame.
+      ctx.renderer.shadowMap.autoUpdate = false; ctx.renderer.shadowMap.needsUpdate = true;
+    }
+    for (const x of ctx.lights) {
+      x.light.color.copy(x.color); x.light.intensity = x.intensity;
+      if (state.light !== 'original' && document.body.dataset.venue !== 'cinema') {
+        const tint = new THREE.Color(state.light === 'warm' ? '#ffe0b5' : '#d8e9ff');
+        x.light.color.lerp(tint, .22);
+      }
+    }
+    ctx.renderer.toneMappingExposure = ctx.exposure;
+    ctx.renderer.setPixelRatio(original ? ctx.pixelRatio : Math.min(devicePixelRatio || 1, state.quality === 'detail' ? 2 : coarse ? 1.25 : 1.5));
+    ctx.renderer.setSize(innerWidth, innerHeight, false);
+    if (document.body.dataset.venue === 'cinema' && panel) panel.querySelector('[name="light"]').disabled = true;
+  }
+  window.KalimpongExperience = {
+    roundedBox,
+    get calm() { return state.calm; },
+    get settings() { return { ...state }; },
+    get modalOpen() { return !!panel?.open; },
+    get diagnostics() { return active ? { materials: active.materials.length, environment: !!active.environment, quality: state.quality } : null; },
+    render(renderer, scene, camera) {
+      if (!contexts.has(renderer)) attach(renderer, scene, camera);
+      renderer.render(scene, camera);
+    }
+  };
+  updateUI();
+})();
+
+</script>
 <script>window.BHANDAR_API="https://kings-macbook-pro.tail35a127.ts.net";</script>
 <script>
 (() => {
@@ -942,6 +1182,7 @@ function buildWing(w) {
     map: cellar ? (() => { const t = TX.wood.clone(); t.needsUpdate = true; t.repeat.set(D / 2.6, W / 2.6); return t; })() : ctex(wingTile(w.col), [Math.max(1, Math.round(D / 2.4)), Math.max(1, Math.round(W / 2.4))]),
     color: cellar ? "#a88" : "#fff",
   });
+  floorMat.userData.kxSurface = {kind: cellar ? 'wood' : 'stone'};
   lplane(w, floorMat, D, W, D / 2, .003, 0, 0, -Math.PI / 2);
   lbox(w, D / 2, WALLH + .1, 0, D, .2, W, ceil);
   // walls: back, both sides, then the shopfront glass either side of the way in
@@ -1115,7 +1356,7 @@ function gate(dt, all = false) {
   // same frame anything crosses it, so it is never seen half-covered.
   for (const g of GATED) {
     if (clearView(g)) { if (++g.ok >= 2 || all) g.on = 1; } else { g.ok = 0; g.on = 0; }
-    g.k = all || RM || !g.on ? g.on : g.k + (1 - g.k) * (1 - Math.exp(-dt * 12));
+    g.k = all || (RM || window.KalimpongExperience.calm) || !g.on ? g.on : g.k + (1 - g.k) * (1 - Math.exp(-dt * 12));
     g.mesh.material.opacity = g.k; g.mesh.visible = g.k > .02;
   }
 }
@@ -1456,11 +1697,11 @@ const faceYaw = (dx, dz) => Math.atan2(-dx, -dz);
 function interrupt() { auto = null; pan = null; }
 // first thing through the doors: a slow look left, right and back, past every
 // department's head board. Any key, drag or tap ends it where it is.
-function lookRound() { if (RM) return; pan = { t: 0, T: 9, a: camera.aspect < 1 ? 1.45 : 1.05, y0: yaw }; }
+function lookRound() { if ((RM || window.KalimpongExperience.calm)) return; pan = { t: 0, T: 9, a: camera.aspect < 1 ? 1.45 : 1.05, y0: yaw }; }
 function glideTo(x, z, opt = {}) { const [tx, tz] = settle(x, z); auto = { x: tx, z: tz, yaw: opt.yaw ?? null, pitch: opt.pitch ?? null, stuck: 0, done: opt.done, path: opt.path || [] }; }
 function teleport(x, z, y, p, after) {
   const f = $("#fade"); const go = () => { [pos.x, pos.z] = settle(x, z); vel.x = vel.z = 0; yaw = y; pitch = p ?? -.06; auto = null; pan = null; camera.position.set(pos.x, EYE, pos.z); gate(0, true); streamPhotos(); streamStrips(); after && after(); };
-  if (RM) { go(); return; } f.style.opacity = 1; setTimeout(() => { go(); requestAnimationFrame(() => f.style.opacity = 0); }, 240);
+  if ((RM || window.KalimpongExperience.calm)) { go(); return; } f.style.opacity = 1; setTimeout(() => { go(); requestAnimationFrame(() => f.style.opacity = 0); }, 240);
 }
 // Walk round the hall rather than through walls: out of this wing's mouth, round
 // the ring, in through the next one. The fountain is skirted, never crossed.
@@ -1542,8 +1783,8 @@ function step(dt) {
   const moved = Math.hypot(pos.x - ox, pos.z - oz);
   if (auto && moved < dt * .05 && Math.hypot(auto.x - pos.x, auto.z - pos.z) > .2) { if (++auto.stuck > 40) auto = null; } else if (auto) auto.stuck = 0;
   pitch = Math.max(-1.1, Math.min(.9, pitch));
-  if (!RM) bob += moved * 2.4;
-  const sy = RM ? 0 : Math.sin(bob) * .02 * Math.min(1, Math.hypot(vel.x, vel.z) / 3.4);
+  if (!(RM || window.KalimpongExperience.calm)) bob += moved * 2.4;
+  const sy = (RM || window.KalimpongExperience.calm) ? 0 : Math.sin(bob) * .02 * Math.min(1, Math.hypot(vel.x, vel.z) / 3.4);
   fov += (fovT - fov) * (1 - Math.exp(-dt * 6)); if (Math.abs(camera.fov - fov) > .01) { camera.fov = fov; camera.updateProjectionMatrix(); }
   camera.position.set(pos.x, EYE + sy, pos.z); camera.rotation.set(pitch, yaw, 0);
   if (moved > 0.001) stepsPlay(moved);
@@ -1598,7 +1839,7 @@ function setGaze(v) {
 }
 function animateLift(dt) {
   if (!lifted) return; liftK = Math.min(1, liftK + dt * 3); const e = 1 - Math.pow(1 - liftK, 3), v = lifted;
-  const wob = RM ? 0 : Math.sin(performance.now() / 500) * .06 * e;
+  const wob = (RM || window.KalimpongExperience.calm) ? 0 : Math.sin(performance.now() / 500) * .06 * e;
   if (v.photo && !v.isLabel) { const [hx, hz] = at(v, .1 + .28 * e); v.photo.visible = true; v.photo.scale.set(v.pw * (1 + .55 * e), v.ph * (1 + .55 * e), 1); v.photo.position.set(hx, v.photoY + .1 * e, hz); v.photo.rotation.y = v.ry + wob; }
   else {
     const [bx, bz] = at(v, v.d[2] / 2 + .02 + .28 * e);
@@ -1782,7 +2023,7 @@ function addToBasket(it, q, from, set) {
   BASKET[it.id] = set ? q : Math.min(99, (BASKET[it.id] || 0) + q); saveBasket(); chime();
   toast(`${it.name.split(" ").slice(0, 4).join(" ")} · in your trolley`);
   const tb = $("#trolley"); tb.classList.remove("bump"); void tb.offsetWidth; tb.classList.add("bump");
-  if (from && it.img && !RM) {
+  if (from && it.img && !(RM || window.KalimpongExperience.calm)) {
     const r = from.getBoundingClientRect(), t = tb.getBoundingClientRect(), f = document.createElement("img"); f.className = "fly"; f.src = pic(it);
     f.style.left = r.left + r.width / 2 - 32 + "px"; f.style.top = r.top - 40 + "px"; document.body.append(f);
     requestAnimationFrame(() => { f.style.transform = `translate(${t.left + 20 - r.left - r.width / 2}px,${t.top - r.top + 40}px) scale(.3)`; f.style.opacity = .2; });
@@ -2013,14 +2254,15 @@ addEventListener("resize", resize);
 let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (document.hidden || window.KalimpongExperience.modalOpen) { requestAnimationFrame(loop); return; }
   step(dt); gaze(dt); animateLift(dt); updateScreen(dt);
-  if (ticker && !RM) ticker.map.offset.x = (ticker.map.offset.x + dt * .03) % 1;
+  if (ticker && !(RM || window.KalimpongExperience.calm)) ticker.map.offset.x = (ticker.map.offset.x + dt * .03) % 1;
   gate(dt);
-  for (const p of PODIUM) { p.g.rotation.y += dt * .6; }
-  if (HL) HL.children.forEach(m => { if (m.userData.pulse) m.scale.setScalar(1 + Math.sin(now / 250) * .12); else m.material.opacity = .45 + .45 * Math.sin(now / 200 - m.userData.seq * .6); });
+  if (!window.KalimpongExperience.calm) for (const p of PODIUM) { p.g.rotation.y += dt * .6; }
+  if (HL && !window.KalimpongExperience.calm) HL.children.forEach(m => { if (m.userData.pulse) m.scale.setScalar(1 + Math.sin(now / 250) * .12); else m.material.opacity = .45 + .45 * Math.sin(now / 200 - m.userData.seq * .6); });
   acc += dt; if (acc > .45) { acc = 0; streamPhotos(); streamStrips(); where(); }
   acc2 += dt; if (acc2 > .12) { acc2 = 0; if (!$("#map").classList.contains("big")) drawMap(); }
-  renderer.render(scene, camera);
+  window.KalimpongExperience.render(renderer, scene, camera);
   frames++; fpsT += dt; if (fpsT > 1) { window.__fps = +(frames / fpsT).toFixed(1); frames = 0; fpsT = 0; }
   requestAnimationFrame(loop);
 }
@@ -2064,4 +2306,3 @@ start();
 </script>
 </body>
 </html>
-

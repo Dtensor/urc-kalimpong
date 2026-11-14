@@ -51,12 +51,12 @@
     }
     const anchor = opts.anchor || document.getElementById('brand') || document.body;
     const btn = document.createElement('button');
-    btn.type = 'button'; btn.className = 'cx-btn'; btn.setAttribute('aria-haspopup', 'menu'); btn.setAttribute('aria-expanded', 'false');
+    btn.type = 'button'; btn.className = 'cx-btn'; btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1 11V5.5L6 1l5 4.5V11H7.5V7.5h-3V11z" fill="currentColor"/></svg>Station Complex<span aria-hidden="true">▾</span>';
     anchor.appendChild(btn);
 
     const pop = document.createElement('nav');
-    pop.className = 'cx-pop'; pop.hidden = true; pop.setAttribute('aria-label', 'Places in Station Complex');
+    pop.id = 'cx-places'; btn.setAttribute('aria-controls', pop.id); pop.className = 'cx-pop'; pop.hidden = true; pop.setAttribute('aria-label', 'Places in Station Complex');
     const row = p => `<a href="${href(p.id, { walk: p.id === 'urc' })}" ${p.id === here ? 'aria-current="page"' : ''}>
       <span class="cx-dot" style="background:${p.color}">${p.glyph}</span>
       <span class="cx-t"><b>${p.name}</b><small>${p.sub}</small></span>
