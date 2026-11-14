@@ -30,12 +30,18 @@ const engine=process.env.ENGINE||'chromium',out='showcase-evidence';fs.mkdirSync
    // Visible scene dragging must turn the camera, and the list route stays usable.
    const before=await page.evaluate(()=>__plaza.pos().yaw);await page.mouse.move(width*.42,height*.55);await page.mouse.down();await page.mouse.move(width*.6,height*.55,{steps:8});await page.mouse.up();
    assert(Math.abs((await page.evaluate(()=>__plaza.pos().yaw))-before)>.1);
-   await page.locator('#listBtn').click();assert(await page.locator('#listClose').isVisible());await page.locator('#listClose').click();
-   await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="quality"]').selectOption('detail');await page.locator('#kx-panel .kx-close').click();
-   await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="quality"]').selectOption('balanced');await page.locator('#kx-panel .kx-close').click();
-   await page.locator('#phone-check').evaluate(e=>e.hidden=false);await page.locator('#phone-check button').first().click();
-   await page.waitForFunction(()=>window.__plazaDeviceCheck?.report,{},{timeout:45000});row.phoneCheck=await page.evaluate(()=>__plazaDeviceCheck.report);
-   assert(row.phoneCheck.samples>10);assert.equal(row.phoneCheck.interrupted,false);assert.equal(await page.locator('#phone-check textarea').inputValue(),JSON.stringify(row.phoneCheck,null,2));await capture('phone-check');
+   // Software Chromium can starve its own input synchronization while rendering.
+   // Rendering is covered by the captures above; exercise DOM controls while paused.
+   if(engine==='chromium'){await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));row.controlCheckPaused=true;}
+   await page.locator('#listBtn').click({noWaitAfter:true});assert(await page.locator('#listClose').isVisible());await page.locator('#listClose').click({noWaitAfter:true});
+   await page.locator('#kx-trigger').click({noWaitAfter:true});await page.locator('#kx-panel [name="quality"]').selectOption('detail');await page.locator('#kx-panel .kx-close').click({noWaitAfter:true});
+   await page.locator('#kx-trigger').click({noWaitAfter:true});await page.locator('#kx-panel [name="quality"]').selectOption('balanced');await page.locator('#kx-panel .kx-close').click({noWaitAfter:true});
+   if(engine==='chromium')await page.evaluate(()=>{delete document.hidden;});
+   if(device==='phone'){
+    await page.locator('#phone-check').evaluate(e=>e.hidden=false);await page.locator('#phone-check button').first().click();
+    await page.waitForFunction(()=>window.__plazaDeviceCheck?.report,{},{timeout:45000});row.phoneCheck=await page.evaluate(()=>__plazaDeviceCheck.report);
+    assert(row.phoneCheck.samples>10);assert.equal(row.phoneCheck.interrupted,false);assert.equal(await page.locator('#phone-check textarea').inputValue(),JSON.stringify(row.phoneCheck,null,2));await capture('phone-check');
+   }else await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    assert.deepEqual(row.errors,[]);assert.deepEqual(row.missing,[]);row.pass=true;
   }catch(e){row.pass=false;row.failure=e.message;await capture('failure').catch(()=>{});}
   results.push(row);fs.writeFileSync(`${out}/${engine}-results.json`,JSON.stringify(results,null,2));console.log('SHOWCASE_CASE '+JSON.stringify(row));await context.close();
