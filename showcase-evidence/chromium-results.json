@@ -1,0 +1,31 @@
+[
+  {
+    "engine": "chromium",
+    "device": "desktop",
+    "viewport": [
+      1366,
+      820
+    ],
+    "kind": "software-rendered lab; not an actual iPhone",
+    "errors": [],
+    "missing": [],
+    "geometry": {
+      "version": "plaza-showcase-20261114",
+      "mapsLoaded": 6,
+      "mapErrors": [],
+      "openings": 13,
+      "trees": 46,
+      "addedTriangles": 54018,
+      "addedDrawCalls": 7
+    },
+    "render": {
+      "entered": true,
+      "pr": 1,
+      "calls": 76,
+      "tris": 72064,
+      "card": null
+    },
+    "pass": false,
+    "failure": "locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator('#listBtn')\n    - locator resolved to <button id=\"listBtn\" type=\"button\" title=\"List view\" class=\"pill glass\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n    - click action done\n    - waiting for scheduled navigations to finish\n"
+  }
+]
