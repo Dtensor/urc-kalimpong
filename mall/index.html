@@ -177,8 +177,10 @@ button{cursor:pointer}
   #credit{right:12px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.search-count{position:sticky;top:-6px;background:var(--panel);margin:0;padding:10px 8px;font-size:12px;border-bottom:1px solid var(--line);z-index:1}.results .search-more{display:block;text-align:center;min-height:44px;font-weight:600}.results button{min-height:56px}.results b{white-space:normal}.results{overscroll-behavior:contain;scrollbar-gutter:stable}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script><meta name="urc-release" content="shelf-search-2026-11-14">
+</head>
 <body>
 <canvas id="gl" aria-label="The canteen, in 3D. Drag to look around, tap the floor to walk, tap a product to pick it up."></canvas>
 
@@ -1250,6 +1252,72 @@ function dimsOf(v) {
   d[1] = Math.min(d[1] * k, room); d[0] = Math.min(d[0], w.slot * .86);
   return d;
 }
+/* Shelf visits frame an upright bay with neighbouring stock, not one pack.
+ * Shelf runs can span 14 metres: on narrow screens frame a complete 1.2 m bay.
+ * Stay on the same side of an island and inside the existing collision model. */
+function shelfView(v, aspect = camera.aspect) {
+  const f = v.face, w = v.w;
+  const start = f.wall ? f.u0 + f.off * w.slot - .05 : f.u0;
+  const length = f.wall ? (f.cols.length - f.off) * w.slot + .1 : f.L;
+  const bay = Math.min(Math.max(0, Math.floor((v.u - start) / 1.2)), Math.ceil(length / 1.2) - 1);
+  const left = start + bay * 1.2, right = Math.min(start + length, left + 1.2);
+  const u = (left + right) / 2, top = Math.max(...f.tiers) + .5;
+  const halfFov = 70 * Math.PI / 360;
+  const span = Math.min(length, aspect < 1 ? right - left + .25 : 3.6);
+  const distance = Math.max(2.8, span / (2 * Math.tan(halfFov) * Math.max(.3, aspect) * .78), top / (2 * Math.tan(halfFov) * .76));
+  // Search toward the shelf only if the ideal point would hit another fixture.
+  // Test the entire approach strip to avoid jumping through an island.
+  let chosen = null;
+  search: for (let d = Math.min(5, distance); d >= 2.1; d -= .05) for (const offset of [0,.3,-.3,.6,-.6,.9,-.9,1.2,-1.2]) {
+    const standU=u+offset;
+    const [x, z] = toW(f.fr, standU, f.vf + f.n * d);
+    if (!free(x, z) || zoneAt(x, z) !== w) continue;
+    let clear = true;
+    for (let k = .45; k < d; k += .15) {
+      const [px, pz] = toW(f.fr, standU, f.vf + f.n * k);
+      if (!free(px, pz)) { clear = false; break; }
+    }
+    if (clear) { chosen = {x, z, distance:d}; break search; }
+  }
+  if (!chosen) {
+    // Existing valid aisle position is safer than moving through a fixture.
+    const [x,z] = settle(...toW(f.fr,u,f.vg+f.n*1.6));
+    chosen={x,z,distance:Math.abs(toL(f.fr,x,z)[1]-f.vf)};
+  }
+  const [tx,tz] = toW(f.fr,u,f.vf);
+  return {...chosen, yaw:faceYaw(tx-chosen.x,tz-chosen.z),
+    pitch:Math.atan2(top/2-EYE,Math.hypot(tx-chosen.x,tz-chosen.z)),
+    fov:70, left, right, top, targetU:u};
+}
+function prepareShelfVisit(v) {
+  const view=shelfView(v);
+  v.vx=view.x;v.vz=view.z;
+  // Reset wheel zoom and turn inertia when choosing a shelf; free look stays free.
+  fovT=view.fov; yawT=null; yawV=pitchV=0;
+  showShelfStand(v,view);
+  return view;
+}
+let shelfStand=null, standItem=null;
+function showShelfStand(v,view) {
+  standItem=v;
+  if(!shelfStand) {
+    shelfStand=new THREE.Mesh(new THREE.RingGeometry(.28,.36,40),new THREE.MeshBasicMaterial({color:'#27776d',transparent:true,opacity:.85,side:THREE.DoubleSide,depthWrite:false}));
+    shelfStand.rotation.x=-Math.PI/2;scene.add(shelfStand);
+    PICKABLE.push({mesh:shelfStand,act:()=>visitItem(standItem)});
+  }
+  shelfStand.position.set(view.x,.035,view.z);
+}
+function floorShelfTarget(x,z) {
+  let best=null,distance=Infinity;
+  for(const v of ITEMS) {
+    const [u,across]=toL(v.fr,x,z),front=(across-v.vf)*v.n;
+    if(front<0||front>2.1||Math.abs(u-v.u)>1.2)continue;
+    const d=Math.hypot(u-v.u,front);
+    if(d<distance){best=v;distance=d;}
+  }
+  return best;
+}
+
 function products() {
   const nb = ITEMS.filter(v => v.shape !== "bottle" && v.shape !== "can").length, nc = ITEMS.length - nb;
   IBox = new THREE.InstancedMesh(UNIT, M.shape, Math.max(1, nb)); ICyl = new THREE.InstancedMesh(new THREE.CylinderGeometry(.5, .5, 1, 10), M.shape, Math.max(1, nc));
@@ -1263,7 +1331,7 @@ function products() {
     v.mesh.setColorAt(v.k, base);
     v.ry = v.fr.ry + (v.n > 0 ? 0 : Math.PI);
     [v.x, v.z] = at(v, v.d[2] / 2 + .02); v.yc = v.y + v.d[1] / 2;
-    [v.vx, v.vz] = toW(v.fr, v.u, v.vg + v.n * 1.6);                                       // where you stand to look at it
+    const view = shelfView(v); [v.vx, v.vz] = [view.x, view.z];                                       // where you stand to look at it
     _o.position.set(v.x, v.yc, v.z); _o.rotation.set(0, v.ry, 0); _o.scale.set(v.d[0], v.d[1], v.d[2]); _o.updateMatrix(); IHit.setMatrixAt(i, _o.matrix);
   });
   scene.add(IBox, ICyl, IHit, ILow);
@@ -1562,7 +1630,7 @@ canvas.addEventListener("pointermove", ev => {
 canvas.addEventListener("pointerup", ev => {
   const d = dragging; dragging = null; canvas.classList.remove("drag"); if (!d) return;
   if (performance.now() - d.t > 120) { yawV = 0; pitchV = 0; }
-  if (d.moved <= 6) { yawV = pitchV = 0; const p = pickAt(ev.clientX, ev.clientY); if (p.v) hold(p.v); else if (p.p) p.p.act(); else if (p.floor) glideTo(p.floor.x, p.floor.z); }
+  if (d.moved <= 6) { yawV = pitchV = 0; const p = pickAt(ev.clientX, ev.clientY); if (p.v) hold(p.v); else if (p.p) p.p.act(); else if (p.floor) { const shelf = floorShelfTarget(p.floor.x, p.floor.z); if (shelf) visitItem(shelf); else glideTo(p.floor.x, p.floor.z); } }
 });
 canvas.addEventListener("wheel", ev => { ev.preventDefault(); fovT = Math.max(34, Math.min(80, fovT + ev.deltaY * .03)); }, { passive: false });
 addEventListener("keydown", ev => {
@@ -1679,6 +1747,7 @@ function highlight(vs) {
   const ringM = new THREE.MeshBasicMaterial({ color: "#ffb347", transparent: true, opacity: .75, depthWrite: false, side: THREE.DoubleSide });
   for (const v of vs) { const r = new THREE.Mesh(new THREE.RingGeometry(.11, .135, 32), ringM); const [rx, rz] = at(v, .2); r.position.set(rx, v.yc, rz); r.rotation.y = v.ry; r.userData.pulse = true; HL.add(r); }
   const tgt = vs[1] || vs[0]; if (!tgt) return;
+  const view = prepareShelfVisit(tgt);
   const pts = [[pos.x, pos.z], ...route(tgt.vx, tgt.vz)];
   const arrowM = new THREE.MeshBasicMaterial({ map: TX.arrow, color: "#ffb347", transparent: true, depthWrite: false });
   for (let i = 0; i < pts.length - 1; i++) {
@@ -1686,19 +1755,19 @@ function highlight(vs) {
     for (let k = 0; k < n; k++) { const t = (k + .5) / n, m = new THREE.Mesh(PLANE, arrowM); m.scale.set(.5, .5, 1); m.position.set(ax + (bx - ax) * t, .03, az + (bz - az) * t); m.rotation.set(-Math.PI / 2, 0, Math.atan2(-(bx - ax), -(bz - az)), "YXZ"); m.rotation.order = "YXZ"; m.rotation.y = Math.atan2(-(bx - ax), -(bz - az)); m.rotation.x = -Math.PI / 2; m.userData.seq = HL.children.length; HL.add(m); }
   }
   toast(`${vs.length - 1} similar, ringed in orange. Follow the arrows.`);
-  walkTo(tgt.vx, tgt.vz, faceYaw(tgt.x - tgt.vx, tgt.z - tgt.vz), -.18);
+  walkTo(tgt.vx, tgt.vz, view.yaw, view.pitch);
 }
 TX.arrow = ctex(cvs(64, 64, (g) => { g.fillStyle = "#fff"; g.beginPath(); g.moveTo(32, 6); g.lineTo(56, 40); g.lineTo(42, 40); g.lineTo(42, 58); g.lineTo(22, 58); g.lineTo(22, 40); g.lineTo(8, 40); g.closePath(); g.fill(); }));
 
 /* ================================================================ visiting */
 function visitItem(v, { pick = false } = {}) {
   if (!v) return; closeHold(); closeSheet(); setGaze(null);
-  const y = faceYaw(v.x - v.vx, v.z - v.vz), p = Math.atan2(v.yc - EYE, Math.hypot(v.x - v.vx, v.z - v.vz));
+  const view = prepareShelfVisit(v), y = view.yaw, p = view.pitch;
   walkTo(v.vx, v.vz, y, p, () => { gazeV = v; gazeT = 1; setGaze(v); if (pick) setTimeout(() => hold(v), 350); });
 }
 // Arrive in the first aisle, just inside the shopfront, looking straight down the shelves.
 // arrive in an aisle between two gondola runs where there is one, so you look down shelves, not a blank side wall
-function goWing(w) { closeHold(); setMap(false); const [x, z] = toW(w, 1.0, 0); teleport(x, z, faceYaw(w.ox, w.oz), -.08); }
+function goWing(w) { fovT = 70; yawT = null; yawV = pitchV = 0; closeHold(); setMap(false); const [x, z] = toW(w, 1.0, 0); teleport(x, z, faceYaw(w.ox, w.oz), -.08); }
 function goHall() { closeHold(); setMap(false); teleport(0, HUB_R - 3.2, 0, -.06); }
 
 /* ================================================================ basket */
@@ -1893,19 +1962,50 @@ function where() {
 
 /* ================================================================ search */
 const qi = $("#q"), res = $("#results");
-function matches(q) {
-  q = q.trim().toLowerCase(); if (!q) return [];
-  const parts = q.split(/\s+/);
-  return ITEMS.map(v => { const n = v.it.name.toLowerCase(), c = (CATS.get(v.it.category)?.label || "").toLowerCase(); let s = 0; for (const p of parts) { if (n.startsWith(p)) s += 3; else if (new RegExp("\\b" + p.replace(/[^a-z0-9]/g, "")).test(n)) s += 2; else if (n.includes(p)) s += 1; else if (c.includes(p)) s += .5; else return [0, v]; } return [s + (available(v.it) ? .5 : 0), v]; })
-    .filter(x => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, 12).map(x => x[1]);
+const searchText = s => String(s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+function matches(query) {
+  const q=searchText(query); if(!q)return [];
+  const parts=q.split(/\s+/);
+  return ITEMS.map(v=>{
+    const name=searchText(v.it.name), category=searchText(CATS.get(v.it.category)?.label);
+    let score=0, shortened=false;
+    for(const part of parts) {
+      if(name.split(' ').includes(part))score+=4;
+      else if(name.includes(part))score+=2;
+      else if(part==='shampoo' && v.it.category==='haircare' && /\b(?:sham|sha|sh)$/.test(name)) {score+=1;shortened=true;}
+      else if(category.includes(part))score+=.5;
+      else return null;
+    }
+    return {v,score:score+(available(v.it)? .25:0),shortened};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score||a.v.it.name.localeCompare(b.v.it.name));
 }
-qi.addEventListener("input", () => {
-  const m = matches(qi.value); res.hidden = !m.length;
-  res.innerHTML = m.map(v => `<button role="option" data-id="${esc(v.it.id)}">${v.it.img ? `<img src="${esc(pic(v.it))}" alt="" loading="lazy">` : `<span class="ph" style="background:${v.w.col}">${esc(v.it.name.slice(0, 2))}</span>`}<b>${esc(v.it.name)}</b><em>${money(v.it.price)}</em><small>${esc(v.w.g.mark)} · ${esc(CATS.get(v.it.category)?.label || "")}${available(v.it) ? "" : " · sold out"}</small></button>`).join("");
-  res.querySelectorAll("button").forEach(b => b.onclick = () => { res.hidden = true; qi.value = ""; qi.blur(); const v = BYID.get(b.dataset.id); toast(`Walking you to ${v.w.g.label.split(/[—&,]/)[0].trim()}…`); visitItem(v); });
+let searchLimit=40;
+function renderSearch() {
+  const all=matches(qi.value), shown=all.slice(0,searchLimit);
+  res.hidden=!searchText(qi.value); qi.setAttribute('aria-expanded',String(!res.hidden));
+  res.innerHTML=`<p class="search-count" role="status">${all.length ? `${all.length} matching items${all.length>shown.length ? ` · showing ${shown.length}` : ' · scroll to browse'}` : 'No matching items. Try a brand or shorter name.'}</p>`+
+    shown.map(({v,shortened})=>`<button data-id="${esc(v.it.id)}">${v.it.img?`<img src="${esc(pic(v.it))}" alt="" loading="lazy">`:`<span class="ph" style="background:${v.w.col}">${esc(v.it.name.slice(0,2))}</span>`}<b>${esc(v.it.name)}</b><em>${money(v.it.price)}</em><small>${esc(v.w.g.mark)} · ${esc(CATS.get(v.it.category)?.label||'')}${shortened?' · shortened stock name':''}${available(v.it)?'':' · sold out'}</small></button>`).join('')+
+    (all.length>shown.length?'<button type="button" class="search-more">Show more results</button>':'');
+  res.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{res.hidden=true;qi.setAttribute('aria-expanded','false');qi.value='';qi.blur();const v=BYID.get(b.dataset.id);toast(`Walking you to ${v.w.g.label.split(/[—&,]/)[0].trim()}…`);visitItem(v);});
+  const more=res.querySelector('.search-more');if(more)more.onclick=()=>{const previous=shown.length;searchLimit+=40;renderSearch();res.querySelectorAll('[data-id]')[previous]?.focus();};
+}
+qi.setAttribute('aria-controls','results'); qi.setAttribute('aria-expanded','false');
+res.setAttribute('role','region');res.setAttribute('aria-label','Search results');
+qi.addEventListener('input',()=>{searchLimit=40;renderSearch();});
+qi.addEventListener('focus',()=>{if(searchText(qi.value))renderSearch();});
+qi.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();res.querySelector('[data-id]')?.focus();}
+  if(e.key==='Enter'){e.preventDefault();res.querySelector('[data-id]')?.click();}
+  if(e.key==='Escape'){res.hidden=true;qi.setAttribute('aria-expanded','false');}
 });
-qi.addEventListener("keydown", e => { if (e.key === "Enter") { const b = res.querySelector("button"); if (b) b.click(); } });
-document.addEventListener("pointerdown", e => { if (!e.target.closest(".search")) res.hidden = true; });
+res.addEventListener('keydown',e=>{
+  e.stopPropagation(); // Search arrows must not also move the 3D camera.
+  const buttons=[...res.querySelectorAll('button')], i=buttons.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[Math.max(0,Math.min(buttons.length-1,i+(e.key==='ArrowDown'?1:-1)))]?.focus();}
+  if(e.key==='Escape'){e.preventDefault();qi.focus();res.hidden=true;qi.setAttribute('aria-expanded','false');}
+});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search')){res.hidden=true;qi.setAttribute('aria-expanded','false');}});
+
 
 /* ================================================================ loop */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
@@ -1964,3 +2064,4 @@ start();
 </script>
 </body>
 </html>
+
