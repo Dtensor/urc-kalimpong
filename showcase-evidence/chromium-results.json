@@ -1,0 +1,103 @@
+[
+  {
+    "engine": "chromium",
+    "device": "desktop",
+    "viewport": [
+      1366,
+      820
+    ],
+    "kind": "software-rendered lab; not an actual iPhone",
+    "errors": [],
+    "missing": [],
+    "geometry": {
+      "version": "plaza-showcase-20261114",
+      "mapsLoaded": 6,
+      "mapErrors": [],
+      "openings": 13,
+      "trees": 46,
+      "addedTriangles": 45002,
+      "addedDrawCalls": 7
+    },
+    "render": {
+      "entered": true,
+      "pr": 1,
+      "calls": 65,
+      "tris": 63016,
+      "card": null
+    },
+    "phoneCheck": {
+      "version": "plaza-showcase-20261114",
+      "checkedAt": "2026-11-14T17:39:10.099Z",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+      "viewport": [
+        1366,
+        820
+      ],
+      "devicePixelRatio": 1,
+      "pixelRatio": 1,
+      "samples": 22,
+      "seconds": 21.6,
+      "medianFrameMs": 266.6,
+      "p95FrameMs": 3316.5,
+      "averageFps": 1,
+      "over50ms": 12,
+      "calls": 63,
+      "triangles": 62260,
+      "interrupted": false,
+      "mapsLoaded": 6,
+      "mapErrors": []
+    },
+    "pass": true
+  },
+  {
+    "engine": "chromium",
+    "device": "phone",
+    "viewport": [
+      440,
+      956
+    ],
+    "kind": "software-rendered lab; not an actual iPhone",
+    "errors": [],
+    "missing": [],
+    "geometry": {
+      "version": "plaza-showcase-20261114",
+      "mapsLoaded": 6,
+      "mapErrors": [],
+      "openings": 13,
+      "trees": 46,
+      "addedTriangles": 45002,
+      "addedDrawCalls": 7
+    },
+    "render": {
+      "entered": true,
+      "fps": 0.2,
+      "pr": 1,
+      "calls": 55,
+      "tris": 62932,
+      "card": null
+    },
+    "phoneCheck": {
+      "version": "plaza-showcase-20261114",
+      "checkedAt": "2026-11-14T17:41:52.274Z",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+      "viewport": [
+        440,
+        956
+      ],
+      "devicePixelRatio": 1,
+      "pixelRatio": 1,
+      "samples": 47,
+      "seconds": 20.4,
+      "medianFrameMs": 533.3,
+      "p95FrameMs": 1083.2,
+      "averageFps": 2,
+      "over50ms": 34,
+      "calls": 45,
+      "triangles": 62168,
+      "interrupted": false,
+      "mapsLoaded": 6,
+      "mapErrors": []
+    },
+    "pass": true
+  }
+]
