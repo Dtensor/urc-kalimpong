@@ -10,7 +10,14 @@ const engine=process.env.ENGINE||'chromium',out='showcase-evidence';fs.mkdirSync
   const page=await context.newPage();page.setDefaultTimeout(45000);
   page.on('pageerror',e=>row.errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&/THREE|WebGL|shader/i.test(m.text()))row.errors.push(m.text());});
   page.on('response',r=>{if(r.url().startsWith('http://127.0.0.1:8765/')&&r.status()>=400)row.missing.push(r.url());});
-  const capture=async name=>{await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));try{await page.waitForTimeout(400);await page.screenshot({path:`${out}/${engine}-${device}-${name}.jpg`,type:'jpeg',quality:85,timeout:90000});}finally{await page.evaluate(()=>{delete document.hidden;});}};
+  const capture=async name=>{
+   for(let attempt=0;attempt<2;attempt++){
+    await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
+    try{await page.waitForTimeout(attempt?2000:400);await page.screenshot({path:`${out}/${engine}-${device}-${name}.jpg`,type:'jpeg',quality:85,timeout:attempt?90000:45000});return;}
+    catch(e){if(attempt)throw e;console.log('CAPTURE_RETRY '+name+' '+e.message.split('\n')[0]);}
+    finally{await page.evaluate(()=>{delete document.hidden;});}
+   }
+  };
   try{
    await page.goto('http://127.0.0.1:8765/complex/?devicecheck=1',{waitUntil:'domcontentloaded'});await page.locator('#enterQuiet').click({timeout:90000});
    await page.waitForFunction(()=>window.__plazaShowcase?.statistics.mapsLoaded===6,{},{timeout:60000});
