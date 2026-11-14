@@ -38,9 +38,16 @@ const engine=process.env.ENGINE||'chromium',out='showcase-evidence';fs.mkdirSync
    await page.locator('#kx-trigger').click({noWaitAfter:true});await page.locator('#kx-panel [name="quality"]').selectOption('balanced');await page.locator('#kx-panel .kx-close').click({noWaitAfter:true});
    if(engine==='chromium')await page.evaluate(()=>{delete document.hidden;});
    if(device==='phone'){
-    await page.locator('#phone-check').evaluate(e=>e.hidden=false);await page.locator('#phone-check button').first().click();
+    await page.locator('#phone-check').evaluate(e=>e.hidden=false);
+    const panel=await page.locator('#phone-check').boundingBox(),stick=await page.locator('#stick').boundingBox();
+    assert(panel.y+panel.height<stick.y||panel.x>stick.x+stick.width,'Phone check must leave the joystick clear');
+    await page.locator('#phone-check button').first().click();
     await page.waitForFunction(()=>window.__plazaDeviceCheck?.report,{},{timeout:45000});row.phoneCheck=await page.evaluate(()=>__plazaDeviceCheck.report);
     assert(row.phoneCheck.samples>10);assert.equal(row.phoneCheck.interrupted,false);assert.equal(await page.locator('#phone-check textarea').inputValue(),JSON.stringify(row.phoneCheck,null,2));await capture('phone-check');
+    await page.setViewportSize({width:956,height:440});await page.waitForTimeout(400);
+    const landscapePanel=await page.locator('#phone-check').boundingBox(),landscapeStick=await page.locator('#stick').boundingBox();
+    assert(landscapePanel.x>landscapeStick.x+landscapeStick.width,'Landscape phone check must leave the joystick clear');
+    await capture('phone-check-landscape');
    }else await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    assert.deepEqual(row.errors,[]);assert.deepEqual(row.missing,[]);row.pass=true;
   }catch(e){row.pass=false;row.failure=e.message;await capture('failure').catch(()=>{});}
