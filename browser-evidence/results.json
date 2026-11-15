@@ -1,0 +1,17 @@
+{
+  "cases": [
+    {
+      "venue": "plaza",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 99,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": false,
+      "failure": "page.screenshot: Timeout 60000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+    }
+  ]
+}
