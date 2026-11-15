@@ -11,7 +11,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
  try{
   await page.goto('http://127.0.0.1:8765/mall/',{waitUntil:'domcontentloaded'});
   await page.locator('#quiet').click();await page.locator('#intro').waitFor({state:'hidden'});
-  await page.waitForFunction(()=>__mall?.hall?.loaded.length>=9&&KalimpongExperience.diagnostics?.materials>0);
+  await page.waitForFunction(()=>__mall?.hall?.loaded.length>=9&&__mall.hall.loaded.length===__mall.hall.mapsExpected&&KalimpongExperience.diagnostics?.materials>0);
   await page.waitForTimeout(900);row.hall=await page.evaluate(()=>__mall.hall);assert.equal(row.hall.fans,4);assert.deepEqual(row.hall.errors,[]);
   row.geometry=await page.evaluate(()=>({draws:__mall.draws,triangles:__mall.tris,items:__mall.items,wings:__mall.wings}));assert.equal(row.geometry.items,1715);assert.equal(row.geometry.wings,7);
   await capture('entrance');

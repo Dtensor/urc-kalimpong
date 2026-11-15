@@ -1112,7 +1112,7 @@ function updateHall(dt){
 }
 function hallFoliage(){
   const leaf=new THREE.Shape();leaf.moveTo(0,0);leaf.quadraticCurveTo(-.13,.17,-.025,.43);leaf.quadraticCurveTo(.12,.19,0,0);
-  const geo=new THREE.ShapeGeometry(leaf,5),tex=ctex(cvs(64,128,(g,W,H)=>{
+  const geo=new THREE.ShapeGeometry(leaf,5);geo.computeBoundingBox();const bb=geo.boundingBox,uv=geo.attributes.uv,verts=geo.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,(verts.getX(i)-bb.min.x)/(bb.max.x-bb.min.x),(verts.getY(i)-bb.min.y)/(bb.max.y-bb.min.y));const tex=ctex(cvs(64,128,(g,W,H)=>{
     const grad=g.createLinearGradient(0,0,W,0);grad.addColorStop(0,'#4a6135');grad.addColorStop(.45,'#8c9f61');grad.addColorStop(.5,'#b1b77c');grad.addColorStop(.55,'#748d4c');grad.addColorStop(1,'#314c2d');g.fillStyle=grad;g.fillRect(0,0,W,H);
     g.strokeStyle='rgba(193,205,147,.3)';g.lineWidth=1;for(let y=20;y<H;y+=17){g.beginPath();g.moveTo(W/2,y);g.lineTo(4,y-14);g.moveTo(W/2,y);g.lineTo(W-4,y-12);g.stroke();}
   }));
@@ -2231,7 +2231,7 @@ document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search')){res
 /* ================================================================ loop */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize);
-let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get hall() { return {version:HALL.version,loaded:HALL.loaded,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
+let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (document.hidden || window.KalimpongExperience.modalOpen) { requestAnimationFrame(loop); return; }
