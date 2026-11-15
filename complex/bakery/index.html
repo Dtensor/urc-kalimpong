@@ -6,6 +6,7 @@
 <title>Station Bakehouse</title>
 <meta name="description" content="Walk into Station Bakehouse, Kalimpong: warm loaves, rose-pink cakes and a window full of Kanchenjunga. Sample items and rates.">
 <meta name="theme-color" content="#f6eee6">
+<link rel="preload" as="script" href="../shared/vendor/three-r128.min.js" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -282,8 +283,7 @@ body.nogl #list .close{display:none}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
-<meta name="kalimpong-release" content="visual-extension-20261114">
-</head>
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
 <body data-venue="bakery" data-material-root="../shared/">
 <canvas id="gl" tabindex="0" aria-label="3D walk-through of Station Bakehouse"></canvas>
 
@@ -587,6 +587,7 @@ body.nogl #list .close{display:none}
 
 </script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/bakery-detail.js"></script>
 <script>
 'use strict';
 /* ================= basics ================= */
@@ -1475,6 +1476,7 @@ function build() {
 
   buildOven(); buildRacksCounters(); buildHero(); buildLamps(); buildCafe();
   flushBoxes();
+  window.__bakeryDetail = BakeryDetail.build(THREE, scene, SLOTS);
   buildItems(); buildMotes();
 }
 
@@ -1594,7 +1596,7 @@ function makeGlass() {
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
     uniforms: { tint: { value: new THREE.Color(0xdff0f0) }, rim: { value: new THREE.Color(0xfff4e6) } },
     vertexShader: 'attribute float tt; varying vec3 vN; varying vec3 vV; varying float vT; void main(){ vec4 wp = modelMatrix*vec4(position,1.); vN = normalize(mat3(modelMatrix)*normal); vV = normalize(cameraPosition-wp.xyz); vT = tt; gl_Position = projectionMatrix*viewMatrix*wp; }',
-    fragmentShader: 'uniform vec3 tint; uniform vec3 rim; varying vec3 vN; varying vec3 vV; varying float vT; void main(){ float f = pow(1.-abs(dot(normalize(vN),normalize(vV))),2.6); float streak = smoothstep(.05,0.,abs(vT-.62))*.35 + smoothstep(.02,0.,abs(vT-.2))*.18; vec3 c = mix(tint, rim, f); gl_FragColor = vec4(c, .06 + .5*f + streak); }',
+    fragmentShader: 'uniform vec3 tint; uniform vec3 rim; varying vec3 vN; varying vec3 vV; varying float vT; void main(){ float f = pow(1.-abs(dot(normalize(vN),normalize(vV))),2.6); float streak = (1.-smoothstep(0.,.035,abs(vT-.62)))*.18 + (1.-smoothstep(0.,.012,abs(vT-.2)))*.08; vec3 c = mix(tint, rim, f); gl_FragColor = vec4(c, .035 + .32*f + streak); }',
   });
 }
 
@@ -1675,12 +1677,12 @@ function buildItems() {
   SLOTS.forEach(s => {
     const it = s.it, i = ITEMS.indexOf(it);
     const n = new THREE.Vector3(s.nx, 0, s.nz), R = new THREE.Vector3(s.nz, 0, -s.nx), Up = new THREE.Vector3(0, 1, 0);
-    const is3D = it.look.kind === 'cake' && !it.photo;
+    const is3D = (it.look.kind === 'cake' && !it.photo) || BakeryDetail.eligible(it);
     const u0 = (i % AC_COLS) * CELL / AW, u1 = u0 + CELL / AW, v1 = 1 - Math.floor(i / AC_COLS) * CELL / AH, v0 = v1 - CELL / AH;
     const size = s.size, copies = is3D ? 0 : it.photo ? 1 : (COPIES[it.look.kind] || 3);
     const offs = copies === 1 ? [[0, 0, 0]] : copies === 2 ? [[-.22, -.06, .02], [.2, .04, 0]] : [[0, -.12, .08], [-.3, .02, 0], [.3, .04, 0]];
     const spread = Math.min(1, s.span / (size * 1.9));
-    offs.forEach(([a, dn, dy], k) => {
+    (copies ? offs : []).forEach(([a, dn, dy], k) => {
       const sc = k === 0 && copies === 3 ? .92 : 1;
       const c = new THREE.Vector3(s.x, s.y + dy, s.z).addScaledVector(R, a * size * spread).addScaledVector(n, dn);
       const tilt = new THREE.Vector3(0, Math.cos(.12), 0).addScaledVector(n, -Math.sin(.12));

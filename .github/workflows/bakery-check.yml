@@ -1,0 +1,62 @@
+name: Bakery and startup acceptance
+on:
+  push:
+    branches: ["kalimpong-bakery-20261115"]
+    paths: ["complex/**", ".github/workflows/bakery-check.yml", ".github/scripts/bakery-check.cjs"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install pinned browser runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/check" --no-package-lock --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/check/node_modules/.bin/playwright" install --with-deps ${{ matrix.engine }}
+      - name: Check bakery and startup resource reuse
+        env:
+          NODE_PATH: ${{ runner.temp }}/check/node_modules
+          ENGINE: ${{ matrix.engine }}
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          node .github/scripts/bakery-check.cjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: bakery-${{ matrix.engine }}
+          path: bakery-evidence/
+          retention-days: 7
+  captures:
+    needs: browser
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: bakery-*
+          merge-multiple: true
+          path: bakery-evidence
+      - name: Retain public-page review evidence separately
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bakery-evidence
+          git commit -m 'Archive bakery and startup browser evidence'
+          git push origin "HEAD:refs/heads/bakery-evidence-${{ github.run_id }}-${{ github.run_attempt }}"
