@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "venue": "plaza",
+      "device": "desktop",
+      "errors": [],
+      "missing": [],
+      "diagnostics": {
+        "materials": 99,
+        "environment": true,
+        "quality": "balanced"
+      },
+      "pass": true
+    }
+  ]
+}
