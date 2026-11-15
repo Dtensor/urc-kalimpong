@@ -18,6 +18,7 @@ const bad=structuredClone(manifest);bad.items[henko.id].file='../private';assert
 assert.deepEqual({...C.cleanBasket({a:2,b:-2,c:'3',d:101})},{a:2});assert.deepEqual({...C.cleanBasket([])},{});
 assert.deepEqual(C.total([{id:'a',price:0.1},{id:'b',price:0.2}],{a:3,b:1}),{paise:50,unknown:0,count:4});assert.equal(C.total([],{a:2}).unknown,1);
 for(const name of ['mall/index.html','complex/shared/easy.html','complex/index.html',...['bakery','sabzi','grocery','cinema'].map(v=>'complex/'+v+'/index.html')]){const html=fs.readFileSync(path.join(base,name),'utf8');for(const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))if(m[1].trim())new vm.Script(m[1]);}
+if(process.env.NODE_PATH){const acorn=require('acorn');for(const name of ['easy-core.js','easy.js'])acorn.parse(fs.readFileSync(path.join(base,'complex/shared',name),'utf8'),{ecmaVersion:2018});}
 for(const name of ['easy-core.js','easy.js'])new vm.Script(fs.readFileSync(path.join(base,'complex/shared',name),'utf8'));
 assert.deepEqual(C.parseWeighted('500 g potatoes')[0],{raw:'500 g potatoes',query:'potatoes',quantity:.5,maxPrice:null,unit:'kg'});
 assert.equal(C.parseWeighted('2 kg rice')[0].quantity,2);assert.equal(C.cleanBasket({a:.5},true).a,.5);assert.equal(C.total([{id:'p',price:30}],{p:.25}).paise,750);assert.deepEqual(C.routes('bread and potatoes').map(r=>r.venue),['bakery','sabzi']);
