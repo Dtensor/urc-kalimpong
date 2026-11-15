@@ -1,0 +1,53 @@
+{
+  "engine": "webkit",
+  "desktop": true,
+  "cases": [
+    {
+      "name": "featured cake",
+      "id": "tiered-wedding-cake",
+      "point": {
+        "x": 683,
+        "y": 383.0585890399755,
+        "element": "gl",
+        "hit": "tiered-wedding-cake"
+      },
+      "held": "tiered-wedding-cake",
+      "pass": true
+    },
+    {
+      "name": "distant visible product",
+      "id": "kalimpong-cheese-200g",
+      "point": {
+        "x": 775.9400510075111,
+        "y": 417.4398009826917,
+        "element": "gl",
+        "hit": null
+      },
+      "held": "kalimpong-cheese-200g",
+      "pass": true
+    },
+    {
+      "name": "near shelf product",
+      "id": "milk-bread-400g",
+      "point": {
+        "x": 1012.9993879714755,
+        "y": 473.4455398632578,
+        "element": "gl",
+        "hit": "milk-bread-400g"
+      },
+      "held": "milk-bread-400g",
+      "pass": true
+    }
+  ],
+  "section": "burger-buns-4",
+  "floor": {
+    "x": 0,
+    "z": 4.4,
+    "yaw": 0,
+    "pitch": -0.35,
+    "gaze": null,
+    "held": null
+  },
+  "pass": false,
+  "error": "Desktop floor click must walk"
+}
