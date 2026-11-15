@@ -43,6 +43,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
    row.products.push({id:product.id,detail,imageState});
    await capture(product.id);
    if(product.id==='henko-detergent-bar'){
+    assert.equal(await page.locator('#obj').evaluate(el=>getComputedStyle(el).pointerEvents),'none');
     const box=await page.locator('#stagehand').boundingBox(),x=box.x+box.width*.15,y=box.y+box.height*.5,dx=Math.PI/.012;
     await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx,y,{steps:12});await page.mouse.up();
     assert.equal(await page.locator('#obj .front').evaluate(el=>getComputedStyle(el).visibility),'hidden');

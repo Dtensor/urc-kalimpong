@@ -96,7 +96,7 @@ button{cursor:pointer}
 #hold{position:fixed;inset:0;z-index:10;display:grid;grid-template-columns:minmax(0,1fr) 380px;background:rgba(10,12,14,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 #stagehand{position:relative;perspective:900px;display:grid;place-items:center;touch-action:none;cursor:grab;overflow:hidden}
 #stagehand.drag{cursor:grabbing}
-.obj{position:relative;transform-style:preserve-3d;transition:transform .08s linear}
+.obj{pointer-events:none;user-select:none;-webkit-user-select:none;position:relative;transform-style:preserve-3d;transition:transform .08s linear}
 .obj .f{position:absolute;left:50%;top:50%;backface-visibility:visible;-webkit-backface-visibility:visible;display:grid;place-items:center;border-radius:6px}
 .obj .front{overflow:hidden;background:radial-gradient(circle at 50% 40%,#fff,#ece8e0)}
 .obj .front img{max-width:92%;max-height:92%;object-fit:contain}
