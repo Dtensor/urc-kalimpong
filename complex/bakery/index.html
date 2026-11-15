@@ -1812,7 +1812,7 @@ function step(dt) {
   vel.x += (tx - vel.x) * k; vel.y += (tz - vel.y) * k;
   pos.x += vel.x * dt; pos.z += vel.y * dt; resolve(pos);
 }
-let shelfNav;
+let shelfNav, shelfQuiet=false;
 function shelfTarget(s) {
   const fx=s.fx, width=innerWidth<760?1.65:Math.min(3.2,fx.type==='shelf'?fx.x1-fx.x0:fx.z1-fx.z0||3.2);
   if(fx.type==='ring')return {id:s.it.id,x:PLAT.x,z:PLAT.z+PLAT.r,nx:0,nz:1,width:3.4,bottom:0,top:3.4,depth:3.4};
@@ -1820,7 +1820,7 @@ function shelfTarget(s) {
   return {id:s.it.id,x:fx.type==='rack'?-7.5:6.1,z:clamp(s.z,fx.z0+width/2,fx.z1-width/2),nx:fx.type==='rack'?1:-1,nz:0,width,bottom:0,top:fx.type==='rack'?2.73:1.72,depth:fx.type==='rack'?1.35:1.5};
 }
 function getShelfNav(){return shelfNav||(shelfNav=ShelfNavigation.create(THREE,scene,{eye:EYE,aspect:()=>cam.aspect,free:(x,z)=>{const v=free(x,z);return Math.hypot(v.x-x,v.z-z)<.01;}}));}
-function arriveShelf(target,done){const n=getShelfNav(),v=n.select(target,()=>arriveShelf(target,done));cam.fov=v.fov;cam.updateProjectionMatrix();vel.set(0,0);stick.x=stick.y=0;hideGaze();glideTo(v.x,v.z,{yaw:v.yaw,pitch:v.pitch,raw:true,done});return v;}
+function arriveShelf(target,done){shelfQuiet=!done;const n=getShelfNav(),v=n.select(target,()=>arriveShelf(target,done));cam.fov=v.fov;cam.updateProjectionMatrix();vel.set(0,0);stick.x=stick.y=0;hideGaze();glideTo(v.x,v.z,{yaw:v.yaw,pitch:v.pitch,raw:true,done});return v;}
 function visitSection(s) {if(!s||!s.fx)return;const slots=s.fx.slots.filter(x=>x.it.section===s.id);if(slots.length)arriveShelf(shelfTarget(slots[Math.floor(slots.length/2)]));}
 function viewPoint(s) {return getShelfNav().view(shelfTarget(s));}
 function visitItem(it) {if(!it)return;const s=it.slot;if(!s){if(it===heroItem)arriveShelf({id:it.id,x:0,z:PLAT.z+PLAT.r,nx:0,nz:1,width:3.4,bottom:0,top:3.0,depth:1.7},()=>showGaze(it,true));return;}arriveShelf(shelfTarget(s),()=>{ringOn([s],3.5);showGaze(it,true);});}
@@ -1854,6 +1854,7 @@ function showGaze(it, pin) {
 }
 function hideGaze() { $('#gaze').hidden = true; gazeIt = null; pinned = false; $('#ret').classList.remove('hot'); }
 function gazeTick(now) {
+  if(shelfQuiet)return;
   if (!inside || auto || !$('#hold').hidden) return;
   if (hoverIt) { if (gazeIt !== hoverIt) showGaze(hoverIt); return; }
   const it = pickAt(0, 0);

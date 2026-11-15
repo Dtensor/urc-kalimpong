@@ -1108,7 +1108,7 @@ function glideStep(dt){const g=S.glide;g.t+=dt;const u=Math.min(1,g.t/g.dur),e=u
   for(let i=1;i<g.segs.length;i++){const a=g.segs[i-1],b=g.segs[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<=l||i===g.segs.length-1){const t=l?Math.min(1,d/l):1;cam.x=a[0]+(b[0]-a[0])*t;cam.z=a[1]+(b[1]-a[1])*t;break}d-=l}
   cam.yaw=g.y0+g.dy*e;cam.pitch=g.p0+(g.p1-g.p0)*e;if(u>=1){S.glide=null;g.done&&g.done()}}
 function fadeJump(x,z,yaw,pitch,done){const f=$('#fade');f.style.opacity=1;setTimeout(()=>{cam.x=x;cam.z=z;if(yaw!=null)cam.yaw=yaw;if(pitch!=null)cam.pitch=pitch;f.style.opacity=0;done&&done()},240)}
-let shelfNav;
+let shelfNav, shelfQuiet=false;
 function shelfTarget(id){const a=ANCH[id];if(!a)return null;const side=Math.sign(a.x)||1;
  if(a.bay)return {id,x:side*SH.front,z:a.bay.zc,nx:-side,nz:0,width:a.bay.len,bottom:.1,top:SH.top+.12,depth:SH.depth};
  if(a.z<-5.8)return {id,x:a.x,z:-6.05,nx:0,nz:1,width:.85,bottom:0,top:1.65,depth:.6};
@@ -1117,8 +1117,8 @@ function shelfTarget(id){const a=ANCH[id];if(!a)return null;const side=Math.sign
 }
 function getShelfNav(){return shelfNav||(shelfNav=ShelfNavigation.create(THREE,scene,{eye:EYE,aspect:()=>camera.aspect,free}));}
 function standOf(id){const t=shelfTarget(id);return t?getShelfNav().view(t):null;}
-function walkTo(id,then){const t=shelfTarget(id);if(!t)return false;const s=getShelfNav().select(t,()=>walkTo(id));camera.fov=s.fov;camera.updateProjectionMatrix();stickV=[0,0];glideTo(s.x,s.z,s.yaw,s.pitch,()=>{ringItems([id],'#ffd27a',4);showGaze(id,true);then&&then()});return true;}
-function safeFloor(x,z){const t=getShelfNav().nearFloor(x,z,Object.keys(ANCH).map(shelfTarget));if(t){walkTo(t.id);return true;}return false;}
+function walkTo(id,then,quiet=false){shelfQuiet=quiet;hideGaze();const t=shelfTarget(id);if(!t)return false;const s=getShelfNav().select(t,()=>walkTo(id,undefined,quiet));camera.fov=s.fov;camera.updateProjectionMatrix();stickV=[0,0];glideTo(s.x,s.z,s.yaw,s.pitch,()=>{ringItems([id],'#ffd27a',4);if(!quiet)showGaze(id,true);then&&then()});return true;}
+function safeFloor(x,z){const t=getShelfNav().nearFloor(x,z,Object.keys(ANCH).map(shelfTarget));if(t){walkTo(t.id,undefined,true);return true;}return false;}
 
 
 /* ---------- renderer and the frame loop ---------- */
@@ -1168,6 +1168,7 @@ function tap(x,y){
 const GZ={cand:null,since:0,shown:null,lost:0,pinned:false,over:false};
 function unpin(){GZ.pinned=false}
 function gazeTick(now){
+  if(shelfQuiet)return;
   if(!$('#hold').hidden||!$('#sheetbg').hidden||!$('#ledger').hidden)return;
   const at=mouse&&!document.body.classList.contains('coarse')?mouse:[innerWidth/2,innerHeight/2],h=pickAt(at[0],at[1]),id=h&&h.d<6?h.id:null;
   $('#gl').classList.toggle('hot',!!id);
@@ -1200,7 +1201,7 @@ function whereTick(){const w=$('#where'),id=nearestItem(),it=id&&BYID[id];let se
   w.hidden=false;
   if(sec!==whereSec){whereSec=sec;document.querySelectorAll('#wings button').forEach(b=>b.setAttribute('aria-current',b.dataset.s===sec?'true':'false'))}}
 function buildWings(){const w=$('#wings');w.innerHTML=SECTS.map((s,i)=>`<button class="glass" data-s="${esc(s.id)}" style="--c:${esc(s.color)}"><i>${i+1}</i>${esc(SHORT[s.id]||s.name)}</button>`).join('');
-  w.onclick=e=>{const b=e.target.closest('button');if(!b)return;const its=ITEMS.filter(i=>i.section===b.dataset.s&&ANCH[i.id]);if(its.length)walkTo(its[Math.floor(its.length/2)].id)}}
+  w.onclick=e=>{const b=e.target.closest('button');if(!b)return;const its=ITEMS.filter(i=>i.section===b.dataset.s&&ANCH[i.id]);if(its.length)walkTo(its[Math.floor(its.length/2)].id,undefined,true)}}
 
 const MAPK=20,MX=x=>(x+5.2)*MAPK+66,MZ=z=>(z+9.2)*MAPK;
 let mapBase=null;

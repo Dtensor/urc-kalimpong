@@ -1504,9 +1504,10 @@ function build3D() {
     $("#wk").textContent = k; $("#wn").textContent = n; $("#ws").textContent = s; $("#where").style.setProperty("--c", c || "var(--warm)");
     for (const b of document.querySelectorAll("#chips button")) b.setAttribute("aria-current", st && b.dataset.s === st.sec.id && !k.startsWith("Weigh") ? "true" : "false");
   }
+  let shelfQuiet=false;
   const shelfNav=ShelfNavigation.create(THREE,scene,{eye:EYE,aspect:()=>camera.aspect,free:(x,z)=>{const [rx,rz]=resolve(x,z);return Math.hypot(rx-x,rz-z)<.01;}});
   function shelfTarget(id){const s=SLOT.get(id),it=BY.get(id),st=stalls.find(x=>x.sec.id===it.section);const width=Math.min(st.len,innerWidth<760?1.5:2.5);return {id,x:s.side*EDGE,z:clamp(s.z,Math.min(st.z0,st.z1)+width/2,Math.max(st.z0,st.z1)-width/2),nx:-s.side,nz:0,width,bottom:0,top:1.95,depth:TD};}
-  function arriveShelf(id,done){const target=shelfTarget(id),v=shelfNav.select(target,()=>arriveShelf(id,done));camera.fov=v.fov;camera.updateProjectionMatrix();yawT=pitchT=null;vel.set(0,0);stick.x=stick.y=0;go(v.x,v.z,v.yaw,v.pitch,done);return v;}
+  function arriveShelf(id,done){shelfQuiet=!done;hideGaze();const target=shelfTarget(id),v=shelfNav.select(target,()=>arriveShelf(id,done));camera.fov=v.fov;camera.updateProjectionMatrix();yawT=pitchT=null;vel.set(0,0);stick.x=stick.y=0;go(v.x,v.z,v.yaw,v.pitch,done);return v;}
   function safeFloor(x,z){const target=shelfNav.nearFloor(x,z,Array.from(SLOT.keys(),shelfTarget));if(target){arriveShelf(target.id);return true;}return false;}
   function goSection(st) {const its=ITEMS.filter(it=>it.section===st.sec.id&&SLOT.has(it.id));if(its.length)arriveShelf(its[Math.floor(its.length/2)].id);}
 
@@ -1572,7 +1573,7 @@ function build3D() {
     // gaze-to-pick
     gazeT += dt;
     if (gazeT > .1) {
-      const busy = !$("#hold").hidden || !$("#sheetbg").hidden || listing || drag || !started;
+      const busy = shelfQuiet || !$("#hold").hidden || !$("#sheetbg").hidden || listing || drag || !started;
       if (!busy) {
         const p = pickRay(cen.x, cen.y), h = p.hit && !p.hit.scale && p.d < 3.4 ? p.hit : null;
         $("#ret").classList.toggle("on", !!h);

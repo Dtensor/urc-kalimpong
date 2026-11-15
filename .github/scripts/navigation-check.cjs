@@ -25,7 +25,7 @@ for(const venue of ['bakery','sabzi','grocery']){
  
  const state=await page.evaluate(()=>navAPI.navigation());assert.equal(state.fov,70);assert(state.marker);
  if(venue==='sabzi')assert.equal(await page.locator('#chips button').first().getAttribute('aria-current'),'true','Section label follows the shelf being viewed');
- await shot(venue+'-shelf');
+ assert(!(await page.locator('#gaze').isVisible()),'Section browsing stays unobstructed');await shot(venue+'-shelf');
  const before=await page.evaluate(v=>v==='bakery'?__bakery.state().yaw:v==='sabzi'?__sabzi.S3.info().yaw:__groc.cam.yaw,venue);
  await pause();await page.mouse.move(200,360);await page.mouse.down();await page.mouse.move(260,360,{steps:3});await page.mouse.up();
  const after=await page.evaluate(v=>v==='bakery'?__bakery.state().yaw:v==='sabzi'?__sabzi.S3.info().yaw:__groc.cam.yaw,venue);assert(Math.abs(after-before)>.2,'Free look after shelf arrival');
