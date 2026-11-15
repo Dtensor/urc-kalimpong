@@ -24,13 +24,13 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
   await page.locator('#results [data-id]').first().click();await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(900);await capture('shelf');
   await page.locator('#wings [data-w="hall"]').click();await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(350);
   // System reduced motion freezes every new ambient animation.
-  const frozen=await page.evaluate(()=>__mall.hall.phase);await page.waitForTimeout(400);assert.equal(await page.evaluate(()=>__mall.hall.phase),frozen);
+  const frozen=await page.evaluate(()=>__mall.hall);await page.waitForFunction(f=>__mall.hall.frames>=f+3,frozen.frames);assert.equal(await page.evaluate(()=>__mall.hall.phase),frozen.phase);
   if(device==='desktop'){
    await page.emulateMedia({reducedMotion:'no-preference'});await page.reload({waitUntil:'domcontentloaded'});await page.locator('#quiet').click();await page.locator('#intro').waitFor({state:'hidden'});
    await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="calm"]').setChecked(false);await page.locator('#kx-panel .kx-close').click();
-   const start=await page.evaluate(()=>__mall.hall.phase);await page.waitForTimeout(600);assert(await page.evaluate(()=>__mall.hall.phase)>start,'Ambient motion advances');
+   const start=await page.evaluate(()=>__mall.hall);await page.waitForFunction(f=>__mall.hall.frames>=f+3,start.frames);assert(await page.evaluate(()=>__mall.hall.phase)>start.phase,'Ambient motion advances across rendered frames');
    await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="calm"]').setChecked(true);await page.locator('#kx-panel .kx-close').click();
-   const stopped=await page.evaluate(()=>__mall.hall.phase);await page.waitForTimeout(400);assert.equal(await page.evaluate(()=>__mall.hall.phase),stopped,'Calm view freezes ambient motion');row.motion='moves normally; freezes with system reduce motion and Calm view';
+   const stopped=await page.evaluate(()=>__mall.hall);await page.waitForFunction(f=>__mall.hall.frames>=f+3,stopped.frames);assert.equal(await page.evaluate(()=>__mall.hall.phase),stopped.phase,'Calm view freezes motion while frames continue');row.motion='moves normally; freezes with system reduce motion and Calm view';
   }
   for(const quality of ['original','detail','balanced']){await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="quality"]').selectOption(quality);await page.locator('#kx-panel .kx-close').click();await page.waitForTimeout(150);}
   assert.deepEqual(row.errors,[]);assert.deepEqual(row.missing,[]);row.pass=true;

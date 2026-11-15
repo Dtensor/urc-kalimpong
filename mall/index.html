@@ -950,7 +950,7 @@ function lotus(g, x, y, r, petal, ring, eye) {
   g.fillStyle = ring; g.beginPath(); g.arc(x, y, r * .36, 0, 7); g.fill();
   g.fillStyle = eye; g.beginPath(); g.arc(x, y, r * .16, 0, 7); g.fill();
 }
-const HALL={version:'urc-hall-20261115',loaded:[],errors:[],fans:[],foliage:[],ripples:null,phase:0};
+const HALL={version:'urc-hall-20261115',loaded:[],errors:[],fans:[],foliage:[],ripples:null,phase:0,frames:0};
 const hallMaps=new Map();
 function hallMap(name,repeat=[1,1],colour=false){
   const key=name+repeat.join(',');if(hallMaps.has(key))return hallMaps.get(key);
@@ -1103,6 +1103,7 @@ function hubLamps(R) {
 let LAMPS = [];
 const hallDummy=new THREE.Object3D();
 function updateHall(dt){
+  HALL.frames++;
   const moving=!(RM||window.KalimpongExperience.calm);if(moving)HALL.phase+=dt;
   for(const f of HALL.fans)f.rotation.y=HALL.phase*.65;
   if(HALL.ripples){for(let i=0;i<24;i++){
@@ -2231,7 +2232,7 @@ document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search')){res
 /* ================================================================ loop */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize);
-let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
+let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (document.hidden || window.KalimpongExperience.modalOpen) { requestAnimationFrame(loop); return; }
