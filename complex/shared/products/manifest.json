@@ -1,0 +1,614 @@
+{
+  "version": "photographic-products-20261115",
+  "disclosure": "AI-generated product illustrations; appearance may differ from actual stock. Supplied product photos take precedence.",
+  "venues": {
+    "bakery": {
+      "sheets": [
+        {
+          "file": "bakery-01.webp",
+          "bytes": 374252,
+          "sha256": "f80d8597cae224d0779ac754d56af380d27157cacecd604ceb8ced072b24f1fd",
+          "sourceSha256": "a311184a8649db1b83a0625ae8d38049944c5665fe33990a686882ebe6d30988"
+        },
+        {
+          "file": "bakery-02.webp",
+          "bytes": 288210,
+          "sha256": "855cd9be716e42eb425f9ebf1ee14f822f63f6e552067163d74b6a655fc4b335",
+          "sourceSha256": "2e7cf4f93932f7954efd622f6a5382fcc11ebdd03ee908dbb25b6c062d211664"
+        },
+        {
+          "file": "bakery-03.webp",
+          "bytes": 244316,
+          "sha256": "e0f81cfe936e8801fd74bd30c49d3486327fa71fbb4c97211fdfab556059c54c",
+          "sourceSha256": "4df4151392b973bb7d4ca0c6e9095180dada70e6506b73dde61bbc92f6ba088d"
+        },
+        {
+          "file": "bakery-04.webp",
+          "bytes": 327216,
+          "sha256": "8b11f0cd5c63a1673d53468eff4249f62cf2bdb8fbed348c83dc4fca971b4708",
+          "sourceSha256": "6aef6fc84221e83e26b9954cab7252a6afe70b180d30377aa359614f0bba57e4"
+        },
+        {
+          "file": "bakery-05.webp",
+          "bytes": 318122,
+          "sha256": "3f67d86b46228eff9909980f8f22293c3a0d011d103e01c18206f1012ef04f3b",
+          "sourceSha256": "6da42e4f14f66016e2f684a2cc66eb92e2cd5f34a8666f307773307b6de08d48"
+        },
+        {
+          "file": "bakery-06.webp",
+          "bytes": 322438,
+          "sha256": "4eb6aea958516d46d311c6692abe523daa01840543700fa70c5b077f342b9421",
+          "sourceSha256": "a95843b84dd70f194f15385fd879e74d24812cea42907f1716dbf0da80bf5f86"
+        },
+        {
+          "file": "bakery-07.webp",
+          "bytes": 327594,
+          "sha256": "c89760568636ddc30b2430cdf2511925364adb09b33c752ba4fbb4a874165dea",
+          "sourceSha256": "9fab50506ee15e50c6ec6f656dc0027c2bb31d597f7d5685b027c12f068198b3"
+        }
+      ],
+      "items": {
+        "milk-bread-400g": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            7,
+            96,
+            364,
+            382
+          ],
+          "generated": true
+        },
+        "brown-bread-400g": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            400,
+            101,
+            347,
+            376
+          ],
+          "generated": true
+        },
+        "multigrain-loaf": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            773,
+            106,
+            350,
+            372
+          ],
+          "generated": true
+        },
+        "fruit-bread": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            1153,
+            107,
+            368,
+            373
+          ],
+          "generated": true
+        },
+        "ladi-pav-6": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            11,
+            615,
+            368,
+            314
+          ],
+          "generated": true
+        },
+        "burger-buns-4": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            396,
+            595,
+            361,
+            322
+          ],
+          "generated": true
+        },
+        "sweet-bun": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            780,
+            605,
+            372,
+            308
+          ],
+          "generated": true
+        },
+        "garlic-baguette": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            1152,
+            636,
+            379,
+            268
+          ],
+          "generated": true
+        },
+        "hill-sourdough": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            10,
+            100,
+            366,
+            349
+          ],
+          "generated": true
+        },
+        "toast-rusk-200g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            401,
+            125,
+            348,
+            306
+          ],
+          "generated": true
+        },
+        "black-forest-500g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            777,
+            67,
+            358,
+            379
+          ],
+          "generated": true
+        },
+        "pineapple-cake-500g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            1166,
+            97,
+            353,
+            352
+          ],
+          "generated": true
+        },
+        "red-velvet-slice": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            27,
+            582,
+            325,
+            374
+          ],
+          "generated": true
+        },
+        "truffle-slice": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            404,
+            583,
+            333,
+            376
+          ],
+          "generated": true
+        },
+        "butter-croissant": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            777,
+            611,
+            365,
+            303
+          ],
+          "generated": true
+        },
+        "chocolate-eclair": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            1163,
+            629,
+            364,
+            283
+          ],
+          "generated": true
+        },
+        "cream-roll": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            8,
+            119,
+            370,
+            332
+          ],
+          "generated": true
+        },
+        "strawberry-cupcake": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            413,
+            51,
+            321,
+            423
+          ],
+          "generated": true
+        },
+        "glazed-doughnut": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            769,
+            135,
+            371,
+            300
+          ],
+          "generated": true
+        },
+        "fruit-danish": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            1154,
+            118,
+            374,
+            324
+          ],
+          "generated": true
+        },
+        "choco-chip-cookies": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            9,
+            610,
+            371,
+            333
+          ],
+          "generated": true
+        },
+        "butter-cookies": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            395,
+            606,
+            359,
+            328
+          ],
+          "generated": true
+        },
+        "coconut-macaroons": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            780,
+            625,
+            361,
+            311
+          ],
+          "generated": true
+        },
+        "nankhatai": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            1161,
+            604,
+            367,
+            336
+          ],
+          "generated": true
+        },
+        "jeera-biscuits": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            31,
+            121,
+            333,
+            318
+          ],
+          "generated": true
+        },
+        "almond-biscotti": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            392,
+            111,
+            373,
+            346
+          ],
+          "generated": true
+        },
+        "salt-biscuits": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            789,
+            111,
+            336,
+            328
+          ],
+          "generated": true
+        },
+        "oat-raisin-cookies": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            1156,
+            126,
+            357,
+            303
+          ],
+          "generated": true
+        },
+        "assorted-cookie-jar": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            52,
+            568,
+            280,
+            379
+          ],
+          "generated": true
+        },
+        "veg-puff": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            386,
+            608,
+            357,
+            305
+          ],
+          "generated": true
+        },
+        "egg-puff": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            768,
+            613,
+            358,
+            297
+          ],
+          "generated": true
+        },
+        "chicken-patty": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            1160,
+            619,
+            343,
+            296
+          ],
+          "generated": true
+        },
+        "paneer-roll": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            17,
+            120,
+            361,
+            319
+          ],
+          "generated": true
+        },
+        "veg-momos-8": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            399,
+            122,
+            356,
+            309
+          ],
+          "generated": true
+        },
+        "chicken-momos-8": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            778,
+            121,
+            358,
+            317
+          ],
+          "generated": true
+        },
+        "sausage-roll": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            1159,
+            114,
+            356,
+            323
+          ],
+          "generated": true
+        },
+        "cheese-garlic-bun": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            21,
+            606,
+            347,
+            332
+          ],
+          "generated": true
+        },
+        "pizza-bun": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            398,
+            607,
+            346,
+            331
+          ],
+          "generated": true
+        },
+        "kalimpong-lollipops-10": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            778,
+            598,
+            353,
+            346
+          ],
+          "generated": true
+        },
+        "kalimpong-ginger-biscuits": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            1154,
+            601,
+            362,
+            352
+          ],
+          "generated": true
+        },
+        "kalimpong-cheese-200g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            32,
+            116,
+            352,
+            321
+          ],
+          "generated": true
+        },
+        "hard-churpi-100g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            384,
+            105,
+            353,
+            320
+          ],
+          "generated": true
+        },
+        "soft-churpi-250g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            769,
+            118,
+            383,
+            317
+          ],
+          "generated": true
+        },
+        "darjeeling-tea-cake": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            1152,
+            94,
+            363,
+            359
+          ],
+          "generated": true
+        },
+        "mandarin-marmalade": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            41,
+            555,
+            343,
+            399
+          ],
+          "generated": true
+        },
+        "cardamom-rusk-200g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            384,
+            557,
+            361,
+            396
+          ],
+          "generated": true
+        },
+        "dalle-chilli-pickle": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            788,
+            554,
+            364,
+            398
+          ],
+          "generated": true
+        },
+        "mandarin-muffin": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            1152,
+            580,
+            360,
+            346
+          ],
+          "generated": true
+        },
+        "kanchenjunga-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            16,
+            111,
+            359,
+            315
+          ],
+          "generated": true
+        },
+        "christmas-plum-cake": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            394,
+            123,
+            362,
+            290
+          ],
+          "generated": true
+        },
+        "birthday-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            779,
+            88,
+            359,
+            335
+          ],
+          "generated": true
+        },
+        "losar-khapse-box": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            1159,
+            59,
+            362,
+            388
+          ],
+          "generated": true
+        },
+        "diwali-cookie-hamper": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            21,
+            584,
+            351,
+            382
+          ],
+          "generated": true
+        },
+        "photo-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            395,
+            615,
+            362,
+            323
+          ],
+          "generated": true
+        },
+        "cupcake-dozen": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            779,
+            615,
+            368,
+            317
+          ],
+          "generated": true
+        },
+        "tiered-wedding-cake": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            1162,
+            536,
+            360,
+            434
+          ],
+          "generated": true
+        }
+      }
+    }
+  }
+}
