@@ -1,15 +1,102 @@
 {
-  "version": "urc-products-20261115",
+  "version": "urc-photo-repair-20261115",
   "summary": {
-    "reference": 1661,
-    "withheld": 6,
+    "reference": 1666,
+    "withheld": 1,
     "missing": 48,
     "catalogueItems": 1715,
-    "uniqueDerivatives": 1603,
-    "originalReferencedBytes": 72511664,
-    "derivativeBytes": 26790056
+    "uniqueDerivatives": 1608,
+    "derivativeBytes": 26835170,
+    "reviewedReplacements": 5,
+    "originalReferencedBytesAtInitialAudit": 72511664
   },
   "policy": {
+    "reviewedAt": "2026-11-15",
+    "withheld": {
+      "ariel-oxyblue-2-kg-washing-pow": "Photograph shows Matic front-load variant; Oxyblue variant is not established."
+    },
+    "reviewedReplacements": [
+      "henko-detergent-bar",
+      "ariel-2kg-front-load-powergel",
+      "wonder-clean-1l-liquid-deter",
+      "johnson-baby-lotion-200-ml",
+      "himalaya-100ml-baby-cream"
+    ],
+    "coverage": {
+      "catalogueItems": 1715,
+      "missingPhotos": 48,
+      "newReferencesVisuallyReviewed": 5
+    },
+    "limits": "Reference product photography, not photographs of current URC stock. No stock, prices or catalogue identifiers changed. Packaging may vary. Other reference photographs have not all been independently certified for exact variant and pack size."
+  },
+  "method": "All public references checked for file existence, dimensions, hashes, source metadata and local OCR. Suspect duplicate groups reviewed visually. Reference status does not certify brand, variant or pack-size accuracy. Originals preserved. 256px WebP shelf derivatives; original image only in product detail.",
+  "guidance": [
+    "https://web.dev/articles/fetch-priority",
+    "https://threejs.org/manual/en/cleanup.html"
+  ],
+  "corrections": {
+    "version": "urc-photo-repair-20261115",
+    "reviewedAt": "2026-11-15",
+    "items": [
+      {
+        "id": "henko-detergent-bar",
+        "name": "Henko Detergent Bar",
+        "original": "static/items/henko-detergent-bar.webp?v=1790478042",
+        "sourceFile": "henko.png",
+        "sourceUrl": "https://www.jyothylabs.com/wp-content/uploads/2023/07/HM_Bar_EC-250gm.png",
+        "productPage": "https://www.jyothylabs.com/products/henko/home/",
+        "sha256": "9ddfa970a665fb061b409669782a3d7cb84f0d19b742b34bf9fce986e5ba4843",
+        "visualReview": "Manufacturer image visibly shows Henko Stain Care Big Bar. Catalogue specifies bar without a net weight; do not infer a stock pack weight.",
+        "approved": true
+      },
+      {
+        "id": "ariel-2kg-front-load-powergel",
+        "name": "Ariel 2kg Front Load Powergel",
+        "original": "static/items/ariel-2kg-front-load-powergel.webp?v=1790477862",
+        "sourceFile": "ariel.png",
+        "sourceUrl": "https://image.aapkabazar.co/product/17242/1768715916969.png?type=webp&width=600",
+        "productPage": "https://aapkabazar.co/17242/pd/ariel-power-gel-front-load-liquid-detergent-2-kg",
+        "sha256": "e1ed3c10e34405e6ac942a83141a15aebb44b9d49531159b2b529bbdd5d94fdb",
+        "visualReview": "Image visibly shows Ariel Power Gel, front-load symbol and 2 kg. Product page corroborates all three.",
+        "approved": true
+      },
+      {
+        "id": "wonder-clean-1l-liquid-deter",
+        "name": "Wonder Clean 1L Liquid Deter",
+        "original": "static/items/wonder-clean-1l-liquid-deter.webp?v=1790478716",
+        "sourceFile": "wonder.png",
+        "sourceUrl": "https://www.spinternationalind.com/assets/img/wonder/fabric_care/Detergent%20Liquid%201%20L.png",
+        "productPage": "https://www.spinternationalind.com/liquidDetergent.php",
+        "sha256": "6f3bc5ec26a4cba93aefbbdac53413885365e1111b168493367dbcae381b31b6",
+        "visualReview": "Manufacturer bottle image visibly reads Wonder Clean Liquid Detergent and 1 Litre.",
+        "approved": true
+      },
+      {
+        "id": "johnson-baby-lotion-200-ml",
+        "name": "Johnson Baby Lotion 200 ml",
+        "original": "static/items/johnson-baby-lotion-200-ml.webp?v=1790476443",
+        "sourceFile": "johnson-200.jpg",
+        "sourceUrl": "https://www.bbassets.com/media/uploads/p/l/261000_10-johnsons-baby-baby-lotion.jpg",
+        "productPage": "https://www.bigbasket.com/pd/261000/johnsons-baby-baby-lotion-200-ml/",
+        "sha256": "2afb6daaf27e37f0b2ab37c9b85e6bb6096d2b4726d0c221828b38e4d92918b8",
+        "visualReview": "Photograph visibly shows Johnsons baby lotion and 200 mL. Rejected manufacturer promotional image because it showed a 500 mL pump bottle.",
+        "approved": true
+      },
+      {
+        "id": "himalaya-100ml-baby-cream",
+        "name": "Himalaya 100ml Baby Cream",
+        "original": "static/items/himalaya-100ml-baby-cream.webp?v=1790476190",
+        "sourceFile": "himalaya-100.jpg",
+        "sourceUrl": "https://images.apollo247.in/pub/media/catalog/product/H/I/HIM0355_1-JULY23_1.jpg",
+        "productPage": "https://www.apollopharmacy.in/otc/himalaya-baby-cream-100ml",
+        "sha256": "bef9ab380a1f3f692b7118da523fc5380da4ad92ca0ea354c8e2bc870f94d39a",
+        "visualReview": "Front shows Himalaya Baby Cream, extra soft and gentle. Matching rear image visibly states Net Vol. 100 ml and barcode 8901138511494, matching the manufacturer 100 ml variant.",
+        "approved": true
+      }
+    ],
+    "limits": "Reference product photography, not photographs of current URC stock. No stock, prices or catalogue identifiers changed. Packaging may vary."
+  },
+  "initialPolicy": {
     "reviewedAt": "2026-11-15",
     "withheld": {
       "ariel-2kg-front-load-powergel": "Photograph shows washing powder, not liquid Power Gel.",
@@ -26,10 +113,5 @@
       "visuallyReviewedPriorityPhotos": 15
     },
     "limits": "Automated OCR and source metadata are screening evidence. Remaining photographs are references, not individually certified pack-size matches. No generated branded packaging. Six mismatches are withheld from the walkthrough without modifying catalogue records."
-  },
-  "method": "All public references checked for file existence, dimensions, hashes, source metadata and local OCR. Suspect duplicate groups reviewed visually. Reference status does not certify brand, variant or pack-size accuracy. Originals preserved. 256px WebP shelf derivatives; original image only in product detail.",
-  "guidance": [
-    "https://web.dev/articles/fetch-priority",
-    "https://threejs.org/manual/en/cleanup.html"
-  ]
+  }
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "device": "desktop",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      }
+    ],
+    "pass": false,
+    "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'hidden'\n- 'visible'\n\n    at /home/runner/work/urc-kalimpong/urc-kalimpong/.github/scripts/repair-browser.cjs:52:12\n    at runNextTicks (node:internal/process/task_queues:64:5)\n    at process.processImmediate (node:internal/timers:452:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)"
+  },
+  {
+    "device": "phone",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      }
+    ],
+    "pass": false,
+    "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'hidden'\n- 'visible'\n\n    at /home/runner/work/urc-kalimpong/urc-kalimpong/.github/scripts/repair-browser.cjs:52:12"
+  }
+]

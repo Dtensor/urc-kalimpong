@@ -1,0 +1,130 @@
+[
+  {
+    "device": "desktop",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "ariel-2kg-front-load-powergel",
+        "detail": "../complex/shared/urc-products/e1ed3c10e34405e6ac94-full.webp",
+        "imageState": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      {
+        "id": "wonder-clean-1l-liquid-deter",
+        "detail": "../complex/shared/urc-products/6f3bc5ec26a4cba93aef-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "johnson-baby-lotion-200-ml",
+        "detail": "../complex/shared/urc-products/2afb6daaf27e37f0b2ab-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "himalaya-100ml-baby-cream",
+        "detail": "../complex/shared/urc-products/bef9ab380a1f3f692b71-full.jpg",
+        "imageState": {
+          "width": 1200,
+          "height": 1200
+        }
+      }
+    ],
+    "photos": {
+      "version": "urc-products-20261115",
+      "streams": 20,
+      "requests": 402,
+      "cacheHits": 177,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 402,
+      "resident": 6,
+      "pending": 0,
+      "queued": 189,
+      "cached": 219,
+      "budget": 220,
+      "withheld": 1
+    },
+    "pass": true
+  },
+  {
+    "device": "phone",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "ariel-2kg-front-load-powergel",
+        "detail": "../complex/shared/urc-products/e1ed3c10e34405e6ac94-full.webp",
+        "imageState": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      {
+        "id": "wonder-clean-1l-liquid-deter",
+        "detail": "../complex/shared/urc-products/6f3bc5ec26a4cba93aef-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "johnson-baby-lotion-200-ml",
+        "detail": "../complex/shared/urc-products/2afb6daaf27e37f0b2ab-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "himalaya-100ml-baby-cream",
+        "detail": "../complex/shared/urc-products/bef9ab380a1f3f692b71-full.jpg",
+        "imageState": {
+          "width": 1200,
+          "height": 1200
+        }
+      }
+    ],
+    "photos": {
+      "version": "urc-products-20261115",
+      "streams": 19,
+      "requests": 248,
+      "cacheHits": 5,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 248,
+      "resident": 8,
+      "pending": 0,
+      "queued": 82,
+      "cached": 89,
+      "budget": 90,
+      "withheld": 1
+    },
+    "pass": true
+  }
+]
