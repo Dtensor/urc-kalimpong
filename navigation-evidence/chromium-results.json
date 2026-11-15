@@ -1,0 +1,48 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "chromium",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 227.5,
+      "y": 746,
+      "width": 911,
+      "height": 58,
+      "display": "flex",
+      "buttons": 6
+    }
+  },
+  {
+    "venue": "sabzi",
+    "engine": "chromium",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 16,
+      "y": 760,
+      "width": 1334,
+      "height": 44,
+      "display": "flex",
+      "buttons": 7
+    }
+  },
+  {
+    "venue": "grocery",
+    "engine": "chromium",
+    "count": 67,
+    "bad": [
+      {
+        "id": "sugar-loose",
+        "distance": 2.5999999999999996,
+        "maxX": 0.18187373134448576,
+        "maxY": 0.32541276020912474
+      }
+    ]
+  },
+  {
+    "engine": "chromium",
+    "pass": false,
+    "error": "grocery unsafe or cropped shelf destinations: [{\"id\":\"sugar-loose\",\"distance\":2.5999999999999996,\"maxX\":0.18187373134448576,\"maxY\":0.32541276020912474}]\n\n1 !== 0\n"
+  }
+]

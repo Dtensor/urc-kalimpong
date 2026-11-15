@@ -1,0 +1,48 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "webkit",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 10,
+      "y": 728,
+      "width": 408,
+      "height": 58,
+      "display": "flex",
+      "buttons": 6
+    }
+  },
+  {
+    "venue": "sabzi",
+    "engine": "webkit",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 10,
+      "y": 736,
+      "width": 420,
+      "height": 44,
+      "display": "flex",
+      "buttons": 7
+    }
+  },
+  {
+    "venue": "grocery",
+    "engine": "webkit",
+    "count": 67,
+    "bad": [
+      {
+        "id": "sugar-loose",
+        "distance": 2.5999999999999996,
+        "maxX": 0.47940963485116406,
+        "maxY": 0.34038133154752703
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "pass": false,
+    "error": "grocery unsafe or cropped shelf destinations: [{\"id\":\"sugar-loose\",\"distance\":2.5999999999999996,\"maxX\":0.47940963485116406,\"maxY\":0.34038133154752703}]\n\n1 !== 0\n"
+  }
+]
