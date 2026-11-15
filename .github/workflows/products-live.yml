@@ -1,0 +1,47 @@
+name: Verify published URC product release
+on:
+  push:
+    branches: [kalimpong-products-live-20261115]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify every published product resource and the walkthrough
+        run: |
+          python3 - <<'PY'
+          from concurrent.futures import ThreadPoolExecutor,as_completed
+          import urllib.request,hashlib,json,time,subprocess
+          rows=[]
+          for line in subprocess.check_output(['git','ls-tree','-r','HEAD','--','mall/index.html','complex/shared/urc-products'],text=True).splitlines():
+              metadata,path=line.split('\t',1);mode,kind,sha=metadata.split();assert kind=='blob';rows.append({'path':path,'sha':sha})
+          assert len(rows)==1606
+          assert next(row['sha'] for row in rows if row['path']=='mall/index.html')=='0d95c4a1288d2e56e4d1f29b8870ba98231e5e7a'
+          def check(row):
+              url='https://dtensor.github.io/urc-kalimpong/'+row['path']+'?v=urc-products-20261115'
+              error=''
+              for attempt in range(5):
+                  try:
+                      with urllib.request.urlopen(url,timeout=30) as r:body=r.read();status=r.status
+                      digest=hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()
+                      if status==200 and digest==row['sha']:return {'path':row['path'],'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()}
+                      error=f'HTTP {status}; content differs'
+                  except Exception as exc:error=str(exc)
+                  time.sleep(3)
+              raise RuntimeError(row['path']+': '+error)
+          total=0;results=[]
+          with ThreadPoolExecutor(max_workers=6) as pool:
+              for future in as_completed([pool.submit(check,row) for row in rows]):
+                  result=future.result();results.append(result);total+=result['bytes']
+                  if len(results)%250==0:print('LIVE_CHECKED',len(results),flush=True)
+          print('LIVE_OK',len(results),'files',total,'bytes; all HTTP 200 and exact accepted Git blob hashes',flush=True)
+          open('products-live-results.json','w').write(json.dumps(sorted(results,key=lambda r:r['path']),indent=2))
+          PY
+      - uses: actions/upload-artifact@v5
+        with:
+          name: products-live-results
+          path: products-live-results.json
+          retention-days: 14
