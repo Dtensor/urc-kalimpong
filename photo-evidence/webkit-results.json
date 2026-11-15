@@ -55,38 +55,38 @@
     "maps": [
       {
         "name": "stone-diff.jpg",
-        "start": 24,
-        "end": 30,
+        "start": 28,
+        "end": 35,
         "type": "link"
       },
       {
         "name": "plaster-diff.jpg",
-        "start": 28,
-        "end": 32,
-        "type": "link"
-      },
-      {
-        "name": "stone-nor_gl.jpg",
         "start": 31,
-        "end": 34,
-        "type": "link"
-      },
-      {
-        "name": "stone-rough.jpg",
-        "start": 32,
         "end": 36.00000000000001,
         "type": "link"
       },
       {
+        "name": "stone-nor_gl.jpg",
+        "start": 35,
+        "end": 39,
+        "type": "link"
+      },
+      {
+        "name": "stone-rough.jpg",
+        "start": 36.00000000000001,
+        "end": 38,
+        "type": "link"
+      },
+      {
         "name": "plaster-nor_gl.jpg",
-        "start": 34,
-        "end": 37,
+        "start": 38,
+        "end": 42,
         "type": "link"
       },
       {
         "name": "plaster-rough.jpg",
-        "start": 36.00000000000001,
-        "end": 39,
+        "start": 39,
+        "end": 41,
         "type": "link"
       }
     ],
