@@ -1,0 +1,21 @@
+name: Verify live photographic release
+on:
+  push:
+    branches: ["kalimpong-photo-live-20261115"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: python3 .github/scripts/live-products.py
+      - uses: actions/upload-artifact@v5
+        with:
+          name: live-product-verification
+          path: live-product-results.json
+          retention-days: 7

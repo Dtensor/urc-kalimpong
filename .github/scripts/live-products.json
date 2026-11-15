@@ -1,0 +1,182 @@
+[
+  {
+    "path": "complex/bakery/index.html",
+    "sha256": "a478df93aeb3bc1c3860622a28cc4e803b51115a395beed9da782005414495d7",
+    "bytes": 174403,
+    "gitBlobSha": "75555a31d740a469a924c23b6a03165b33e1c103"
+  },
+  {
+    "path": "complex/grocery/index.html",
+    "sha256": "a675d37e47d427bbfaa2c6916bade337ec1cdf69280e16ffc5a4543a308d99d8",
+    "bytes": 128863,
+    "gitBlobSha": "dc82a48c8a7db416370242f9c744692fcebdf426"
+  },
+  {
+    "path": "complex/index.html",
+    "sha256": "3c4e1294e07ad815d5c4efe4162796c6cf2994a2f19c0b15dba32832e1b9b701",
+    "bytes": 151137,
+    "gitBlobSha": "d615d9558223a61930c1819a23b496f2107096f3"
+  },
+  {
+    "path": "complex/sabzi/index.html",
+    "sha256": "44822f16c387d40495636ad7e7c21b9c1bdffb9bb51fb2948f2db22d1c2d5624",
+    "bytes": 139434,
+    "gitBlobSha": "66cd7c99c6b5fbea691136bd24403775ddd800bb"
+  },
+  {
+    "path": "complex/shared/photographic-products.js",
+    "sha256": "a99c463910628005fae1bb8435df0712b7e763535ac27569fbc7f13913ff5cc1",
+    "bytes": 3698,
+    "gitBlobSha": "89f2a20ddd239d5c10bd284a02719493ae15aa74"
+  },
+  {
+    "path": "complex/shared/products/bakery-01.webp",
+    "sha256": "f80d8597cae224d0779ac754d56af380d27157cacecd604ceb8ced072b24f1fd",
+    "bytes": 374252,
+    "gitBlobSha": "18394540445a7595f4b77cf1a5ce77f94e4077d5"
+  },
+  {
+    "path": "complex/shared/products/bakery-02.webp",
+    "sha256": "855cd9be716e42eb425f9ebf1ee14f822f63f6e552067163d74b6a655fc4b335",
+    "bytes": 288210,
+    "gitBlobSha": "f44c7378ed3bf34ecea0b121f54957ee49673b92"
+  },
+  {
+    "path": "complex/shared/products/bakery-03.webp",
+    "sha256": "e0f81cfe936e8801fd74bd30c49d3486327fa71fbb4c97211fdfab556059c54c",
+    "bytes": 244316,
+    "gitBlobSha": "a32d29359dedced17ff5244fdaf57d6b771154ff"
+  },
+  {
+    "path": "complex/shared/products/bakery-04.webp",
+    "sha256": "8b11f0cd5c63a1673d53468eff4249f62cf2bdb8fbed348c83dc4fca971b4708",
+    "bytes": 327216,
+    "gitBlobSha": "7463c0d4ab353b916cfcb59599ab9ae5c1cf7a71"
+  },
+  {
+    "path": "complex/shared/products/bakery-05.webp",
+    "sha256": "3f67d86b46228eff9909980f8f22293c3a0d011d103e01c18206f1012ef04f3b",
+    "bytes": 318122,
+    "gitBlobSha": "651debe21266341344ff81e1eecde4067b079eea"
+  },
+  {
+    "path": "complex/shared/products/bakery-06.webp",
+    "sha256": "4eb6aea958516d46d311c6692abe523daa01840543700fa70c5b077f342b9421",
+    "bytes": 322438,
+    "gitBlobSha": "ac2d3eeb2bdcfeec05b4094cbf33f272e2d2214a"
+  },
+  {
+    "path": "complex/shared/products/bakery-07.webp",
+    "sha256": "c89760568636ddc30b2430cdf2511925364adb09b33c752ba4fbb4a874165dea",
+    "bytes": 327594,
+    "gitBlobSha": "4d9f221edfcb1c404f682fe84a551e74aa4c63c1"
+  },
+  {
+    "path": "complex/shared/products/grocery-01.webp",
+    "sha256": "8f4fdc7ff53abc1b88e59b41c238eba4c0645a9ec5d737ba7aad78772469b70f",
+    "bytes": 241528,
+    "gitBlobSha": "fde7bd8922f3ff1ce58037b7c8b655ef56c81ba1"
+  },
+  {
+    "path": "complex/shared/products/grocery-02.webp",
+    "sha256": "d8d8cc32ad225a10f550eaebcbf5df25aff8fa7ca8c133d4fe6e82afc424530d",
+    "bytes": 283412,
+    "gitBlobSha": "8845bcfa77d370812ac04d69a3bb602a1c26a40e"
+  },
+  {
+    "path": "complex/shared/products/grocery-03.webp",
+    "sha256": "86a99ffc3cf2838dca3e108d3e73ee21ed5a74c51a4c80e4f52d4a10a0422233",
+    "bytes": 276056,
+    "gitBlobSha": "b6e875e37a354bff6b8a639bf8f8de8fe4cab696"
+  },
+  {
+    "path": "complex/shared/products/grocery-04.webp",
+    "sha256": "18eb822d96680c477c46eadb8729ee500d8b30f9a1539f69f3b31a095df00a1f",
+    "bytes": 333616,
+    "gitBlobSha": "3e3b72613aa5d67f2184e7f2267b399d848698f5"
+  },
+  {
+    "path": "complex/shared/products/grocery-05.webp",
+    "sha256": "c8c7531c028775577f9794b0e115425baa294039e5478929aec23d14fa526dba",
+    "bytes": 139600,
+    "gitBlobSha": "da77f4048fb325048c307728b74ff0eecb857e7b"
+  },
+  {
+    "path": "complex/shared/products/grocery-06.webp",
+    "sha256": "3ec147591114d8937f7dddd2f72c81e9a204f4e23e8aac3dbdc4996793c05a5b",
+    "bytes": 216544,
+    "gitBlobSha": "0cac63dadd414dffd40830a7f8bffd9051047854"
+  },
+  {
+    "path": "complex/shared/products/grocery-07.webp",
+    "sha256": "0759f8f1b8c09e4ecc0203b58ab55d6f17c9fa9e24745ca61cce818170b0828b",
+    "bytes": 277070,
+    "gitBlobSha": "be9250a1791bb8a88bab3e7060c44b43c237bdf0"
+  },
+  {
+    "path": "complex/shared/products/grocery-08.webp",
+    "sha256": "e7f09f3798f6b7b9ec22083c0903f530930b4789935934aa97a90ffbf8fb7489",
+    "bytes": 198722,
+    "gitBlobSha": "2008013151bb8b38c21057da8935dffbd956d755"
+  },
+  {
+    "path": "complex/shared/products/grocery-09.webp",
+    "sha256": "81eafcb5541207b451d83386083aa2ec045ba8e4395815ecc3575b6e056d7449",
+    "bytes": 93068,
+    "gitBlobSha": "d72f369aa5c126f77932b805ff0753d7932d7655"
+  },
+  {
+    "path": "complex/shared/products/manifest.json",
+    "sha256": "c38bc38b76d475f801a350d46b72e735f1d60b2550d4033be7f4db494a666b42",
+    "bytes": 42761,
+    "gitBlobSha": "ff4ec3a424b5133faa9765058336196001c34e0c"
+  },
+  {
+    "path": "complex/shared/products/provenance.json",
+    "sha256": "63001da9c71bb3d55799d1237d263671174b29a508b98bca781c8c5e4a3877f2",
+    "bytes": 936,
+    "gitBlobSha": "7a9cb641ab3a4da545424730b6ec6c21daebe04c"
+  },
+  {
+    "path": "complex/shared/products/sabzi-01.webp",
+    "sha256": "3e1df45ea6b907a74eaa9736a7b9f1e030527edae7d9f4435b64f16595781727",
+    "bytes": 279326,
+    "gitBlobSha": "8d89f89e195d00e3866cba7479efd4fb6ffa620f"
+  },
+  {
+    "path": "complex/shared/products/sabzi-02.webp",
+    "sha256": "3c886ac9389b9329407432980afb9a094cae35199380d30c9acfa581ec221779",
+    "bytes": 258370,
+    "gitBlobSha": "d20798c2f9a5f6a791f27e0a1bf2b568b75d0bf3"
+  },
+  {
+    "path": "complex/shared/products/sabzi-03.webp",
+    "sha256": "457df6798f0e69f246d65cd52ff3c34a4ecc646dcb90fdb4349b887a2285c1d2",
+    "bytes": 335088,
+    "gitBlobSha": "024ec24fb3abbf73ffb9ec810f115d3ea7f067a6"
+  },
+  {
+    "path": "complex/shared/products/sabzi-04.webp",
+    "sha256": "6a7bfd27af8252df0871a04fb2464553d33811b96ed1a6643d4f5257a0d91085",
+    "bytes": 301072,
+    "gitBlobSha": "50e8249bfe0095739217d87d53f3542366fcbce5"
+  },
+  {
+    "path": "complex/shared/products/sabzi-05.webp",
+    "sha256": "17b4f965ec91a8e70cedf264f9ba0fcc5554d50175925ff1a980bc130f4dbbd8",
+    "bytes": 270248,
+    "gitBlobSha": "dd34f449e4828567ca90bd57f318ef6a0cb7d133"
+  },
+  {
+    "path": "complex/shared/products/sabzi-06.webp",
+    "sha256": "6612c2d58efa6e5e160c3920118022cf80ba8a59e9daa848f0b7b9817c2d6177",
+    "bytes": 306296,
+    "gitBlobSha": "8333a24deb22f0fc3b9fb0436f5b960e27b00d52"
+  },
+  {
+    "path": "complex/shared/products/sabzi-07.webp",
+    "sha256": "935ba4c7a2d366c0c9ff5ac679afdb6e86ca8a3de197e18a25e68a50d4921d2c",
+    "bytes": 261972,
+    "gitBlobSha": "7c8f733c21387676747b8850d63410e2b2c5644c"
+  }
+]
