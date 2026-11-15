@@ -9,7 +9,7 @@
     for (let i = 0; i < p.count; i++) {
       // A paler lower crust and softly toasted crown, with deterministic tiny variation.
       const y = p.getY(i), grain = Math.sin(p.getX(i)*43 + p.getZ(i)*29)*.025;
-      const c = new THREE.Color(y > .35 ? '#c28445' : '#edc185').convertSRGBToLinear();
+      const c = new THREE.Color('#e1b477').convertSRGBToLinear().lerp(new THREE.Color('#ad6a2e').convertSRGBToLinear(),Math.max(0,Math.min(1,(y+.2)/1.2)));
       c.multiplyScalar(1 + grain); colors.push(c.r,c.g,c.b);
       p.setY(i, Math.max(-.58,y));
     }
@@ -26,17 +26,26 @@
         const offset=(copy-.5)*Math.min(s.span*.38,.31), x=s.x+r.x*offset,z=s.z+r.z*offset;
         add(body,x,s.y+b*.58,z,a,b,c,ry);
         body[body.length-1].tint=s.it.look.tint;
-        for(let k=0;k<(baguette?5:3);k++){
-          const along=(k-((baguette?5:3)-1)/2)*(baguette?.105:.12);
-          // Thin pale scoring follows the rounded crown, never a floating card.
-          const yy=s.y+b*.58+b*Math.sqrt(Math.max(0,1-(along/c)**2))*.985;
-          add(scores,x+Math.sin(ry)*along,yy,z+Math.cos(ry)*along,a*.72,.006,.011,ry+.25);
-        }
+        add(scores,x,s.y+b*.58,z,a,b,c,ry);
       }
     }
     function batch(geo,mat,list){const m=new THREE.InstancedMesh(geo,mat,list.length),o=new THREE.Object3D();list.forEach((v,i)=>{o.position.set(v.x,v.y,v.z);o.scale.set(v.sx,v.sy,v.sz);o.rotation.set(0,v.ry,v.rz);o.updateMatrix();m.setMatrixAt(i,o.matrix);if(v.tint)m.setColorAt(i,new THREE.Color(v.tint).convertSRGBToLinear().lerp(new THREE.Color(1,1,1),.55));});m.instanceMatrix.needsUpdate=true;scene.add(m);return m;}
-    if(body.length){batch(geometry,crust,body);batch(new THREE.SphereGeometry(1,10,6),cut,scores);}
-    return {version:'bakery-detail-20261115',products:products.length,loaves:body.length,addedDrawCalls:body.length?2:0,addedTriangles:body.length*geometry.index.count/3+scores.length*100};
+    // Scoring curves follow the ellipsoid instead of hovering as straight strokes.
+    const scoreParts=[];
+    for(const z of [-.43,0,.43]){
+      const points=[];
+      for(let i=0;i<=12;i++){const x=-.65+i/12*1.3,zz=z+x*.12;points.push(new THREE.Vector3(x,Math.sqrt(Math.max(0,1-x*x-zz*zz))+.008,zz));}
+      const g=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),12,.018,4,false);scoreParts.push(g.toNonIndexed());g.dispose();
+    }
+    const scoring=new THREE.BufferGeometry();
+    for(const key of ['position','normal','uv']){
+      const size=scoreParts[0].attributes[key].itemSize,data=new Float32Array(scoreParts.reduce((n,g)=>n+g.attributes[key].array.length,0));let offset=0;
+      for(const g of scoreParts){data.set(g.attributes[key].array,offset);offset+=g.attributes[key].array.length;}
+      scoring.setAttribute(key,new THREE.BufferAttribute(data,size));
+    }
+    scoreParts.forEach(g=>g.dispose());
+    if(body.length){batch(geometry,crust,body);batch(scoring,cut,scores);}
+    return {version:'bakery-detail-20261115',products:products.length,loaves:body.length,addedDrawCalls:body.length?2:0,addedTriangles:body.length*geometry.index.count/3+scores.length*scoring.attributes.position.count/3};
   }
   window.BakeryDetail={eligible,build};
 })();
