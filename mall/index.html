@@ -491,7 +491,15 @@ function applyPhotoManifest() {
     if (!row || row.original !== (it.img || "")) continue; // A changed catalogue photograph needs a fresh derivative.
     it.photoState = row.status;
     if (row.status === "withheld") { it.img = ""; it.photoHeld = true; }
-    else if (row.file) { it.shelfImg = row.file; it.packRect = row.rect; it.packColor = row.color; }
+    else if (row.file) {
+      if (row.replacement) {
+        // A reviewed correction is valid only for this exact catalogue identity.
+        if (row.name !== it.name || !/^[a-f0-9]{20}-full\.(png|jpg|webp)$/.test(row.full || "") || !/^[a-f0-9]{20}\.webp$/.test(row.file)) continue;
+        it.img = "complex/shared/urc-products/" + row.full;
+        it.photoHeld = false;
+      }
+      it.shelfImg = row.file; it.packRect = row.rect; it.packColor = row.color;
+    }
   }
 }
 const store = {
