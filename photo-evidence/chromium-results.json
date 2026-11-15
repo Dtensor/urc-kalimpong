@@ -1,0 +1,96 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "chromium",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 7,
+      "products": 55,
+      "errors": []
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "sabzi",
+    "engine": "chromium",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 7,
+      "products": 55,
+      "errors": [],
+      "displayCards": 55,
+      "displayDrawCalls": 7
+    },
+    "basket": {
+      "tomato": 1
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "grocery",
+    "engine": "chromium",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 9,
+      "products": 66,
+      "errors": [],
+      "displayCards": 523,
+      "displayDrawCalls": 9
+    },
+    "basket": {
+      "mustard-oil-1l": 1
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "plaza",
+    "engine": "chromium",
+    "pass": true,
+    "maps": [
+      {
+        "name": "stone-diff.jpg",
+        "start": 37.59999999997672,
+        "end": 49.89999999999418,
+        "type": "link"
+      },
+      {
+        "name": "stone-rough.jpg",
+        "start": 37.69999999998254,
+        "end": 51.59999999997672,
+        "type": "link"
+      },
+      {
+        "name": "stone-nor_gl.jpg",
+        "start": 37.69999999998254,
+        "end": 52.69999999998254,
+        "type": "link"
+      },
+      {
+        "name": "plaster-diff.jpg",
+        "start": 37.69999999998254,
+        "end": 59.89999999999418,
+        "type": "link"
+      },
+      {
+        "name": "plaster-nor_gl.jpg",
+        "start": 37.79999999998836,
+        "end": 63.89999999999418,
+        "type": "link"
+      },
+      {
+        "name": "plaster-rough.jpg",
+        "start": 39.69999999998254,
+        "end": 60.19999999998254,
+        "type": "link"
+      }
+    ],
+    "errors": [],
+    "missing": []
+  }
+]
