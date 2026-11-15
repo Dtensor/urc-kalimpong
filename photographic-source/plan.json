@@ -1,0 +1,391 @@
+[
+  {
+    "id": "bakery-01",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "milk-bread-400g",
+        "name": "Milk Bread 400 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "brown-bread-400g",
+        "name": "Brown Bread 400 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "multigrain-loaf",
+        "name": "Multigrain Loaf",
+        "existingPhoto": null
+      },
+      {
+        "id": "fruit-bread",
+        "name": "Fruit Bread",
+        "existingPhoto": null
+      },
+      {
+        "id": "ladi-pav-6",
+        "name": "Ladi Pav (6)",
+        "existingPhoto": null
+      },
+      {
+        "id": "burger-buns-4",
+        "name": "Burger Buns (4)",
+        "existingPhoto": null
+      },
+      {
+        "id": "sweet-bun",
+        "name": "Tutti-frutti Sweet Bun",
+        "existingPhoto": null
+      },
+      {
+        "id": "garlic-baguette",
+        "name": "Garlic Baguette",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-01.png",
+    "alpha": {
+      "transparentPct": 44.7,
+      "nearOpaquePct": 45.4
+    },
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 44.7
+  },
+  {
+    "id": "bakery-02",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "hill-sourdough",
+        "name": "Hill Sourdough Boule",
+        "existingPhoto": null
+      },
+      {
+        "id": "toast-rusk-200g",
+        "name": "Toast Rusk 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "black-forest-500g",
+        "name": "Black Forest Cake 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "pineapple-cake-500g",
+        "name": "Pineapple Cake 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "red-velvet-slice",
+        "name": "Red Velvet Slice",
+        "existingPhoto": null
+      },
+      {
+        "id": "truffle-slice",
+        "name": "Chocolate Truffle Slice",
+        "existingPhoto": null
+      },
+      {
+        "id": "butter-croissant",
+        "name": "Butter Croissant",
+        "existingPhoto": null
+      },
+      {
+        "id": "chocolate-eclair",
+        "name": "Chocolate Eclair",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-02.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 53.5
+  },
+  {
+    "id": "bakery-03",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "cream-roll",
+        "name": "Cream Roll",
+        "existingPhoto": null
+      },
+      {
+        "id": "strawberry-cupcake",
+        "name": "Strawberry Cupcake",
+        "existingPhoto": null
+      },
+      {
+        "id": "glazed-doughnut",
+        "name": "Pink Glazed Doughnut",
+        "existingPhoto": null
+      },
+      {
+        "id": "fruit-danish",
+        "name": "Mixed-fruit Danish",
+        "existingPhoto": null
+      },
+      {
+        "id": "choco-chip-cookies",
+        "name": "Choco-chip Cookies 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "butter-cookies",
+        "name": "Butter Cookies 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "coconut-macaroons",
+        "name": "Coconut Macaroons 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "nankhatai",
+        "name": "Nankhatai 250 g",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-03.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 52.0
+  },
+  {
+    "id": "bakery-04",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "jeera-biscuits",
+        "name": "Jeera Biscuits 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "almond-biscotti",
+        "name": "Almond Biscotti 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "salt-biscuits",
+        "name": "Salt Biscuits 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "oat-raisin-cookies",
+        "name": "Oat & Raisin Cookies 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "assorted-cookie-jar",
+        "name": "Assorted Cookie Jar 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "veg-puff",
+        "name": "Veg Puff",
+        "existingPhoto": null
+      },
+      {
+        "id": "egg-puff",
+        "name": "Egg Puff",
+        "existingPhoto": null
+      },
+      {
+        "id": "chicken-patty",
+        "name": "Chicken Patty",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-04.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 48.9
+  },
+  {
+    "id": "bakery-05",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "paneer-roll",
+        "name": "Paneer Roll",
+        "existingPhoto": null
+      },
+      {
+        "id": "veg-momos-8",
+        "name": "Veg Momos (8)",
+        "existingPhoto": null
+      },
+      {
+        "id": "chicken-momos-8",
+        "name": "Chicken Momos (8)",
+        "existingPhoto": null
+      },
+      {
+        "id": "sausage-roll",
+        "name": "Chicken Sausage Roll",
+        "existingPhoto": null
+      },
+      {
+        "id": "cheese-garlic-bun",
+        "name": "Cheese Garlic Bun",
+        "existingPhoto": null
+      },
+      {
+        "id": "pizza-bun",
+        "name": "Pizza Bun",
+        "existingPhoto": null
+      },
+      {
+        "id": "kalimpong-lollipops-10",
+        "name": "Kalimpong Lollipops (10)",
+        "existingPhoto": null
+      },
+      {
+        "id": "kalimpong-ginger-biscuits",
+        "name": "Kalimpong Ginger Biscuits 200 g",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-05.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 52.2
+  },
+  {
+    "id": "bakery-06",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "kalimpong-cheese-200g",
+        "name": "Kalimpong Cheese 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "hard-churpi-100g",
+        "name": "Hard Churpi 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "soft-churpi-250g",
+        "name": "Soft Churpi 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "darjeeling-tea-cake",
+        "name": "Darjeeling Tea Cake 300 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "mandarin-marmalade",
+        "name": "Mandarin Marmalade 350 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "cardamom-rusk-200g",
+        "name": "Large Cardamom Rusk 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "dalle-chilli-pickle",
+        "name": "Dalle Chilli Pickle 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "mandarin-muffin",
+        "name": "Mandarin Muffin",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-06.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 47.5
+  },
+  {
+    "id": "bakery-07",
+    "venue": "bakery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "kanchenjunga-cake-1kg",
+        "name": "Kanchenjunga Celebration Cake 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "christmas-plum-cake",
+        "name": "Christmas Plum Cake 500 g",
+        "existingPhoto": "photo-sample.jpg"
+      },
+      {
+        "id": "birthday-cake-1kg",
+        "name": "Birthday Cake 1 kg (to order)",
+        "existingPhoto": null
+      },
+      {
+        "id": "losar-khapse-box",
+        "name": "Losar Khapse Box",
+        "existingPhoto": null
+      },
+      {
+        "id": "diwali-cookie-hamper",
+        "name": "Diwali Cookie Hamper",
+        "existingPhoto": null
+      },
+      {
+        "id": "photo-cake-1kg",
+        "name": "Photo Cake 1 kg (to order)",
+        "existingPhoto": null
+      },
+      {
+        "id": "cupcake-dozen",
+        "name": "Cupcake Dozen (to order)",
+        "existingPhoto": null
+      },
+      {
+        "id": "tiered-wedding-cake",
+        "name": "Tiered Wedding Cake (to order)",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/bakery-07.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 33.6
+  }
+]

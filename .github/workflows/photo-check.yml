@@ -1,0 +1,85 @@
+name: Photographic product acceptance
+on:
+  push:
+    branches: ["kalimpong-photo-20261115"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  encode:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==12.2.0
+      - run: python .github/scripts/encode-products.py
+      - uses: actions/upload-artifact@v5
+        with:
+          name: photographic-products
+          path: complex/shared/products/
+          retention-days: 7
+  browser:
+    needs: encode
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: photographic-products
+          path: complex/shared/products
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install pinned browser runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/check" --no-package-lock --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/check/node_modules/.bin/playwright" install --with-deps ${{ matrix.engine }}
+      - name: Verify photographic products and early plaza texture reuse
+        env:
+          NODE_PATH: ${{ runner.temp }}/check/node_modules
+          ENGINE: ${{ matrix.engine }}
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          node .github/scripts/photo-check.cjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: photo-${{ matrix.engine }}
+          path: photo-evidence/
+          retention-days: 7
+  captures:
+    needs: [encode, browser]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: photographic-products
+          path: complex/shared/products
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: photo-*
+          merge-multiple: true
+          path: photo-evidence
+      - name: Retain generated assets and browser evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add complex/shared/products photo-evidence
+          git commit -m 'Retain encoded product atlases and review evidence'
+          git push origin "HEAD:refs/heads/photo-evidence-${{ github.run_id }}-${{ github.run_attempt }}"
