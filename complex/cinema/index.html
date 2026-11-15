@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>window.URC_EASY_REDIRECT=new URLSearchParams(location.search).get('view') !== 'hall' && (matchMedia('(max-width: 760px)').matches || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width,screen.height)<=760));if(window.URC_EASY_REDIRECT)location.replace(new URL("../shared/easy.html?venue=cinema",location.href).href);</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Station Cinema</title>
 <meta name="description" content="Station Cinema, Kalimpong: walk into an art-deco single-screen hall, take a seat and watch the trailer.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap\">");</script>
 <style>
 :root{
   --bg:#f3f1ec;--panel:#fcfbf8;--panel-2:#f3f0ea;--ink:#1d1e21;--muted:#62666d;--line:#dedad2;
@@ -248,9 +249,11 @@ body.seated #wings,body.seated #map,body.seated #where,body.seated #tickets,body
   </div>
 </div>
 
-<script src="../shared/nav.js"></script>
-<script src="../shared/vendor/three-r128.min.js"></script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/nav.js\"><\/script>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/vendor/three-r128.min.js\"><\/script>");</script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 /* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
  * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
  * Existing labels, product photographs, picking meshes and catalogue data stay intact.
@@ -493,8 +496,12 @@ body.seated #wings,body.seated #map,body.seated #where,body.seated #tickets,body
   updateUI();
 })();
 
+
+}
 </script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 (() => {
 "use strict";
 const $ = (s, r = document) => r.querySelector(s);
@@ -1531,6 +1538,8 @@ $("#quiet").onclick = () => { hideIntro(); if (musicOn) setMusic(false); };
 $("#ilist").onclick = () => { hideIntro(); openList(!GL_OK); };
 boot();
 })();
+
+}
 </script>
 </body>
 </html>

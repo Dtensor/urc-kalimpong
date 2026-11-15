@@ -2,7 +2,7 @@ name: URC Easy shopping acceptance
 on:
   push:
     branches: [kalimpong-easy-mobile-20261115, main]
-    paths: ['mall/index.html', 'complex/shared/easy*', '.github/scripts/easy-*', '.github/workflows/easy-shopping.yml']
+    paths: ['mall/index.html', 'complex/**', '.github/scripts/easy-*', '.github/workflows/easy-shopping.yml']
 permissions:
   contents: read
 jobs:
@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==12.2.0
+      - run: python .github/scripts/easy-build-thumbs.py .
       - run: node .github/scripts/easy-core-test.cjs .
       - run: |
           npm install --prefix "$RUNNER_TEMP/check" --no-package-lock --no-audit --no-fund playwright@1.59.1 axe-core@4.10.3
@@ -37,6 +42,12 @@ jobs:
           name: easy-${{ matrix.engine }}
           path: easy-evidence/${{ matrix.engine }}-*
           retention-days: 7
+      - uses: actions/upload-artifact@v5
+        if: always() && matrix.engine == 'chromium'
+        with:
+          name: mobile-product-derivatives
+          path: complex/shared/easy-products
+          retention-days: 7
   captures:
     needs: browser
     if: always()
@@ -51,9 +62,13 @@ jobs:
           pattern: easy-*
           merge-multiple: true
           path: easy-evidence
+      - uses: actions/download-artifact@v5
+        with:
+          name: mobile-product-derivatives
+          path: complex/shared/easy-products
       - run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add easy-evidence
+          git add easy-evidence complex/shared/easy-products
           git commit -m 'Retain Easy shopping browser and accessibility evidence'
           git push origin "HEAD:refs/heads/easy-evidence-${{ github.run_id }}-${{ github.run_attempt }}"

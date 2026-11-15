@@ -61,7 +61,7 @@
       <span class="cx-dot" style="background:${p.color}">${p.glyph}</span>
       <span class="cx-t"><b>${p.name}</b><small>${p.sub}</small></span>
       <span class="cx-go">${p.id === here ? 'You are here' : 'Go →'}</span></a>`;
-    pop.innerHTML = `<h6>Station Complex · Kalimpong</h6>${row(PLACES[0])}
+    pop.innerHTML = `<h6>Station Complex · Kalimpong</h6><a href="${up()}shared/easy.html?venue=${here}" style="min-height:52px"><span class="cx-t"><b>Easy shopping</b><small>Large text, simple lists and help</small></span></a>${row(PLACES[0])}
       <div class="cx-urc"><a href="${href('urc', { walk: true })}">Walk in (3D)</a><a href="${href('urc')}">Shop list</a></div>
       <div class="cx-sep"></div>${PLACES.slice(1).map(row).join('')}
       <div class="cx-sep"></div><a href="${href('plaza')}" ${here === 'plaza' ? 'aria-current="page"' : ''}>
