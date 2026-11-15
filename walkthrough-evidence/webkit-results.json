@@ -1,0 +1,84 @@
+{
+  "engine": "webkit",
+  "checks": [
+    "normal-motion entrance completed"
+  ],
+  "entry": {
+    "x": 0,
+    "z": 4.4,
+    "yaw": 0,
+    "pitch": 0.06,
+    "gaze": null,
+    "held": null
+  },
+  "hit": "stick",
+  "forward": {
+    "before": {
+      "x": 0,
+      "z": 4.4,
+      "yaw": 0,
+      "pitch": 0,
+      "gaze": null,
+      "held": null
+    },
+    "after": {
+      "x": 0,
+      "z": 2.08,
+      "yaw": 0,
+      "pitch": 0,
+      "gaze": null,
+      "held": null
+    },
+    "held": {
+      "x": 0,
+      "y": -0.7692307692307693,
+      "id": 1
+    }
+  },
+  "sideways": {
+    "before": {
+      "x": 0,
+      "z": 4.4,
+      "yaw": 0,
+      "pitch": 0,
+      "gaze": null,
+      "held": null
+    },
+    "after": {
+      "x": 0,
+      "z": 4.4,
+      "yaw": -2.24,
+      "pitch": 0,
+      "gaze": null,
+      "held": null
+    },
+    "held": {
+      "x": 0.7692307692307693,
+      "y": 0,
+      "id": 1
+    }
+  },
+  "keyboard": {
+    "x": 0,
+    "z": 1.32,
+    "yaw": 0,
+    "pitch": 0,
+    "gaze": null,
+    "held": null
+  },
+  "floorPoint": {
+    "x": 220,
+    "y": 483.1275986744935
+  },
+  "floorStarted": false,
+  "floor": {
+    "x": 0,
+    "z": 4.93,
+    "yaw": 0,
+    "pitch": 0.12,
+    "gaze": null,
+    "held": null
+  },
+  "pass": false,
+  "error": "Floor tap walks toward floor destination"
+}
