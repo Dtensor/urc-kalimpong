@@ -1,0 +1,47 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "webkit",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 10,
+      "y": 728,
+      "width": 408,
+      "height": 58,
+      "display": "flex",
+      "buttons": 6
+    },
+    "landscapeCount": 56
+  },
+  {
+    "venue": "sabzi",
+    "engine": "webkit",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 10,
+      "y": 736,
+      "width": 420,
+      "height": 44,
+      "display": "flex",
+      "buttons": 7
+    },
+    "landscapeCount": 56
+  },
+  {
+    "venue": "grocery",
+    "engine": "webkit",
+    "count": 67,
+    "bad": [],
+    "controls": {
+      "x": 10,
+      "y": 736,
+      "width": 420,
+      "height": 44,
+      "display": "flex",
+      "buttons": 7
+    },
+    "landscapeCount": 67
+  }
+]
