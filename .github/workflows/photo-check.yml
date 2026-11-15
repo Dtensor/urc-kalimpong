@@ -55,7 +55,7 @@ jobs:
         if: always()
         with:
           name: photo-${{ matrix.engine }}
-          path: photo-evidence/
+          path: photo-evidence/${{ matrix.engine }}-*
           retention-days: 7
   captures:
     needs: [encode, browser]
