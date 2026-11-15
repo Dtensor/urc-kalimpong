@@ -526,6 +526,7 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
 </script>
 <script src="../shared/nav.js"></script>
 <script src="../shared/photographic-products.js"></script>
+<script src="../shared/shelf-navigation.js"></script>
 <script>
 'use strict';
 /* Station Grocery: a kirana that grew into a small supermarket. Everything on the
@@ -949,7 +950,7 @@ function fillSlot(it,bay,t,h,first){
     else (KL[k]=KL[k]||[]).push({x,y:by+st*fh*1.002,z,ry:ry+(rnd()-.5)*.07,s,uv})}
   addHit(it.id,bay.side*(SH.front+.2),by+.2,zc,.42,.4,half-.03);
   PRICE.push({x:bay.side*(SH.front-.009),y:by-.013,z:zc,ry,it,w:.2,h:.05});
-  if(first)ANCH[it.id]={x:bay.side*(SH.front+.08),y:by+fh*.6,z:zc,stand:{x:bay.side*2.85,z:zc,yaw:ry}};
+  if(first)ANCH[it.id]={bay,x:bay.side*(SH.front+.08),y:by+fh*.6,z:zc,stand:{x:bay.side*2.85,z:zc,yaw:ry}};
 }
 function layoutIsland(bins){
   const cols=[[],[]],order=SECTS.map(s=>s.id).filter(id=>bins.some(b=>b.section===id));
@@ -1105,8 +1106,18 @@ function glideStep(dt){const g=S.glide;g.t+=dt;const u=Math.min(1,g.t/g.dur),e=u
   for(let i=1;i<g.segs.length;i++){const a=g.segs[i-1],b=g.segs[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<=l||i===g.segs.length-1){const t=l?Math.min(1,d/l):1;cam.x=a[0]+(b[0]-a[0])*t;cam.z=a[1]+(b[1]-a[1])*t;break}d-=l}
   cam.yaw=g.y0+g.dy*e;cam.pitch=g.p0+(g.p1-g.p0)*e;if(u>=1){S.glide=null;g.done&&g.done()}}
 function fadeJump(x,z,yaw,pitch,done){const f=$('#fade');f.style.opacity=1;setTimeout(()=>{cam.x=x;cam.z=z;if(yaw!=null)cam.yaw=yaw;if(pitch!=null)cam.pitch=pitch;f.style.opacity=0;done&&done()},240)}
-function standOf(id){const a=ANCH[id];if(!a)return null;const s=a.stand,dist=Math.hypot(a.x-s.x,a.z-s.z);return{x:s.x,z:s.z,yaw:s.yaw,pitch:s.pitch!=null?s.pitch:Math.atan2(a.y-EYE,dist)}}
-function walkTo(id,then){const s=standOf(id);if(!s)return false;glideTo(s.x,s.z,s.yaw,s.pitch,()=>{ringItems([id],'#ffd27a',4);showGaze(id,true);then&&then()});return true}
+let shelfNav;
+function shelfTarget(id){const a=ANCH[id];if(!a)return null;const side=Math.sign(a.x)||1;
+ if(a.bay)return {id,x:side*SH.front,z:a.bay.zc,nx:-side,nz:0,width:a.bay.len,bottom:.1,top:SH.top+.12,depth:SH.depth};
+ if(a.z<-5.8)return {id,x:a.x,z:-6.05,nx:0,nz:1,width:.85,bottom:0,top:1.65,depth:.6};
+ if(a.x<-4)return {id,x:-4.3,z:a.z,nx:1,nz:0,width:.85,bottom:0,top:1.2,depth:.6};
+ return {id,x:side*1.03,z:a.z,nx:side,nz:0,width:.95,bottom:.1,top:1.25,depth:.7};
+}
+function getShelfNav(){return shelfNav||(shelfNav=ShelfNavigation.create(THREE,scene,{eye:EYE,aspect:()=>camera.aspect,free}));}
+function standOf(id){const t=shelfTarget(id);return t?getShelfNav().view(t):null;}
+function walkTo(id,then){const t=shelfTarget(id);if(!t)return false;const s=getShelfNav().select(t,()=>walkTo(id));camera.fov=s.fov;camera.updateProjectionMatrix();stickV=[0,0];glideTo(s.x,s.z,s.yaw,s.pitch,()=>{ringItems([id],'#ffd27a',4);showGaze(id,true);then&&then()});return true;}
+function safeFloor(x,z){const t=getShelfNav().nearFloor(x,z,Object.keys(ANCH).map(shelfTarget));if(t){walkTo(t.id);return true;}return false;}
+
 
 /* ---------- renderer and the frame loop ---------- */
 function hasGL(){try{const c=document.createElement('canvas');return!!(window.WebGLRenderingContext&&(c.getContext('webgl2')||c.getContext('webgl')))}catch(e){return false}}
@@ -1144,11 +1155,11 @@ function floorAt(cx,cy_){ndc.set(cx/innerWidth*2-1,-(cy_/innerHeight)*2+1);ray.s
   c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);c.addEventListener('pointerleave',()=>{mouse=null});
 })();
 function tap(x,y){
-  const h=pickAt(x,y);
+  const h=pickAt(x,y);if(getShelfNav().pick(ray)){getShelfNav().activate();return;}
   if(h){if(h.id==='__bell'){ding();toast('Ding! Someone will be with you shortly');return}
     if(h.id==='__door'){showGaze('__door',true);return}
     const it=BYID[h.id];if(!it)return;if(h.d>3.4){walkTo(it.id,()=>hold(it));return}hold(it);return}
-  const f=floorAt(x,y);if(f&&free(f[0],f[1]))glideTo(f[0],f[1]);
+  const f=floorAt(x,y);if(f&&!safeFloor(f[0],f[1])&&free(f[0],f[1]))glideTo(f[0],f[1]);
 }
 
 /* ---------- gaze card ---------- */
@@ -1187,7 +1198,8 @@ function whereTick(){const w=$('#where'),id=nearestItem(),it=id&&BYID[id];let se
   w.hidden=false;
   if(sec!==whereSec){whereSec=sec;document.querySelectorAll('#wings button').forEach(b=>b.setAttribute('aria-current',b.dataset.s===sec?'true':'false'))}}
 function buildWings(){const w=$('#wings');w.innerHTML=SECTS.map((s,i)=>`<button class="glass" data-s="${esc(s.id)}" style="--c:${esc(s.color)}"><i>${i+1}</i>${esc(SHORT[s.id]||s.name)}</button>`).join('');
-  w.onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=SECANCH[b.dataset.s];if(!a)return;glideTo(a.x,a.z,a.yaw,a.pitch==null?-.12:a.pitch,()=>{const ids=ITEMS.filter(i=>i.section===b.dataset.s).map(i=>i.id);ringItems(ids,SECT[b.dataset.s].color,5)})}}
+  w.onclick=e=>{const b=e.target.closest('button');if(!b)return;const its=ITEMS.filter(i=>i.section===b.dataset.s&&ANCH[i.id]);if(its.length)walkTo(its[Math.floor(its.length/2)].id)}}
+
 const MAPK=20,MX=x=>(x+5.2)*MAPK+66,MZ=z=>(z+9.2)*MAPK;
 let mapBase=null;
 function drawMapBase(){const[c,g]=mkCanvas(340,340);g.fillStyle='#e6e2d8';g.fillRect(0,0,340,340);g.fillStyle='#f3f0ea';g.fillRect(MX(-5.2),MZ(-9.2),10.4*MAPK,17*MAPK);
@@ -1388,7 +1400,7 @@ async function boot(){
   $('#gomusic').disabled=false;$('#goquiet').disabled=false;
   $('#gomusic').onclick=()=>enter(true);$('#goquiet').onclick=()=>enter(false);
   if(!$('#ledger').hidden)openLedger();
-  window.__groc={items:ITEMS,walkTo,holdId:id=>hold(BYID[id]),state:S,basket:()=>Object.assign({},basket),anch:ANCH,cam,enter};
+  window.__groc={navigation:()=>({targets:Object.keys(ANCH).map(shelfTarget),views:Object.keys(ANCH).map(standOf),selected:getShelfNav().selected,fov:camera.fov,marker:getShelfNav().marker.visible}),items:ITEMS,walkTo,holdId:id=>hold(BYID[id]),state:S,basket:()=>Object.assign({},basket),anch:ANCH,cam,enter};
 }
 $('#golist').onclick=()=>{openLedger()};
 boot();
