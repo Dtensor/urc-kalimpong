@@ -1,0 +1,13 @@
+{
+  "reviewedAt": "2026-11-15",
+  "withheld": {
+    "ariel-2kg-front-load-powergel": "Photograph shows washing powder, not liquid Power Gel.",
+    "ariel-oxyblue-2-kg-washing-pow": "Photograph shows Matic front-load variant; Oxyblue variant is not established.",
+    "henko-detergent-bar": "Photograph shows detergent powder, not a bar.",
+    "himalaya-100ml-baby-cream": "Photograph shows a gift basket, not a cream tube.",
+    "johnson-baby-lotion-200-ml": "Photograph shows wipes, not lotion.",
+    "wonder-clean-1l-liquid-deter": "Photograph shows fabric conditioner, not liquid detergent."
+  },
+  "coverage": {"catalogueItems":1715,"referencedPhotosAudited":1667,"missingPhotos":48,"visuallyReviewedPriorityPhotos":15},
+  "limits": "Automated OCR and source metadata are screening evidence. Remaining photographs are references, not individually certified pack-size matches. No generated branded packaging. Six mismatches are withheld from the walkthrough without modifying catalogue records."
+}

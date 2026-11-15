@@ -478,7 +478,22 @@ const API = (window.BHANDAR_API || "").replace(/\/$/, "");
 const url = (p) => API + p;
 // On GitHub Pages this page lives at /mall/, beside the shop at /.
 const ROOT = /\/mall\/?(index\.html)?$/.test(location.pathname) ? "../" : "";
-const pic = (it) => !it.img ? "" : it.img.startsWith("/") ? API + it.img : ROOT + it.img;
+let photoManifest = null;
+const photoStats = {version:"urc-products-20261115",requests:0,cacheHits:0,discarded:0,errors:0,optimized:0};
+const pic = (it, full = false) => !it.img ? "" : (!full && it.shelfImg ? ROOT + "complex/shared/urc-products/" + it.shelfImg : it.img.startsWith("/") ? API + it.img : ROOT + it.img);
+async function loadPhotoManifest() {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 4000);
+  try { const r = await fetch(ROOT + "complex/shared/urc-products/manifest.json", {signal:controller.signal}); if (r.ok) photoManifest = await r.json(); } catch {} finally { clearTimeout(timer); }
+}
+function applyPhotoManifest() {
+  for (const it of DATA.items) {
+    const row = photoManifest?.items?.[it.id];
+    if (!row || row.original !== (it.img || "")) continue; // A changed catalogue photograph needs a fresh derivative.
+    it.photoState = row.status;
+    if (row.status === "withheld") { it.img = ""; it.photoHeld = true; }
+    else if (row.file) it.shelfImg = row.file;
+  }
+}
 const store = {
   get(k, d) { try { const v = localStorage.getItem("bhandar." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("bhandar." + k, JSON.stringify(v)); } catch {} },
@@ -515,7 +530,7 @@ function merge(live) {
   const cur = new Map(DATA.items.map(i => [i.id, i]));
   for (const li of live.items) {
     const it = cur.get(li.id);
-    if (it) Object.assign(it, { qty: li.qty, status: li.status, wants: li.wants, featured: li.featured, price: li.price, img: it.img || li.img });
+    if (it) Object.assign(it, { qty: li.qty, status: li.status, wants: li.wants, featured: li.featured, price: li.price, img: it.photoHeld ? "" : it.img || li.img });
   }
   if (live.notices) DATA.notices = live.notices;
 }
@@ -1554,16 +1569,34 @@ function products() {
     _o.position.set(v.x, v.yc, v.z); _o.rotation.set(0, v.ry, 0); _o.scale.set(v.d[0], v.d[1], v.d[2]); _o.updateMatrix(); IHit.setMatrixAt(i, _o.matrix);
   });
   scene.add(IBox, ICyl, IHit, ILow);
+  buildPackDetails();
   restock();
+}
+let packShadows, packCaps;
+function buildPackDetails() {
+  const shadow = cvs(64,64,(g)=>{const grad=g.createRadialGradient(32,32,2,32,32,31);grad.addColorStop(0,"rgba(37,29,19,.28)");grad.addColorStop(1,"rgba(37,29,19,0)");g.fillStyle=grad;g.fillRect(0,0,64,64);});
+  packShadows = new THREE.InstancedMesh(PLANE,new THREE.MeshBasicMaterial({map:ctex(shadow),transparent:true,depthWrite:false}),ITEMS.length);
+  packCaps = new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.5,1,10),new THREE.MeshStandardMaterial({color:"#ddd8c7",roughness:.45}),ITEMS.length);
+  ITEMS.forEach(v=>{
+    _o.position.set(v.x,v.y+.003,v.z);_o.rotation.set(-Math.PI/2,0,v.ry);_o.scale.set(v.d[0]*1.55,v.d[2]*1.8,1);_o.updateMatrix();packShadows.setMatrixAt(v.i,_o.matrix);
+    _o.position.set(v.x,v.y+v.d[1]+.008,v.z);_o.rotation.set(0,v.ry,0);_o.scale.set(0,0,0);_o.updateMatrix();packCaps.setMatrixAt(v.i,_o.matrix);
+  });
+  scene.add(packShadows,packCaps);
 }
 function place(v, hidden) {
   if (hidden) _o.scale.set(0, 0, 0); else _o.scale.set(v.d[0], v.d[1], v.d[2]);
   _o.position.set(v.x, v.yc, v.z); _o.rotation.set(0, v.ry, 0); _o.updateMatrix(); v.mesh.setMatrixAt(v.k, _o.matrix); v.mesh.instanceMatrix.needsUpdate = true;
+  if (packCaps) {
+    _o.position.set(v.x,v.y+v.d[1]+.008,v.z);_o.rotation.set(0,v.ry,0);
+    _o.scale.setScalar(0); if (!hidden && v.shape === "bottle") _o.scale.set(v.d[0]*.62,.022,v.d[2]*.62);
+    _o.updateMatrix();packCaps.setMatrixAt(v.i,_o.matrix);packCaps.instanceMatrix.needsUpdate=true;
+  }
 }
 function restock() {
   // Sold-out items leave a gap; three or fewer left get a red shelf tag.
   ITEMS.forEach(v => {
     const on = available(v.it); v.gone = !on;
+    if (packShadows) { _o.position.set(v.x,v.y+.003,v.z);_o.rotation.set(-Math.PI/2,0,v.ry);_o.scale.set(on?v.d[0]*1.55:0,on?v.d[2]*1.8:0,1);_o.updateMatrix();packShadows.setMatrixAt(v.i,_o.matrix);packShadows.instanceMatrix.needsUpdate=true; }
     place(v, !on || (!!v.photo && !v.isLabel) || v === lifted);
     if (v.photo) v.photo.visible = on && v !== lifted;
     const low = on && v.it.qty != null && v.it.qty <= 5;
@@ -1576,7 +1609,20 @@ function restock() {
 
 /* ---------- photos near the eye ---------- */
 const BUDGET = WEAK ? 40 : COARSE ? 90 : 220, RADIUS = COARSE ? 7.5 : 11, TEX = COARSE ? 192 : 256;
-const loaded = new Set(); let loading = 0;
+const loaded = new Set(); let loading = 0, wanted = new Set(), photoQueue = [];
+const photoCache = new Map(), CACHE_LIMIT = COARSE ? 56 : 96, LOAD_LIMIT = COARSE ? 4 : 6;
+function rememberPhoto(id, value) {
+  photoCache.delete(id); photoCache.set(id, value);
+  while (photoCache.size > CACHE_LIMIT) photoCache.delete(photoCache.keys().next().value);
+}
+function pumpPhotos() {
+  let labels = 0;
+  for (const v of photoQueue) {
+    if (v.photo || v.loading || loaded.size + loading >= BUDGET) continue;
+    if (!v.it.img || v.bad) { if (labels++ < 3) photoFor(v); }
+    else if (loading < LOAD_LIMIT) photoFor(v);
+  }
+}
 // No photograph yet: print the name on a pack in the wing's colour, so the aisle still reads.
 function labelFor(v) {
   const base = new THREE.Color(); v.mesh.getColorAt(v.k, base);
@@ -1595,16 +1641,21 @@ function labelFor(v) {
 function photoFor(v) {
   if (v.photo || v.loading) return;
   if (!v.it.img || v.bad) { const c = labelFor(v); v.labelled = true; mountPhoto(v, c, c.width, c.height, true); return; }
-  v.loading = true; loading++;
-  const im = new Image(); im.crossOrigin = "anonymous"; im.decoding = "async";
+  const cached = photoCache.get(v.it.id);
+  if (cached) { photoStats.cacheHits++; rememberPhoto(v.it.id, cached); mountPhoto(v, cached, cached.width, cached.height, false); return; }
+  v.loading = true; loading++; photoStats.requests++; if (v.it.shelfImg) photoStats.optimized++;
+  const im = new Image(); im.crossOrigin = "anonymous"; im.decoding = "async"; im.fetchPriority = photoQueue.indexOf(v) < 2 ? "high" : "low";
+  const finish = () => { loading--; v.loading = false; };
   im.onload = () => {
-    loading--; v.loading = false;
+    finish();
     const k = Math.min(1, TEX / Math.max(im.width, im.height)), cw = Math.max(8, Math.round(im.width * k)), ch = Math.max(8, Math.round(im.height * k));
     let c;
-    try { c = cvs(cw, ch, g => g.drawImage(im, 0, 0, cw, ch)); } catch { return; }
+    try { c = cvs(cw, ch, g => g.drawImage(im, 0, 0, cw, ch)); } catch { v.bad = true; photoStats.errors++; return; }
+    rememberPhoto(v.it.id, c);
+    if ((!wanted.has(v) && v !== lifted) || v.gone || loaded.size >= BUDGET) { photoStats.discarded++; return; }
     mountPhoto(v, c, cw, ch, false);
   };
-  im.onerror = () => { loading--; v.loading = false; v.bad = true; };
+  im.onerror = () => { finish(); v.bad = true; photoStats.errors++; };
   im.src = pic(v.it);
 }
 function mountPhoto(v, c, cw, ch, label) {
@@ -1615,24 +1666,28 @@ function mountPhoto(v, c, cw, ch, label) {
     const m = new THREE.Mesh(PLANE, label ? new THREE.MeshLambertMaterial({ map: t }) : new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: .35 }));
     const [mx, mz] = at(v, label ? v.d[2] + .023 : .1);
     m.scale.set(cw * s2, ch * s2, 1); m.position.set(mx, v.y + ch * s2 / 2 + .005, mz); m.rotation.y = v.ry;
-    v.photo = m; v.pw = cw * s2; v.ph = ch * s2; v.photoY = m.position.y; v.photoZ = m.position.z; v.isLabel = label; scene.add(m); loaded.add(v);
+    v.photo = m; v.pw = cw * s2; v.ph = ch * s2; v.photoX = m.position.x; v.photoY = m.position.y; v.photoZ = m.position.z; v.isLabel = label; scene.add(m); loaded.add(v);
     // a label sits on the pack's face; a photo cut-out replaces the pack
     if (!label) place(v, true); if (v.gone) m.visible = false;
 }
 function dropPhoto(v) { if (!v.photo || v === lifted) return; scene.remove(v.photo); v.photo.material.map.dispose(); v.photo.material.dispose(); v.photo = null; loaded.delete(v); place(v, v.gone); }
 function streamPhotos() {
-  const px = pos.x, pz = pos.z, fx = -Math.sin(yaw), fz = -Math.cos(yaw);
-  const near = [];
+  const fx = -Math.sin(yaw), fz = -Math.cos(yaw), near = [];
+  const halfView = Math.atan(Math.tan(fov * Math.PI / 360) * camera.aspect) + .45;
   for (const v of ITEMS) {
     if (v.gone) continue;
-    const dx = v.x - px, dz = v.z - pz, d = Math.hypot(dx, dz); if (d > RADIUS) continue;
+    const dx = v.x - pos.x, dz = v.z - pos.z, d = Math.hypot(dx, dz);
+    if (d > RADIUS) continue;
+    const [, across] = toL(v.fr, pos.x, pos.z);
+    if ((across - v.vf) * v.n < .05) continue; // The back of a shelf cannot show its front photograph.
     const ahead = (dx * fx + dz * fz) / (d || 1);
-    near.push([d - ahead * 2.5, v]);
+    if (ahead < Math.cos(halfView) && d > 1.5) continue;
+    near.push([d - ahead * 3, v]);
   }
   near.sort((a, b) => a[0] - b[0]);
-  const want = new Set(near.slice(0, BUDGET).map(x => x[1]));
-  if (loaded.size > BUDGET * .9) for (const v of [...loaded]) if (!want.has(v)) dropPhoto(v);
-  for (const [, v] of near.slice(0, BUDGET)) { if (!v.photo && loaded.size < BUDGET && (!v.it.img || v.bad || loading < 6)) photoFor(v); }
+  photoQueue = near.slice(0, BUDGET).map(x => x[1]); wanted = new Set(photoQueue);
+  for (const v of [...loaded]) if (!wanted.has(v) && v !== lifted) dropPhoto(v);
+  pumpPhotos();
 }
 
 /* ---------- price strips on shelf edges, near the eye only ---------- */
@@ -1647,19 +1702,21 @@ function streamStrips() {
   }
 }
 function makeStrip(f) {
-  const w = f.w, o = f.off || 0, n = Math.max(1, f.cols.length - o), SH = .045, H = 34, px = Math.min(Math.round(H * w.slot / SH), Math.floor(4096 / n)), grp = new THREE.Group();
+  const w = f.w, o = f.off || 0, n = Math.max(1, f.cols.length - o), SH = .075, H = 72, px = Math.min(Math.round(H * w.slot / SH), Math.floor(4096 / n)), grp = new THREE.Group();
   f.tiers.forEach((y, t) => {
     const c = cvs(n * px, H, (g, W) => {
       g.fillStyle = w.st.cellar ? "#1d130f" : "#fffdf8"; g.fillRect(0, 0, W, H); g.textAlign = "center"; g.textBaseline = "middle";
       f.cols.forEach((col, ci) => { const v = col && col[t]; if (!v) return; const x = f.n > 0 ? ci - o : n - 1 - (ci - o);
         g.fillStyle = v.gone ? "#999" : v.it.qty != null && v.it.qty <= 5 ? "#c62d22" : w.st.cellar ? "#f3d9a4" : "#1d1e21";
-        fitText(g, v.gone ? "sold out" : money(v.it.price), px - 8, 24, 700); g.fillText(v.gone ? "sold out" : money(v.it.price), x * px + px / 2, H / 2);
+        fitText(g, v.it.name, px - 10, 15, 500); g.fillText(v.it.name, x * px + px / 2, 16);
+        fitText(g, v.gone ? "sold out" : money(v.it.price), px - 10, 31, 700); g.fillText(v.gone ? "sold out" : money(v.it.price), x * px + px / 2, 47);
+        g.fillStyle = "#b4a387"; g.fillRect(x * px + 5, 68, px - 10, 2);
         g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(x * px, 6, 1, H - 12); });
     });
     const t2 = ctex(c); t2.anisotropy = Math.min(8, MAXANISO);
     const m = new THREE.Mesh(PLANE, new THREE.MeshBasicMaterial({ map: t2 }));
     const [sx, sz] = toW(f.fr, f.u0 + (o + n / 2) * w.slot, f.vf + f.n * .014);   // only as long as the stocked run
-    m.scale.set(n * w.slot, .045, 1); m.position.set(sx, y - .05, sz); m.rotation.y = f.fr.ry + (f.n > 0 ? 0 : Math.PI); grp.add(m);
+    m.scale.set(n * w.slot, SH, 1); m.position.set(sx, y - .06, sz); m.rotation.y = f.fr.ry + (f.n > 0 ? 0 : Math.PI); grp.add(m);
   });
   scene.add(grp); return grp;
 }
@@ -1806,7 +1863,7 @@ function gaze(dt) {
 }
 function setGaze(v) {
   if (lifted === v) return;
-  if (lifted) { const o = lifted; lifted = null; if (o.photo) { o.photo.visible = !o.gone; o.photo.scale.set(o.pw, o.ph, 1); o.photo.position.set(o.x, o.photoY, o.photoZ); o.photo.rotation.y = o.n > 0 ? 0 : Math.PI; } place(o, o.gone || (!!o.photo && !o.isLabel)); }
+  if (lifted) { const o = lifted; lifted = null; if (o.photo) { o.photo.visible = !o.gone; o.photo.scale.set(o.pw, o.ph, 1); o.photo.position.set(o.photoX, o.photoY, o.photoZ); o.photo.rotation.y = o.ry; } place(o, o.gone || (!!o.photo && !o.isLabel)); }
   lifted = v; liftK = 0; const g = $("#gaze");
   if (!v) { g.hidden = true; return; }
   const it = v.it, low = it.qty != null && it.qty <= 5;
@@ -1885,7 +1942,7 @@ function hold(v) {
   const it = v.it, w = v.w, d = v.d; const big = Math.max(d[0], d[1]); const k = 300 / big;
   let W = Math.max(150, Math.min(280, d[0] * k)), H = Math.max(160, Math.min(320, d[1] * k)), D = Math.max(40, Math.min(160, d[2] * k));
   if (v.shape === "bottle" || v.shape === "can") D = W * .9;
-  const img = it.img ? `<img src="${esc(pic(it))}" alt="" draggable="false">` : `<div class="noimg">${esc(it.name)}</div>`;
+  const img = it.img ? `<img src="${esc(pic(it, true))}" alt="" draggable="false">` : `<div class="noimg">${esc(it.name)}</div>`;
   const side = w.col;
   const o = $("#obj"); o.style.width = W + "px"; o.style.height = H + "px"; o.style.setProperty("--sidec", side);
   const f = (cls, fw, fh, tr, inner = "") => `<div class="f ${cls}" style="width:${fw}px;height:${fh}px;margin:${-fh / 2}px 0 0 ${-fw / 2}px;transform:${tr}">${inner}</div>`;
@@ -1931,6 +1988,7 @@ function card(v) {
   c.innerHTML = `<button class="close" aria-label="Put it back">✕</button>
   <div class="ey">${esc(w.g.mark)} · ${esc(w.g.label)} · ${esc(cat?.label || "")}</div>
   <h2>${esc(it.name)}</h2>
+  <p class="note">${it.photoHeld ? "Photograph being checked. The product name and pack size above identify this item." : it.img ? "Packaging may vary. Check the product name and pack size above." : "A photograph is not available for this item yet."}</p>
   ${DATA.outlet.show_prices !== false ? `<div class="price">${money(it.price)}</div><div class="note">Depot rate with VAT. The counter bill is final.</div>` : ""}
   <div class="stock">${!available(it) ? '<span class="low">Sold out for now</span>' : low ? `<span class="low">Only ${it.qty} left</span>` : it.qty != null ? `${it.qty} on the shelf` : "On the shelf"}</div>
   ${w.st.cellar ? '<p class="note">Liquor is issued against your entitlement card. Bring it when you collect.</p>' : ""}
@@ -2229,14 +2287,36 @@ res.addEventListener('keydown',e=>{
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search')){res.hidden=true;qi.setAttribute('aria-expanded','false');}});
 
 
+function installDeviceCheck() {
+  if (!new URLSearchParams(location.search).has("devicecheck")) return;
+  const trigger=document.createElement("button"), panel=document.createElement("section"), style=document.createElement("style");
+  style.textContent=`#urc-check-trigger{position:fixed;right:12px;top:82px;z-index:90;min-height:44px;padding:10px 15px;border:1px solid #b9ac8d;border-radius:24px;background:#fffaf0;color:#302a20;font:600 13px system-ui;box-shadow:0 3px 16px #0002}#urc-check{position:fixed;right:12px;top:134px;z-index:91;width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 260px);overflow:auto;padding:18px;border:1px solid #b9ac8d;border-radius:16px;background:#fffaf0;color:#302a20;box-shadow:0 8px 35px #0003;font:14px/1.5 system-ui}#urc-check[hidden]{display:none}#urc-check h3{margin:0 0 8px}#urc-check p{margin:8px 0}#urc-check button{min-height:44px;margin:6px 5px 0 0;padding:8px 12px;border:1px solid #a69a82;border-radius:10px;background:white;color:#302a20;font:600 13px system-ui}#urc-check textarea{width:100%;height:100px;font:11px monospace}@media(max-height:500px){#urc-check-trigger{top:64px}#urc-check{top:112px;max-height:calc(100dvh - 130px)}}`;
+  document.head.append(style);trigger.id="urc-check-trigger";trigger.textContent="Check this device";trigger.setAttribute("aria-expanded","false");panel.id="urc-check";panel.hidden=true;panel.setAttribute("aria-label","Device walkthrough check");
+  panel.innerHTML='<h3>A 20-second walkthrough</h3><p>Walk into a wing, turn along a shelf, and try a ground tap. Keep this tab visible. The check stays on this device.</p><button data-start>Start check</button><button data-close>Close</button><div data-result aria-live="polite"></div>';
+  document.body.append(trigger,panel);
+  let active=false,start=0,lastFrame=0,samples=[],report=null,interrupted=false;
+  const show=on=>{panel.hidden=!on;trigger.setAttribute("aria-expanded",String(on));};
+  trigger.onclick=()=>show(panel.hidden);panel.querySelector('[data-close]').onclick=()=>show(false);
+  document.addEventListener('visibilitychange',()=>{if(active&&document.hidden)interrupted=true;});
+  panel.querySelector('[data-start]').onclick=()=>{active=true;start=performance.now();lastFrame=0;samples=[];report=null;interrupted=false;show(false);trigger.textContent="Checking · 20s";};
+  function finish(now){
+    active=false;const sorted=samples.slice().sort((a,b)=>a-b),at=p=>sorted[Math.min(sorted.length-1,Math.floor(sorted.length*p))]||0;
+    const resources=performance.getEntriesByType('resource').filter(r=>r.name.includes('/urc-products/'));
+    report={version:photoStats.version,checkedAt:new Date().toISOString(),userAgent:navigator.userAgent,viewport:[innerWidth,innerHeight],devicePixelRatio:devicePixelRatio,pixelRatio:renderer.getPixelRatio(),samples:samples.length,seconds:+((now-start)/1000).toFixed(2),medianFrameMs:Math.round(at(.5)),p95FrameMs:Math.round(at(.95)),averageFps:samples.length?Math.round(1000/(samples.reduce((a,b)=>a+b,0)/samples.length)):0,over50ms:samples.filter(x=>x>50).length,interrupted,calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,photos:window.__mall.photos,mapsLoaded:HALL.loaded.length,mapErrors:HALL.errors,optimizedImageRequests:resources.filter(r=>/\.webp/.test(r.name)).length,optimizedTransferredBytes:resources.reduce((n,r)=>n+r.transferSize,0)};
+    trigger.textContent="Check ready";show(true);const result=panel.querySelector('[data-result]');result.innerHTML=`<p><b>${report.averageFps} FPS</b> average · ${report.p95FrameMs} ms p95${interrupted?' · interrupted; please repeat':''}</p><p>Copy the results and tell me whether walking, turning and shelf distance felt comfortable.</p><button data-copy>Copy results</button><textarea hidden aria-label="Device results"></textarea>`;
+    result.querySelector('[data-copy]').onclick=async()=>{const text=JSON.stringify(report,null,2);try{await navigator.clipboard.writeText(text);result.querySelector('[data-copy]').textContent='Copied';}catch{const box=result.querySelector('textarea');box.hidden=false;box.value=text;box.focus();box.select();}};
+  }
+  window.__urcDeviceCheck={get report(){return report;},get active(){return active;},frame(now){if(!active)return;if(window.KalimpongExperience.modalOpen)interrupted=true;if(lastFrame)samples.push(now-lastFrame);lastFrame=now;const remaining=Math.max(0,20-Math.floor((now-start)/1000));trigger.textContent=`Checking · ${remaining}s`;if(now-start>=20000)finish(now);}};
+}
+
 /* ================================================================ loop */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize);
-let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
+let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get photos() { return {...photoStats,resident:loaded.size,pending:loading,cached:photoCache.size,budget:BUDGET,withheld:DATA?.items.filter(i=>i.photoHeld).length||0}; }, get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (document.hidden || window.KalimpongExperience.modalOpen) { requestAnimationFrame(loop); return; }
-  step(dt); gaze(dt); animateLift(dt); updateScreen(dt); updateHall(dt);
+  pumpPhotos(); step(dt); gaze(dt); animateLift(dt); updateScreen(dt); updateHall(dt);
   if (ticker && !(RM || window.KalimpongExperience.calm)) ticker.map.offset.x = (ticker.map.offset.x + dt * .03) % 1;
   gate(dt);
   if (!(RM || window.KalimpongExperience.calm)) for (const p of PODIUM) { p.g.rotation.y += dt * .6; }
@@ -2244,6 +2324,7 @@ function loop(now) {
   acc += dt; if (acc > .45) { acc = 0; streamPhotos(); streamStrips(); where(); }
   acc2 += dt; if (acc2 > .12) { acc2 = 0; if (!$("#map").classList.contains("big")) drawMap(); }
   window.KalimpongExperience.render(renderer, scene, camera);
+  window.__urcDeviceCheck?.frame(now);
   frames++; fpsT += dt; if (fpsT > 1) { window.__fps = +(frames / fpsT).toFixed(1); frames = 0; fpsT = 0; }
   requestAnimationFrame(loop);
 }
@@ -2259,7 +2340,7 @@ async function podiumPhotos() {
 }
 PICKABLE.push = PICKABLE.push.bind(PICKABLE);
 async function start() {
-  try { await load(); }
+  try { await Promise.all([load(), loadPhotoManifest()]); applyPhotoManifest(); }
   catch { $("#enter").textContent = "The shelves did not load"; $("#ip").textContent = "Neither the snapshot nor the counter answered. The list view may still work."; return; }
   const o = DATA.outlet; $("#oname").textContent = o.name || "The canteen"; document.title = (o.name || "Canteen") + " · Walk-through";
   $("#ih").textContent = "Walk into " + (o.name || "the canteen"); $("#iey").textContent = o.subtitle || "Canteen Stores Department";
@@ -2274,6 +2355,7 @@ async function start() {
   $("#inote").textContent = (o.price_note || "") + (COARSE ? " Use the round pad to walk, drag to look, tap anything to pick it up." : " Walk with W A S D or click the floor. Look at anything to lift it; click to pick it up.");
   [pos.x, pos.z] = settle(0, HUB_R - 1.8); yaw = 0; pitch = .04;
   resize(); camera.position.set(pos.x, EYE, pos.z); gate(0, true); streamPhotos(); streamStrips(); where();
+  installDeviceCheck();
   requestAnimationFrame(loop);
   const go = (music) => { $("#intro").style.opacity = 0; setTimeout(() => $("#intro").hidden = true, 600); setMusic(music); lookRound(); };
   $("#enter").disabled = false; $("#enter").textContent = "Enter the canteen, with music"; $("#quiet").disabled = false;

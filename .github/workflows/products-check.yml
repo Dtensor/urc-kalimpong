@@ -1,0 +1,83 @@
+name: URC products and device acceptance
+on:
+  push:
+    branches: [kalimpong-products-20261115]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==12.2.0
+      - run: python .github/scripts/build-assets.py .
+      - uses: actions/upload-artifact@v5
+        with:
+          name: product-assets
+          path: complex/shared/urc-products
+          retention-days: 7
+  browser:
+    needs: assets
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: product-assets
+          path: complex/shared/urc-products
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: |
+          npm install --prefix "$RUNNER_TEMP/check" --no-package-lock --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/check/node_modules/.bin/playwright" install --with-deps ${{ matrix.engine }}
+      - name: Compare loading and exercise the real walkthrough
+        env:
+          NODE_PATH: ${{ runner.temp }}/check/node_modules
+          ENGINE: ${{ matrix.engine }}
+        run: |
+          python3 .github/scripts/product-server.py > "$RUNNER_TEMP/http.log" 2>&1 &
+          node .github/scripts/products-check.cjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: products-${{ matrix.engine }}
+          path: products-evidence/${{ matrix.engine }}-*
+          retention-days: 7
+  captures:
+    needs: [assets,browser]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: product-assets
+          path: complex/shared/urc-products
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: products-*
+          merge-multiple: true
+          path: products-evidence
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add complex/shared/urc-products products-evidence
+          git commit -m 'Retain product derivatives and browser acceptance evidence'
+          git push origin "HEAD:refs/heads/products-evidence-${{ github.run_id }}-${{ github.run_attempt }}"
