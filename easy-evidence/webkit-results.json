@@ -1,0 +1,112 @@
+[
+  {
+    "name": "shopping",
+    "engine": "webkit",
+    "errors": [],
+    "checks": [
+      {
+        "mobileRequests": 9,
+        "heavyRequests": []
+      },
+      {
+        "axe": "welcome",
+        "violations": []
+      },
+      {
+        "axe": "phrase",
+        "violations": []
+      },
+      {
+        "axe": "list",
+        "violations": []
+      },
+      {
+        "axe": "detail",
+        "violations": []
+      },
+      {
+        "axe": "help",
+        "violations": []
+      },
+      {
+        "axe": "large-help",
+        "violations": []
+      },
+      {
+        "axe": "hindi-products",
+        "violations": []
+      },
+      {
+        "phrase": true,
+        "sharedBasket": true,
+        "undo": true,
+        "reload": true,
+        "copyFallback": true,
+        "favourites": true,
+        "hindi": true,
+        "largeText": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "resilience",
+    "engine": "webkit",
+    "errors": [],
+    "checks": [
+      {
+        "blockedStorage": true,
+        "photoFailures": true,
+        "noSpeechAPI": true,
+        "networkRetry": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "voice-keyboard",
+    "engine": "webkit",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "keyboard-results",
+        "violations": []
+      },
+      {
+        "voiceConsent": true,
+        "editableTranscript": true,
+        "noAutomaticAdd": true,
+        "keyboardSubmit": true,
+        "focusHeading": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-hall",
+    "engine": "webkit",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "easy-desktop",
+        "violations": []
+      },
+      {
+        "desktopHall": true,
+        "desktopEasyLink": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "phone-hall-opt-in",
+    "engine": "webkit",
+    "errors": [],
+    "checks": [
+      {
+        "phoneHallOptIn": true
+      }
+    ],
+    "pass": true
+  }
+]
