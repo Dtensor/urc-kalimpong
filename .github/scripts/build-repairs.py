@@ -37,9 +37,11 @@ for correction in review['items']:
         full = digest + '-full' + extension
         shutil.copyfile(source, assets / full)
         image = original.convert('RGBA')
+        source_width, source_height = image.size
         alpha = image.getchannel('A')
-        if alpha.getextrema()[0] < 230 and alpha.getbbox():
-            image = image.crop(alpha.getbbox())
+        bounds = alpha.getbbox() if alpha.getextrema()[0] < 230 else None
+        bounds = bounds or (0, 0, source_width, source_height)
+        image = image.crop(bounds)
         image.thumbnail((256, 256), Image.Resampling.LANCZOS)
         name = digest + '.webp'
         image.save(assets / name, format='WEBP', quality=82, method=3)
@@ -50,6 +52,7 @@ for correction in review['items']:
         'width': width, 'height': height, 'bytes': (assets / name).stat().st_size,
         'rect': False, 'color': '#ddd5c4', 'source': correction['productPage'],
         'sourceSha256': correction['sha256'], 'review': correction['visualReview'],
+        'fullFrame': [bounds[0], bounds[1], bounds[2]-bounds[0], bounds[3]-bounds[1], source_width, source_height],
     }
 manifest['version'] = review['version']
 counts = collections.Counter(row['status'] for row in manifest['items'].values())

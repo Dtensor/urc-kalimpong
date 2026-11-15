@@ -32,6 +32,8 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
    await page.evaluate(id=>__repairHold(id),product.id);
    await page.locator('#hold').waitFor({state:'visible'});assert.equal(await page.locator('#kx-trigger').isVisible(),false);
    await page.waitForFunction(()=>[...document.querySelectorAll('#obj .front img')].some(im=>im.complete&&im.naturalWidth>0));
+   assert.equal(await page.locator('#obj .front').evaluate(el=>getComputedStyle(el).visibility),'visible');
+   assert.equal(await page.locator('#obj .back').evaluate(el=>getComputedStyle(el).visibility),'hidden');
    const detail=await page.locator('#obj .front img').first().getAttribute('src');assert(detail.endsWith(manifest.items[product.id].full));
    assert(await page.locator('#card').innerText().then(t=>t.includes(product.name)));
    const imageState=await page.locator('#obj .front img').first().evaluate(im=>({width:im.naturalWidth,height:im.naturalHeight}));
@@ -40,6 +42,15 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
    assert(!requestUrls.some(url=>url.endsWith(product.original)),`Rejected original requested: ${product.id}`);
    row.products.push({id:product.id,detail,imageState});
    await capture(product.id);
+   if(product.id==='henko-detergent-bar'){
+    const box=await page.locator('#stagehand').boundingBox(),x=box.x+box.width*.15,y=box.y+box.height*.5,dx=Math.PI/.012;
+    await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx,y,{steps:12});await page.mouse.up();
+    assert.equal(await page.locator('#obj .front').evaluate(el=>getComputedStyle(el).visibility),'hidden');
+    assert.equal(await page.locator('#obj .back').evaluate(el=>getComputedStyle(el).visibility),'visible');
+    await capture('henko-turned');
+    await page.mouse.move(x+dx,y);await page.mouse.down();await page.mouse.move(x,y,{steps:12});await page.mouse.up();
+    assert.equal(await page.locator('#obj .front').evaluate(el=>getComputedStyle(el).visibility),'visible');
+   }
    if(device==='phone'&&product.id==='henko-detergent-bar'){
     await page.setViewportSize({width:796,height:440});const f=await page.evaluate(()=>__mall.hall.frames);await page.waitForFunction(n=>__mall.hall.frames>=n+3,f);
     assert.equal(await page.locator('#kx-trigger').isVisible(),false);await capture('henko-landscape');
