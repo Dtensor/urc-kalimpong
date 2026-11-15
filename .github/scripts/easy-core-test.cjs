@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const base=process.argv[2]||path.join(__dirname,'site'),C=require(path.resolve(base,'complex/shared/easy-core.js'));
 const data=JSON.parse(fs.readFileSync(path.join(base,'menu.json'))),manifest=JSON.parse(fs.readFileSync(path.join(base,'complex/shared/urc-products/manifest.json'))),cats=Object.fromEntries(data.categories.map(c=>[c.id,c.label]));
-assert.equal(data.items.length,1715);
+assert.equal(data.items.length,1715);const publicRoot=fs.readFileSync(path.join(base,'index.html'),'utf8');assert(!/\.ts\.net|shala-stats/.test(publicRoot));assert(publicRoot.includes('if (!API) return;'));
 assert.deepEqual(C.parse('two soaps and toothpaste'),[{raw:'two soaps',query:'soaps',quantity:2,maxPrice:null},{raw:'toothpaste',query:'toothpaste',quantity:1,maxPrice:null}]);
 assert.equal(C.parse('मुझे दो साबुन और टूथपेस्ट चाहिए')[0].quantity,2);
 assert.equal(C.parse('२ साबुन')[0].quantity,2);assert.equal(C.parse('2 kg atta')[0].quantity,1);
@@ -17,7 +17,7 @@ const ox=data.items.find(x=>x.id==='ariel-oxyblue-2-kg-washing-pow');assert.equa
 const bad=structuredClone(manifest);bad.items[henko.id].file='../private';assert.equal(C.photo(henko,bad,false),'');
 assert.deepEqual({...C.cleanBasket({a:2,b:-2,c:'3',d:101})},{a:2});assert.deepEqual({...C.cleanBasket([])},{});
 assert.deepEqual(C.total([{id:'a',price:0.1},{id:'b',price:0.2}],{a:3,b:1}),{paise:50,unknown:0,count:4});assert.equal(C.total([],{a:2}).unknown,1);
-for(const name of ['mall/index.html','complex/shared/easy.html','complex/index.html',...['bakery','sabzi','grocery','cinema'].map(v=>'complex/'+v+'/index.html')]){const html=fs.readFileSync(path.join(base,name),'utf8');for(const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))if(m[1].trim())new vm.Script(m[1]);}
+for(const name of ['index.html','mall/index.html','complex/shared/easy.html','complex/index.html',...['bakery','sabzi','grocery','cinema'].map(v=>'complex/'+v+'/index.html')]){const html=fs.readFileSync(path.join(base,name),'utf8');for(const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))if(m[1].trim())new vm.Script(m[1]);}
 if(process.env.NODE_PATH){const acorn=require('acorn');for(const name of ['easy-core.js','easy.js'])acorn.parse(fs.readFileSync(path.join(base,'complex/shared',name),'utf8'),{ecmaVersion:2018});}
 for(const name of ['easy-core.js','easy.js'])new vm.Script(fs.readFileSync(path.join(base,'complex/shared',name),'utf8'));
 assert.deepEqual(C.parseWeighted('500 g potatoes')[0],{raw:'500 g potatoes',query:'potatoes',quantity:.5,maxPrice:null,unit:'kg'});

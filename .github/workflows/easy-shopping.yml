@@ -2,7 +2,7 @@ name: URC Easy shopping acceptance
 on:
   push:
     branches: [kalimpong-easy-mobile-20261115, main]
-    paths: ['mall/index.html', 'complex/**', '.github/scripts/easy-*', '.github/workflows/easy-shopping.yml']
+    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/easy-*', '.github/workflows/easy-shopping.yml']
 permissions:
   contents: read
 jobs:
