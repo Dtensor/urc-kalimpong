@@ -1605,6 +1605,7 @@ function makeGlass() {
 function buildHero() {
   const photoHero=ITEMS.find(it=>it.id==='tiered-wedding-cake'&&PhotographicProducts.has(it));
   if(photoHero){
+    heroItem=photoHero;
     heroGroup=new THREE.Group();heroGroup.position.set(PLAT.x,.8,PLAT.z);scene.add(heroGroup);
     const spinG=new THREE.Group();heroGroup.add(spinG);heroGroup.userData.spin=spinG;
     const canvas=cvs(512,512,g=>PhotographicProducts.draw(g,photoHero,12,12,488,488));
@@ -1840,8 +1841,8 @@ function highlight(it) {
 /* ================= gaze + picking ================= */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 let gazeIt = null, gazeSince = 0, gazeCand = null, hoverIt = null, pinned = false;
-function pickAt(nx, ny) {
-  ndc.set(nx, ny); ray.setFromCamera(ndc, cam); ray.far = 7;
+function pickAt(nx, ny, maxDistance = 7) {
+  ndc.set(nx, ny); ray.setFromCamera(ndc, cam); ray.far = maxDistance;
   const hits = ray.intersectObject(IHit);
   let best = hits.length ? { it: hitIndex[hits[0].instanceId].it, d: hits[0].distance } : null;
   if (heroItem) { const hh = ray.intersectObject(heroGroup, true); if (hh.length && (!best || hh[0].distance < best.d)) best = { it: heroItem, d: hh[0].distance }; }
@@ -2003,7 +2004,7 @@ function bindInput() {
       if (down.moved && inside) { yaw = down.yaw + dx * .0048; pitch = clamp(down.pitch + dy * .0036, -1.1, 1.1); }
       return;
     }
-    if (e.pointerType === 'mouse') { lastMove = e; if (!hoverQ) { hoverQ = true; requestAnimationFrame(() => { hoverQ = false; if (!inside || auto || !lastMove) return; const r = C.getBoundingClientRect(); hoverIt = pickAt((lastMove.clientX - r.left) / r.width * 2 - 1, -((lastMove.clientY - r.top) / r.height) * 2 + 1); C.style.cursor = hoverIt ? 'pointer' : 'grab'; }); } }
+    if (e.pointerType === 'mouse') { lastMove = e; if (!hoverQ) { hoverQ = true; requestAnimationFrame(() => { hoverQ = false; if (!inside || auto || !lastMove) return; const r = C.getBoundingClientRect(); hoverIt = pickAt((lastMove.clientX - r.left) / r.width * 2 - 1, -((lastMove.clientY - r.top) / r.height) * 2 + 1, 30); C.style.cursor = hoverIt ? 'pointer' : 'grab'; }); } }
   });
   C.addEventListener('pointerleave', () => { hoverIt = null; });
   const up = e => {
@@ -2011,7 +2012,7 @@ function bindInput() {
     if (d.moved || !inside) return;
     const r = C.getBoundingClientRect(), nx = (e.clientX - r.left) / r.width * 2 - 1, ny = -((e.clientY - r.top) / r.height) * 2 + 1;
     ndc.set(nx,ny);ray.setFromCamera(ndc,cam);if(getShelfNav().pick(ray)){getShelfNav().activate();return;}
-    const it = pickAt(nx, ny);
+    const it = pickAt(nx, ny, 30);
     if (it) { holdItem(it); return; }
     ndc.set(nx, ny); ray.setFromCamera(ndc, cam); ray.far = 30;
     const h = ray.intersectObject(floorMesh);
