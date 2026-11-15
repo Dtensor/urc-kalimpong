@@ -1,0 +1,280 @@
+[
+  {
+    "device": "desktop",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "baselineImages": {
+      "requests": 31,
+      "bytes": 1203772
+    },
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "plaster-rough1,1",
+        "plaster-rough4,2",
+        "plaster-rough3,2",
+        "plaster-rough1,2",
+        "plaster-rough5,2",
+        "plaster-rough6,2",
+        "plaster-diff1,1",
+        "plaster-diff3,2",
+        "plaster-diff1,2",
+        "plaster-diff5,2",
+        "plaster-diff4,2",
+        "plaster-diff6,2",
+        "marble-nor_gl3.75,2.875",
+        "marble-nor_gl2.375,1.875",
+        "marble-nor_gl1.75,1.5",
+        "marble-nor_gl7.875,7.875",
+        "marble-nor_gl2.625,2.125",
+        "marble-nor_gl1.5,1.5",
+        "marble-nor_gl3.625,2.875",
+        "marble-rough3.75,2.875",
+        "marble-rough3.625,2.875",
+        "marble-rough2.625,2.125",
+        "marble-rough1.75,1.5",
+        "marble-rough7.875,7.875",
+        "marble-rough1.5,1.5",
+        "marble-rough2.375,1.875",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl3,2",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl5,2",
+        "marble-diff1.5,1.5",
+        "marble-diff3.625,2.875",
+        "marble-diff7.875,7.875",
+        "marble-diff2.625,2.125",
+        "marble-diff2.375,1.875",
+        "marble-diff3.75,2.875",
+        "marble-diff1.75,1.5"
+      ],
+      "mapsExpected": 39,
+      "errors": [],
+      "fans": 4,
+      "phase": 0,
+      "frames": 13
+    },
+    "geometry": {
+      "draws": 239,
+      "triangles": 174436,
+      "items": 1715,
+      "wings": 7
+    },
+    "candidateImages": {
+      "requests": 19,
+      "bytes": 319774
+    },
+    "photoStats": {
+      "version": "urc-products-20261115",
+      "requests": 0,
+      "cacheHits": 0,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 0,
+      "resident": 0,
+      "pending": 0,
+      "cached": 0,
+      "budget": 220,
+      "withheld": 6
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 1.178937801578034,
+        "z": 9.316145169048935
+      },
+      "distance": 4.781475183906967
+    },
+    "shelfPhotos": {
+      "version": "urc-products-20261115",
+      "requests": 288,
+      "cacheHits": 0,
+      "discarded": 2,
+      "errors": 0,
+      "optimized": 288,
+      "resident": 172,
+      "pending": 0,
+      "cached": 96,
+      "budget": 220,
+      "withheld": 6
+    },
+    "returnPhotos": {
+      "version": "urc-products-20261115",
+      "requests": 438,
+      "cacheHits": 0,
+      "discarded": 8,
+      "errors": 0,
+      "optimized": 438,
+      "resident": 86,
+      "pending": 6,
+      "cached": 96,
+      "budget": 220,
+      "withheld": 6
+    },
+    "pass": false,
+    "failure": "The expression evaluated to a falsy value:\n\n  assert(row.returnPhotos.cacheHits>0)\n"
+  },
+  {
+    "device": "phone",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "baselineImages": {
+      "requests": 19,
+      "bytes": 822210
+    },
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "marble-rough3.625,2.875",
+        "marble-rough2.375,1.875",
+        "marble-rough2.625,2.125",
+        "marble-rough7.875,7.875",
+        "marble-rough1.75,1.5",
+        "marble-rough1.5,1.5",
+        "marble-rough3.75,2.875",
+        "marble-nor_gl1.5,1.5",
+        "marble-nor_gl2.375,1.875",
+        "marble-nor_gl2.625,2.125",
+        "marble-nor_gl7.875,7.875",
+        "marble-nor_gl3.625,2.875",
+        "marble-nor_gl1.75,1.5",
+        "marble-nor_gl3.75,2.875",
+        "plaster-rough5,2",
+        "plaster-rough6,2",
+        "plaster-rough1,2",
+        "plaster-rough1,1",
+        "plaster-rough3,2",
+        "plaster-rough4,2",
+        "marble-diff2.375,1.875",
+        "marble-diff3.75,2.875",
+        "marble-diff2.625,2.125",
+        "marble-diff1.5,1.5",
+        "marble-diff1.75,1.5",
+        "marble-diff3.625,2.875",
+        "marble-diff7.875,7.875",
+        "plaster-diff5,2",
+        "plaster-diff6,2",
+        "plaster-diff1,2",
+        "plaster-diff4,2",
+        "plaster-diff3,2",
+        "plaster-diff1,1",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl5,2",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl3,2"
+      ],
+      "mapsExpected": 39,
+      "errors": [],
+      "fans": 4,
+      "phase": 0,
+      "frames": 34
+    },
+    "geometry": {
+      "draws": 156,
+      "triangles": 159966,
+      "items": 1715,
+      "wings": 7
+    },
+    "candidateImages": {
+      "requests": 19,
+      "bytes": 325804
+    },
+    "photoStats": {
+      "version": "urc-products-20261115",
+      "requests": 0,
+      "cacheHits": 0,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 0,
+      "resident": 0,
+      "pending": 0,
+      "cached": 0,
+      "budget": 90,
+      "withheld": 6
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 0.39010443195441546,
+        "z": 9.284549875823462
+      },
+      "distance": 4.68173112523662
+    },
+    "shelfPhotos": {
+      "version": "urc-products-20261115",
+      "requests": 103,
+      "cacheHits": 45,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 103,
+      "resident": 77,
+      "pending": 0,
+      "cached": 56,
+      "budget": 90,
+      "withheld": 6
+    },
+    "returnPhotos": {
+      "version": "urc-products-20261115",
+      "requests": 203,
+      "cacheHits": 45,
+      "discarded": 3,
+      "errors": 0,
+      "optimized": 203,
+      "resident": 56,
+      "pending": 4,
+      "cached": 56,
+      "budget": 90,
+      "withheld": 6
+    },
+    "deviceCheck": {
+      "version": "urc-products-20261115",
+      "checkedAt": "2026-11-15T10:01:07.964Z",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15",
+      "viewport": [
+        440,
+        796
+      ],
+      "devicePixelRatio": 1,
+      "pixelRatio": 1,
+      "samples": 317,
+      "seconds": 20.02,
+      "medianFrameMs": 63,
+      "p95FrameMs": 67,
+      "averageFps": 16,
+      "over50ms": 317,
+      "interrupted": false,
+      "calls": 73,
+      "triangles": 149560,
+      "photos": {
+        "version": "urc-products-20261115",
+        "requests": 234,
+        "cacheHits": 45,
+        "discarded": 6,
+        "errors": 0,
+        "optimized": 234,
+        "resident": 76,
+        "pending": 0,
+        "cached": 56,
+        "budget": 90,
+        "withheld": 6
+      },
+      "mapsLoaded": 39,
+      "mapErrors": [],
+      "optimizedImageRequests": 240,
+      "optimizedTransferredBytes": 3401361
+    },
+    "pass": true
+  }
+]
