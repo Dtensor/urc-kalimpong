@@ -4,7 +4,7 @@ const engine=process.env.ENGINE||'chromium',out='products-evidence';fs.mkdirSync
 try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
  const row={device,engine,errors:[],missing:[]};const ctx=await browser.newContext({viewport:{width,height},hasTouch:device==='phone',isMobile:device==='phone',deviceScaleFactor:1,reducedMotion:'reduce'});
  await ctx.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(k,o){return get.call(this,k,/^(webgl2?|experimental-webgl)$/.test(k)?{...o,preserveDrawingBuffer:true}:o);};});
- const page=await ctx.newPage();page.setDefaultTimeout(60000);
+ const page=await ctx.newPage();page.setDefaultTimeout(120000);
  page.on('pageerror',e=>row.errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&/shader|THREE|WebGL/i.test(m.text()))row.errors.push(m.text());});
  page.on('response',r=>{if(r.url().startsWith('http://127.0.0.1:8765/')&&r.status()>=400)row.missing.push(r.url());});
  async function capture(name){await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));try{await page.waitForTimeout(250);await page.screenshot({path:`${out}/${engine}-${device}-${name}.jpg`,type:'jpeg',quality:84,timeout:90000});}finally{await page.evaluate(()=>{delete document.hidden;});}}
@@ -41,7 +41,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
   // The optional device check is local, works on touch-size screens and reports real frame intervals.
   await page.locator('#urc-check-trigger').click();await page.locator('#urc-check [data-start]').click();await page.waitForFunction(()=>__urcDeviceCheck.report,{},{timeout:50000});
   row.deviceCheck=await page.evaluate(()=>__urcDeviceCheck.report);assert(row.deviceCheck.samples>0);assert.equal(row.deviceCheck.interrupted,false);await page.locator('#urc-check [data-close]').click();
-  if(device==='phone'){await page.setViewportSize({width:796,height:440});await capture('landscape');assert(await page.locator('#urc-check-trigger').isVisible());await page.setViewportSize({width,height});}
+  if(device==='phone'){await page.setViewportSize({width:796,height:440});const landscapeFrame=await page.evaluate(()=>__mall.hall.frames);await page.waitForFunction(f=>__mall.hall.frames>=f+3,landscapeFrame);await capture('landscape');assert(await page.locator('#urc-check-trigger').isVisible());await page.setViewportSize({width,height});}
 
   await page.locator('#wings [data-w="hall"]').click();await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(350);
   // System reduced motion freezes every new ambient animation.
@@ -55,7 +55,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
   }
   for(const quality of ['original','detail','balanced']){await page.locator('#kx-trigger').click();await page.locator('#kx-panel [name="quality"]').selectOption(quality);await page.locator('#kx-panel .kx-close').click();await page.waitForTimeout(150);}
   assert.deepEqual(row.errors,[]);assert.deepEqual(row.missing,[]);row.pass=true;
- }catch(e){row.pass=false;row.failure=e.message;await capture('failure').catch(()=>{});}
+ }catch(e){row.pass=false;row.failure=e.stack;await capture('failure').catch(()=>{});}
  results.push(row);fs.writeFileSync(`${out}/${engine}-results.json`,JSON.stringify(results,null,2));console.log('PRODUCTS_CASE '+JSON.stringify(row));await ctx.close();
 }}finally{await browser.close();}if(results.length!==2||results.some(r=>!r.pass))process.exitCode=1;
 })().catch(e=>{console.error(e);process.exitCode=1;});

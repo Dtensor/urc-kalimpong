@@ -1214,7 +1214,7 @@ function buildWing(w) {
     else lplane(w, M.light, 1.6, .5, k * 3, WALLH - .01, v, 0, Math.PI / 2);
   }
   // shelving against the walls, and the island when there is one
-  const body = cellar ? "#6a4630" : w.st.counter ? "#2f2a24" : "#f5f2ec", edge = w.st.counter ? "#e9dcc0" : w.col;
+  const body = cellar ? "#6a4630" : w.st.counter ? "#2f2a24" : "#f5f2ec", edge = w.st.counter ? "#e9dcc0" : "#b7aea0";
   for (const f of w.faces) {
     if (!f.wall && f.n < 0) continue;
     if (!f.cols.some(Boolean) && !(f.wall ? 0 : w.faces.some(o => !o.wall && o !== f && o.cols.some(Boolean)))) continue;   // nothing on it: leave the floor open
@@ -1234,7 +1234,7 @@ function buildWing(w) {
       for (const nn of f.wall ? [f.n] : [1, -1]) lbox(fr, cu, y - .05, vc + nn * dp / 2, L, .06, .02, edge);
     }
     for (let k = 0; k <= Math.round(L / 1.2); k++) lbox(fr, a0 + Math.min(L, k * 1.2), top / 2, vc, .06, top, dp, "#c9c3b7");
-    lbox(fr, cu, top + .04, vc, L + .06, .08, dp + .04, w.col);                         // cornice in the wing's colour
+    lbox(fr, cu, top + .04, vc, L + .06, .08, dp + .04, cellar ? "#79563c" : "#b7aea0");                         // cornice in the wing's colour
     if (!f.wall) for (const e of [f.u0 - .03, f.u0 + L + .03]) lbox(fr, e, top / 2, 0, .06, top, .9, w.col);   // end caps
     if (!f.wall) lplane(fr, capSign(w), .8, top - .16, f.u0 - .065, top / 2 + .02, 0, IN);                     // what is on it, facing the doors
   }
@@ -1244,7 +1244,7 @@ function buildWing(w) {
     const u = f.u0 + (cc.from + f.off) * w.slot + span / 2, wd = Math.min(span - .05, 3.2);
     if (wd < .5) return;
     const ty = f.tiers[f.tiers.length - 1] + .45;
-    lplane(f.fr, sign(cc.c.label, null, cellar ? "#2b1a14" : "#fff", wd, .32, { ink: cellar ? "#f3d9a4" : w.col }), wd, .32, u, f.wall ? ty + .42 : ty + .22, f.wall ? f.vf - f.n * .2 : f.vf + f.n * .01, f.n > 0 ? 0 : Math.PI);
+    lplane(f.fr, sign(cc.c.label, null, cellar ? "#2b1a14" : "#fff", wd, .32, { ink: cellar ? "#f3d9a4" : "#f4ebd8" }), wd, .32, u, f.wall ? ty + .42 : ty + .22, f.wall ? f.vf - f.n * .2 : f.vf + f.n * .01, f.n > 0 ? 0 : Math.PI);
   });
   // posters: never in the liquor wing
   if (!cellar) wingAds(w);
@@ -1561,7 +1561,7 @@ function products() {
   ITEMS.forEach((v, i) => {
     v.d = dimsOf(v); v.i = i;
     if (v.shape === "bottle" || v.shape === "can") { v.mesh = ICyl; v.k = ci++; } else { v.mesh = IBox; v.k = bi++; }
-    const base = new THREE.Color(v.w.col); base.lerp(new THREE.Color(v.h > .5 ? "#ffffff" : "#222222"), Math.abs(v.h - .5) * .7);
+    const base = new THREE.Color(v.w.col); base.lerp(new THREE.Color("#e7e0d0"), .70 + v.h * .18);
     v.mesh.setColorAt(v.k, base);
     v.ry = v.fr.ry + (v.n > 0 ? 0 : Math.PI);
     [v.x, v.z] = at(v, v.d[2] / 2 + .02); v.yc = v.y + v.d[1] / 2;
@@ -1576,20 +1576,21 @@ let packShadows, packCaps;
 function buildPackDetails() {
   const shadow = cvs(64,64,(g)=>{const grad=g.createRadialGradient(32,32,2,32,32,31);grad.addColorStop(0,"rgba(37,29,19,.28)");grad.addColorStop(1,"rgba(37,29,19,0)");g.fillStyle=grad;g.fillRect(0,0,64,64);});
   packShadows = new THREE.InstancedMesh(PLANE,new THREE.MeshBasicMaterial({map:ctex(shadow),transparent:true,depthWrite:false}),ITEMS.length);
-  packCaps = new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.5,1,10),new THREE.MeshStandardMaterial({color:"#ddd8c7",roughness:.45}),ITEMS.length);
+  packCaps = new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.5,1,6),new THREE.MeshStandardMaterial({color:"#ddd8c7",roughness:.45}),Math.max(1,ITEMS.filter(v=>v.shape==="bottle").length));
+  let capIndex=0;
   ITEMS.forEach(v=>{
     _o.position.set(v.x,v.y+.003,v.z);_o.rotation.set(-Math.PI/2,0,v.ry);_o.scale.set(v.d[0]*1.55,v.d[2]*1.8,1);_o.updateMatrix();packShadows.setMatrixAt(v.i,_o.matrix);
-    _o.position.set(v.x,v.y+v.d[1]+.008,v.z);_o.rotation.set(0,v.ry,0);_o.scale.set(0,0,0);_o.updateMatrix();packCaps.setMatrixAt(v.i,_o.matrix);
+    _o.position.set(v.x,v.y+v.d[1]+.008,v.z);_o.rotation.set(0,v.ry,0);_o.scale.set(0,0,0);_o.updateMatrix();if(v.shape==="bottle"){v.capIndex=capIndex++;packCaps.setMatrixAt(v.capIndex,_o.matrix);}
   });
   scene.add(packShadows,packCaps);
 }
 function place(v, hidden) {
   if (hidden) _o.scale.set(0, 0, 0); else _o.scale.set(v.d[0], v.d[1], v.d[2]);
   _o.position.set(v.x, v.yc, v.z); _o.rotation.set(0, v.ry, 0); _o.updateMatrix(); v.mesh.setMatrixAt(v.k, _o.matrix); v.mesh.instanceMatrix.needsUpdate = true;
-  if (packCaps) {
+  if (packCaps && v.capIndex != null) {
     _o.position.set(v.x,v.y+v.d[1]+.008,v.z);_o.rotation.set(0,v.ry,0);
     _o.scale.setScalar(0); if (!hidden && v.shape === "bottle") _o.scale.set(v.d[0]*.62,.022,v.d[2]*.62);
-    _o.updateMatrix();packCaps.setMatrixAt(v.i,_o.matrix);packCaps.instanceMatrix.needsUpdate=true;
+    _o.updateMatrix();packCaps.setMatrixAt(v.capIndex,_o.matrix);packCaps.instanceMatrix.needsUpdate=true;
   }
 }
 function restock() {
@@ -1609,11 +1610,11 @@ function restock() {
 
 /* ---------- photos near the eye ---------- */
 const BUDGET = WEAK ? 40 : COARSE ? 90 : 220, RADIUS = COARSE ? 7.5 : 11, TEX = COARSE ? 192 : 256;
-const loaded = new Set(); let loading = 0, wanted = new Set(), photoQueue = [];
-const photoCache = new Map(), CACHE_LIMIT = COARSE ? 56 : 96, LOAD_LIMIT = COARSE ? 4 : 6;
+const loaded = new Set(); let loading = 0, wanted = new Set(), wantedIds = new Set(), photoQueue = [];
+const photoCache = new Map(), CACHE_LIMIT = BUDGET, LOAD_LIMIT = COARSE ? 4 : 6;
 function rememberPhoto(id, value) {
   photoCache.delete(id); photoCache.set(id, value);
-  while (photoCache.size > CACHE_LIMIT) photoCache.delete(photoCache.keys().next().value);
+  while (photoCache.size > CACHE_LIMIT) { const victim=[...photoCache.keys()].find(key=>!wantedIds.has(key)) || photoCache.keys().next().value; photoCache.delete(victim); }
 }
 function pumpPhotos() {
   let labels = 0;
@@ -1640,9 +1641,13 @@ function labelFor(v) {
 }
 function photoFor(v) {
   if (v.photo || v.loading) return;
+  if (loaded.size + loading >= BUDGET) {
+    if (v !== lifted) return;
+    const victim = [...loaded].find(o => o !== lifted); if (victim) dropPhoto(victim); else return;
+  }
   if (!v.it.img || v.bad) { const c = labelFor(v); v.labelled = true; mountPhoto(v, c, c.width, c.height, true); return; }
   const cached = photoCache.get(v.it.id);
-  if (cached) { photoStats.cacheHits++; rememberPhoto(v.it.id, cached); mountPhoto(v, cached, cached.width, cached.height, false); return; }
+  if (cached) { photoStats.cacheHits++; photoCache.delete(v.it.id); mountPhoto(v, cached, cached.width, cached.height, false); return; }
   v.loading = true; loading++; photoStats.requests++; if (v.it.shelfImg) photoStats.optimized++;
   const im = new Image(); im.crossOrigin = "anonymous"; im.decoding = "async"; im.fetchPriority = photoQueue.indexOf(v) < 2 ? "high" : "low";
   const finish = () => { loading--; v.loading = false; };
@@ -1659,12 +1664,13 @@ function photoFor(v) {
   im.src = pic(v.it);
 }
 function mountPhoto(v, c, cw, ch, label) {
+    photoCache.delete(v.it.id);
     const t = ctex(c);
     const room = (v.w.tiers[1] ? v.w.tiers[1] - v.w.tiers[0] : .5) - .08, mw = v.w.slot * .92, mh = Math.max(v.d[1] * 1.15, Math.min(room, mw * 1.4));
     const s = Math.min(mw / cw, mh / ch);
     const s2 = label ? Math.min(v.d[0] / cw, v.d[1] / ch) : s;
-    const m = new THREE.Mesh(PLANE, label ? new THREE.MeshLambertMaterial({ map: t }) : new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: .35 }));
-    const [mx, mz] = at(v, label ? v.d[2] + .023 : .1);
+    const m = new THREE.Mesh(PLANE, label ? new THREE.MeshLambertMaterial({ map: t }) : new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: .35 }));
+    v.photoFront = label ? v.d[2] + .023 : v.it.packRect ? v.d[2] + .025 : .1; const [mx, mz] = at(v, v.photoFront);
     m.scale.set(cw * s2, ch * s2, 1); m.position.set(mx, v.y + ch * s2 / 2 + .005, mz); m.rotation.y = v.ry;
     v.photo = m; v.pw = cw * s2; v.ph = ch * s2; v.photoX = m.position.x; v.photoY = m.position.y; v.photoZ = m.position.z; v.isLabel = label; scene.add(m); loaded.add(v);
     // a label sits on the pack's face; a photo cut-out replaces the pack
@@ -1678,7 +1684,7 @@ function syncPhotoBody(v) {
   v.mesh.setMatrixAt(v.k,_o.matrix);v.mesh.instanceMatrix.needsUpdate=true;
   _c.set(v.it.packColor||"#ddd5c4").convertSRGBToLinear();v.mesh.setColorAt(v.k,_c);v.mesh.instanceColor.needsUpdate=true;
 }
-function dropPhoto(v) { if (!v.photo || v === lifted) return; scene.remove(v.photo); v.photo.material.map.dispose(); v.photo.material.dispose(); v.photo = null; loaded.delete(v); place(v, v.gone); }
+function dropPhoto(v) { if (!v.photo || v === lifted) return; if (!v.isLabel) rememberPhoto(v.it.id,v.photo.material.map.image); scene.remove(v.photo); v.photo.material.map.dispose(); v.photo.material.dispose(); v.photo = null; loaded.delete(v); place(v, v.gone); }
 function streamPhotos() {
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw), near = [];
   const halfView = Math.atan(Math.tan(fov * Math.PI / 360) * camera.aspect) + .45;
@@ -1693,7 +1699,7 @@ function streamPhotos() {
     near.push([d - ahead * 3, v]);
   }
   near.sort((a, b) => a[0] - b[0]);
-  photoQueue = near.slice(0, BUDGET).map(x => x[1]); wanted = new Set(photoQueue);
+  photoQueue = near.slice(0, BUDGET).map(x => x[1]); wanted = new Set(photoQueue); wantedIds = new Set(photoQueue.map(v=>v.it.id));
   for (const v of [...loaded]) if (!wanted.has(v) && v !== lifted) dropPhoto(v);
   pumpPhotos();
 }
@@ -1883,7 +1889,7 @@ function setGaze(v) {
 function animateLift(dt) {
   if (!lifted) return; liftK = Math.min(1, liftK + dt * 3); const e = 1 - Math.pow(1 - liftK, 3), v = lifted;
   const wob = (RM || window.KalimpongExperience.calm) ? 0 : Math.sin(performance.now() / 500) * .06 * e;
-  if (v.photo && !v.isLabel) { const [hx, hz] = at(v, .1 + .28 * e); v.photo.visible = true; v.photo.scale.set(v.pw * (1 + .55 * e), v.ph * (1 + .55 * e), 1); v.photo.position.set(hx, v.photoY + .1 * e, hz); v.photo.rotation.y = v.ry + wob; syncPhotoBody(v); }
+  if (v.photo && !v.isLabel) { const [hx, hz] = at(v, (v.photoFront || .1) + .28 * e); v.photo.visible = true; v.photo.scale.set(v.pw * (1 + .55 * e), v.ph * (1 + .55 * e), 1); v.photo.position.set(hx, v.photoY + .1 * e, hz); v.photo.rotation.y = v.ry + wob; syncPhotoBody(v); }
   else {
     const [bx, bz] = at(v, v.d[2] / 2 + .02 + .28 * e);
     if (v.photo) { const k = 1 + .5 * e, [fx, fz] = at(v, v.d[2] / 2 + .02 + .28 * e + v.d[2] * k / 2 + .003); v.photo.scale.set(v.pw * k, v.ph * k, 1); v.photo.rotation.y = v.ry + wob;
@@ -2314,7 +2320,7 @@ function installDeviceCheck() {
     trigger.textContent="Check ready";show(true);const result=panel.querySelector('[data-result]');result.innerHTML=`<p><b>${report.averageFps} FPS</b> average · ${report.p95FrameMs} ms p95${interrupted?' · interrupted; please repeat':''}</p><p>Copy the results and tell me whether walking, turning and shelf distance felt comfortable.</p><button data-copy>Copy results</button><textarea hidden aria-label="Device results"></textarea>`;
     result.querySelector('[data-copy]').onclick=async()=>{const text=JSON.stringify(report,null,2);try{await navigator.clipboard.writeText(text);result.querySelector('[data-copy]').textContent='Copied';}catch{const box=result.querySelector('textarea');box.hidden=false;box.value=text;box.focus();box.select();}};
   }
-  window.__urcDeviceCheck={get report(){return report;},get active(){return active;},frame(now){if(!active)return;if(window.KalimpongExperience.modalOpen)interrupted=true;if(lastFrame)samples.push(now-lastFrame);lastFrame=now;const remaining=Math.max(0,20-Math.floor((now-start)/1000));trigger.textContent=`Checking · ${remaining}s`;if(now-start>=20000)finish(now);}};
+  window.__urcDeviceCheck={interrupt(){if(active)interrupted=true;},get report(){return report;},get active(){return active;},frame(now){if(!active)return;if(window.KalimpongExperience.modalOpen)interrupted=true;if(lastFrame)samples.push(now-lastFrame);lastFrame=now;const remaining=Math.max(0,20-Math.floor((now-start)/1000));trigger.textContent=`Checking · ${remaining}s`;if(now-start>=20000)finish(now);}};
 }
 
 /* ================================================================ loop */
@@ -2323,7 +2329,7 @@ addEventListener("resize", resize);
 let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get photos() { return {...photoStats,resident:loaded.size,pending:loading,cached:photoCache.size,budget:BUDGET,withheld:DATA?.items.filter(i=>i.photoHeld).length||0}; }, get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (document.hidden || window.KalimpongExperience.modalOpen) { requestAnimationFrame(loop); return; }
+  if (document.hidden || window.KalimpongExperience.modalOpen) { window.__urcDeviceCheck?.interrupt(); requestAnimationFrame(loop); return; }
   pumpPhotos(); step(dt); gaze(dt); animateLift(dt); updateScreen(dt); updateHall(dt);
   if (ticker && !(RM || window.KalimpongExperience.calm)) ticker.map.offset.x = (ticker.map.offset.x + dt * .03) % 1;
   gate(dt);
