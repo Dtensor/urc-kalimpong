@@ -1,0 +1,147 @@
+[
+  {
+    "device": "desktop",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "plaster-diff1,1",
+        "plaster-diff1,2",
+        "plaster-diff6,2",
+        "plaster-diff4,2",
+        "plaster-diff5,2",
+        "plaster-diff3,2",
+        "plaster-nor_gl5,2",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl3,2",
+        "plaster-rough1,2",
+        "plaster-rough1,1",
+        "plaster-rough6,2",
+        "plaster-rough3,2",
+        "plaster-rough5,2",
+        "plaster-rough4,2",
+        "marble-nor_gl1.5,1.5",
+        "marble-nor_gl2.375,1.875",
+        "marble-nor_gl1.75,1.5",
+        "marble-nor_gl2.625,2.125",
+        "marble-nor_gl3.75,2.875",
+        "marble-nor_gl7.875,7.875",
+        "marble-nor_gl3.625,2.875",
+        "marble-rough2.375,1.875",
+        "marble-rough3.75,2.875",
+        "marble-rough3.625,2.875",
+        "marble-rough2.625,2.125",
+        "marble-rough1.75,1.5",
+        "marble-rough1.5,1.5",
+        "marble-rough7.875,7.875",
+        "marble-diff7.875,7.875",
+        "marble-diff3.75,2.875",
+        "marble-diff1.75,1.5",
+        "marble-diff2.625,2.125",
+        "marble-diff3.625,2.875",
+        "marble-diff1.5,1.5",
+        "marble-diff2.375,1.875"
+      ],
+      "mapsExpected": 39,
+      "errors": [],
+      "fans": 4,
+      "phase": 0
+    },
+    "geometry": {
+      "draws": 239,
+      "triangles": 102410,
+      "items": 1715,
+      "wings": 7
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 1.1839349394736827,
+        "z": 9.322620986720366
+      },
+      "distance": 4.776435749954912
+    },
+    "pass": false,
+    "failure": "Ambient motion advances"
+  },
+  {
+    "device": "phone",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "marble-diff2.375,1.875",
+        "marble-diff3.625,2.875",
+        "marble-diff1.5,1.5",
+        "marble-diff2.625,2.125",
+        "marble-diff1.75,1.5",
+        "marble-diff7.875,7.875",
+        "marble-diff3.75,2.875",
+        "marble-rough7.875,7.875",
+        "marble-rough1.5,1.5",
+        "marble-rough2.625,2.125",
+        "marble-rough3.75,2.875",
+        "marble-rough3.625,2.875",
+        "marble-rough2.375,1.875",
+        "marble-rough1.75,1.5",
+        "plaster-rough4,2",
+        "plaster-rough1,1",
+        "plaster-rough6,2",
+        "plaster-rough5,2",
+        "plaster-rough3,2",
+        "plaster-rough1,2",
+        "plaster-nor_gl5,2",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl3,2",
+        "plaster-diff4,2",
+        "plaster-diff6,2",
+        "plaster-diff5,2",
+        "plaster-diff3,2",
+        "plaster-diff1,2",
+        "plaster-diff1,1",
+        "marble-nor_gl3.75,2.875",
+        "marble-nor_gl3.625,2.875",
+        "marble-nor_gl1.75,1.5",
+        "marble-nor_gl7.875,7.875",
+        "marble-nor_gl2.375,1.875",
+        "marble-nor_gl1.5,1.5",
+        "marble-nor_gl2.625,2.125"
+      ],
+      "mapsExpected": 39,
+      "errors": [],
+      "fans": 4,
+      "phase": 0
+    },
+    "geometry": {
+      "draws": 154,
+      "triangles": 87936,
+      "items": 1715,
+      "wings": 7
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 0.3931555206639654,
+        "z": 9.319062639742187
+      },
+      "distance": 4.647596378566037
+    },
+    "pass": true
+  }
+]
