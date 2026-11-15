@@ -30,6 +30,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
    await page.waitForFunction(()=>__mall.photos.pending===0&&__mall.photos.queued===0);
    // Exercise the production detail renderer after real search navigation.
    await page.evaluate(id=>__repairHold(id),product.id);
+   await page.locator('#hold').waitFor({state:'visible'});assert.equal(await page.locator('#kx-trigger').isVisible(),false);
    await page.waitForFunction(()=>[...document.querySelectorAll('#obj .front img')].some(im=>im.complete&&im.naturalWidth>0));
    const detail=await page.locator('#obj .front img').first().getAttribute('src');assert(detail.endsWith(manifest.items[product.id].full));
    assert(await page.locator('#card').innerText().then(t=>t.includes(product.name)));
@@ -39,7 +40,13 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
    assert(!requestUrls.some(url=>url.endsWith(product.original)),`Rejected original requested: ${product.id}`);
    row.products.push({id:product.id,detail,imageState});
    await capture(product.id);
+   if(device==='phone'&&product.id==='henko-detergent-bar'){
+    await page.setViewportSize({width:796,height:440});const f=await page.evaluate(()=>__mall.hall.frames);await page.waitForFunction(n=>__mall.hall.frames>=n+3,f);
+    assert.equal(await page.locator('#kx-trigger').isVisible(),false);await capture('henko-landscape');
+   }
    await page.locator('#card .close').click();
+   await page.locator('#hold').waitFor({state:'hidden'});assert.equal(await page.locator('#kx-trigger').isVisible(),true);
+   if(device==='phone')await page.setViewportSize({width,height});
   }
   await page.locator('#q').fill('Ariel Oxyblue');await page.locator('#results [data-id="ariel-oxyblue-2-kg-washing-pow"]').click();await page.waitForFunction(()=>!__mall.auto);
   await page.evaluate(()=>__repairHold('ariel-oxyblue-2-kg-washing-pow'));
