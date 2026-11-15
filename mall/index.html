@@ -96,9 +96,9 @@ button{cursor:pointer}
 #hold{position:fixed;inset:0;z-index:10;display:grid;grid-template-columns:minmax(0,1fr) 380px;background:rgba(10,12,14,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 #stagehand{position:relative;perspective:900px;display:grid;place-items:center;touch-action:none;cursor:grab;overflow:hidden}
 #stagehand.drag{cursor:grabbing}
-.obj{position:relative;transform-style:preserve-3d;transition:transform .08s linear}
-.obj .f{position:absolute;left:50%;top:50%;backface-visibility:hidden;display:grid;place-items:center;border-radius:6px}
-.obj .front{background:radial-gradient(circle at 50% 40%,#fff,#ece8e0)}
+.obj{pointer-events:none;user-select:none;-webkit-user-select:none;position:relative;transform-style:preserve-3d;transition:transform .08s linear}
+.obj .f{position:absolute;left:50%;top:50%;backface-visibility:visible;-webkit-backface-visibility:visible;display:grid;place-items:center;border-radius:6px}
+.obj .front{overflow:hidden;background:radial-gradient(circle at 50% 40%,#fff,#ece8e0)}
 .obj .front img{max-width:92%;max-height:92%;object-fit:contain}
 .obj .back{background:#f7f4ee;color:#222;padding:14px;font-size:13px;line-height:1.35;text-align:left;align-content:start;overflow:hidden}
 .obj .back b{font-size:15px}
@@ -301,7 +301,7 @@ button{cursor:pointer}
     :focus-visible{outline:3px solid var(--accent,#1f5f4a)!important;outline-offset:3px!important}
     html.kx-map-off #mapw,html.kx-map-off #mapwrap,html.kx-map-off #map{visibility:hidden;pointer-events:none}
     html.kx-calm *,html.kx-calm *::before,html.kx-calm *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
-    body[data-venue="urc"]:has(#q[aria-expanded="true"]) #kx-trigger{visibility:hidden;pointer-events:none}
+    body[data-venue="urc"]:has(#q[aria-expanded="true"]) #kx-trigger,body[data-venue="urc"]:has(#hold:not([hidden])) #kx-trigger{visibility:hidden;pointer-events:none}
     @media(max-width:600px){#kx-trigger{font-size:11px;padding:6px 10px}
       .cx-btn{min-height:44px!important}.cx-pop a{min-height:44px}
       body[data-venue="urc"] .results{position:fixed;left:10px;right:10px;top:calc(60px + env(safe-area-inset-top));width:auto;max-height:min(65dvh,520px)}
@@ -491,7 +491,17 @@ function applyPhotoManifest() {
     if (!row || row.original !== (it.img || "")) continue; // A changed catalogue photograph needs a fresh derivative.
     it.photoState = row.status;
     if (row.status === "withheld") { it.img = ""; it.photoHeld = true; }
-    else if (row.file) { it.shelfImg = row.file; it.packRect = row.rect; it.packColor = row.color; }
+    else if (row.file) {
+      if (row.replacement) {
+        // A reviewed correction is valid only for this exact catalogue identity.
+        if (row.name !== it.name || !/^[a-f0-9]{20}-full\.(png|jpg|webp)$/.test(row.full || "") || !/^[a-f0-9]{20}\.webp$/.test(row.file)) continue;
+        it.img = "complex/shared/urc-products/" + row.full;
+        it.photoHeld = false;
+        const frame = row.fullFrame;
+        if (Array.isArray(frame) && frame.length === 6 && frame.every(Number.isFinite) && frame[0] >= 0 && frame[1] >= 0 && frame.slice(2).every(n => n > 0) && frame[0] + frame[2] <= frame[4] && frame[1] + frame[3] <= frame[5]) it.photoFrame = frame;
+      }
+      it.shelfImg = row.file; it.packRect = row.rect; it.packColor = row.color;
+    }
   }
 }
 const store = {
@@ -1959,7 +1969,14 @@ function hold(v) {
   const it = v.it, w = v.w, d = v.d; const big = Math.max(d[0], d[1]); const k = 300 / big;
   let W = Math.max(150, Math.min(280, d[0] * k)), H = Math.max(160, Math.min(320, d[1] * k)), D = Math.max(40, Math.min(160, d[2] * k));
   if (v.shape === "bottle" || v.shape === "can") D = W * .9;
-  const img = it.img ? `<img src="${esc(pic(it, true))}" alt="" draggable="false">` : `<div class="noimg">${esc(it.name)}</div>`;
+  let photoStyle = "";
+  if (it.photoFrame) {
+    const [x,y,cw,ch,sw,sh] = it.photoFrame, fit = Math.min(280/cw,320/ch);
+    W = cw*fit; H = ch*fit; D = Math.min(D,Math.min(W,H)*.24);
+    // Show the original pixels without transparent padding; no label is invented or repainted.
+    photoStyle = `position:absolute;max-width:none;max-height:none;width:${100*sw/cw}%;height:${100*sh/ch}%;left:${-100*x/cw}%;top:${-100*y/ch}%`;
+  }
+  const img = it.img ? `<img src="${esc(pic(it, true))}" alt="" draggable="false" style="${photoStyle}">` : `<div class="noimg">${esc(it.name)}</div>`;
   const side = w.col;
   const o = $("#obj"); o.style.width = W + "px"; o.style.height = H + "px"; o.style.setProperty("--sidec", side);
   const f = (cls, fw, fh, tr, inner = "") => `<div class="f ${cls}" style="width:${fw}px;height:${fh}px;margin:${-fh / 2}px 0 0 ${-fw / 2}px;transform:${tr}">${inner}</div>`;
@@ -1967,13 +1984,23 @@ function hold(v) {
     f("back", W, H, `rotateY(180deg) translateZ(${D / 2}px)`, `<b>${esc(it.name)}</b><br>${esc(CATS.get(it.category)?.label || "")}<br><br>${money(it.price)}<br><span style="opacity:.7">${esc(w.g.mark)} · ${esc(w.g.label)}</span>`) +
     f("side", D, H, `rotateY(90deg) translateZ(${W / 2}px)`) + f("side", D, H, `rotateY(-90deg) translateZ(${W / 2}px)`) +
     f("side", W, D, `rotateX(90deg) translateZ(${H / 2}px)`) + f("side", W, D, `rotateX(-90deg) translateZ(${H / 2}px)`);
-  o.dataset.h = H; drawHand(W, H);
+  o.dataset.h = H; o.dataset.w = W; o.dataset.d = D; drawHand(W, H);
   card(v); $("#hold").hidden = false; holdT = performance.now();
   const st = $("#stagehand"); zoom = Math.min(1, (st.clientHeight * .62) / (H + 60), (st.clientWidth * .7) / W); turn();
   dwell.set(it.id, (dwell.get(it.id) || 0));
 }
 let holdT = 0;
-function turn() { $("#obj").style.transform = `scale(${zoom}) rotateX(${rot.x}rad) rotateY(${rot.y}rad)`; $("#handsvg").style.transform = `translate(-50%, ${(+$("#obj").dataset.h / 2) * zoom - 70}px) scale(${zoom})`; }
+function turn() {
+  const object = $("#obj");
+  object.style.transform = `scale(${zoom}) rotateX(${rot.x}rad) rotateY(${rot.y}rad)`;
+  // Explicit face visibility avoids Safari painting a mirrored rear through the photo.
+  // Face normals follow the CSS rotateX * rotateY order and 900px perspective.
+  const cx=Math.cos(rot.x), sx=Math.sin(rot.x), cy=Math.cos(rot.y), sy=Math.sin(rot.y);
+  const normals=[cx*cy,-cx*cy,-cx*sy,cx*sy,-sx,sx];
+  const extent=[object.dataset.d,object.dataset.d,object.dataset.w,object.dataset.w,object.dataset.h,object.dataset.h];
+  object.querySelectorAll('.f').forEach((face,i)=>{face.style.visibility=900*normals[i] > Number(extent[i])*zoom/2 ? 'visible' : 'hidden';});
+  $("#handsvg").style.transform = `translate(-50%, ${(+object.dataset.h / 2) * zoom - 70}px) scale(${zoom})`;
+}
 function drawHand() {
   // a simple open hand under the product: palm and four fingers behind, thumb in front
   $("#handsvg").innerHTML = `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2b48f"/><stop offset="1" stop-color="#c48e68"/></linearGradient></defs>
