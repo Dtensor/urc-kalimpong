@@ -1,0 +1,36 @@
+name: Acquire CC0 URC indoor marble maps
+on:
+  push:
+    branches: [kalimpong-hall-assets-20261115]
+permissions:
+  contents: write
+jobs:
+  assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download pinned public material channels
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,pathlib,hashlib
+          root=pathlib.Path('complex/shared/materials/scanned');root.mkdir(parents=True,exist_ok=True)
+          with urllib.request.urlopen('https://api.polyhaven.com/files/marble_01',timeout=30) as r: meta=json.load(r)
+          rows=[]
+          for channel in ['diff','nor_gl','rough']:
+              spec=meta[channel]['1k']['jpg'];url=spec['url']
+              assert url.startswith('https://dl.polyhaven.org/file/ph-assets/Textures/')
+              with urllib.request.urlopen(url,timeout=45) as r: data=r.read()
+              assert len(data)<3000000 and data[:2]==b'\xff\xd8'
+              path=root/('marble-'+channel+'.jpg');path.write_bytes(data)
+              rows.append({'path':str(path),'source':url,'asset':'marble_01','assetPage':'https://polyhaven.com/a/marble_01','license':'CC0-1.0','channel':channel,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          (root/'urc-marble-provenance.json').write_text(json.dumps({'licenseSource':'https://polyhaven.com/license','assets':rows},indent=2)+'\n')
+          print(json.dumps(rows))
+          PY
+      - name: Retain assets for visual review
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add complex/shared/materials/scanned/marble-*.jpg complex/shared/materials/scanned/urc-marble-provenance.json
+          git commit -m 'Stage CC0 indoor marble scans with provenance'
+          git push origin "HEAD:refs/heads/hall-assets-${{ github.run_id }}"
