@@ -19,13 +19,15 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
    const page=await ctx.newPage();page.setDefaultTimeout(30000);
    const takeScreenshot=page.screenshot.bind(page);
    page.screenshot=async options=>{
-    // Let the last visible WebGL frame drain before readback on software GPUs.
-    // The page's normal visibility-aware loop resumes immediately afterwards.
-    await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
-    try{await page.waitForTimeout(350);return await takeScreenshot({...options,timeout:60000});}
-    finally{await page.evaluate(()=>{delete document.hidden;}).catch(()=>{});}
-   };
-   // Keep this read-only verification isolated from any optional live counter.
+     for(let attempt=0;attempt<2;attempt++){
+      await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
+      try{await page.waitForTimeout(350);return await takeScreenshot({...options,timeout:60000});}
+      catch(error){if(attempt || !/Timeout/.test(error.message))throw error;row.captureRetries=(row.captureRetries||0)+1;}
+      finally{await page.evaluate(()=>{delete document.hidden;}).catch(()=>{});}
+      await page.waitForTimeout(1500);
+     }
+    };
+    // Keep this read-only verification isolated from any optional live counter.
    await page.route('**/api/**',r=>r.fulfill({status:404,body:'Offline acceptance'}));
    page.on('pageerror',e=>row.errors.push(e.message));
    page.on('console',m=>{if(m.type()==='error'&&/THREE|WebGL|shader/i.test(m.text()))row.errors.push(m.text())});
@@ -77,15 +79,4 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
  }finally{await browser.close()}
  const expected=process.env.KALIMPONG_CASES?process.env.KALIMPONG_CASES.split(',').length:12;
  if(cases.length!==expected||cases.some(r=>!r.pass))process.exitCode=1;
-})();    page.screenshot=async options=>{
-     for(let attempt=0;attempt<2;attempt++){
-      await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
-      try{await page.waitForTimeout(350);return await takeScreenshot({...options,timeout:60000});}
-      catch(error){if(attempt || !/Timeout/.test(error.message))throw error;row.captureRetries=(row.captureRetries||0)+1;}
-      finally{await page.evaluate(()=>{delete document.hidden;}).catch(()=>{});}
-      // The first compositor readback can time out on SwiftShader even while the
-      // fallback capture succeeds. Resume a fresh frame, then retry the capture only.
-      await page.waitForTimeout(1500);
-     }
-    };
-
+})();
