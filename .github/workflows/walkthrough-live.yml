@@ -1,0 +1,32 @@
+name: Verify published bakery walking
+on:
+  push:
+    branches: [kalimpong-walkthrough-live-20261115]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify public responses against accepted release hashes
+        run: |
+          python3 - <<'PY'
+          import urllib.request,hashlib,json,time
+          rows=json.load(open('.github/navigation-live-hashes.json'))
+          for row in rows:
+              url='https://dtensor.github.io/urc-kalimpong/'+row['path']+'?v=bakery-walk-20261115'
+              for attempt in range(18):
+                  try:
+                      with urllib.request.urlopen(url,timeout=25) as r:
+                          body=r.read();status=r.status
+                      digest=hashlib.sha256(body).hexdigest()
+                      if status==200 and digest==row['sha256']:
+                          print('LIVE_OK',row['path'],status,digest);break
+                  except Exception as exc:
+                      print('RETRY',row['path'],str(exc))
+                  time.sleep(5)
+              else:raise RuntimeError('Public release mismatch: '+row['path'])
+          print('PASS: bakery walking page match the accepted release.')
+          PY
