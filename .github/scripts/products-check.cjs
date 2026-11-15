@@ -19,7 +19,7 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
   await page.waitForFunction(()=>__mall?.hall?.loaded.length>=9&&__mall.hall.loaded.length===__mall.hall.mapsExpected&&KalimpongExperience.diagnostics?.materials>0);
   await page.waitForTimeout(900);row.hall=await page.evaluate(()=>__mall.hall);assert.equal(row.hall.fans,4);assert.deepEqual(row.hall.errors,[]);
   row.geometry=await page.evaluate(()=>({draws:__mall.draws,triangles:__mall.tris,items:__mall.items,wings:__mall.wings}));assert.equal(row.geometry.items,1715);assert.equal(row.geometry.wings,7);
-  await page.waitForFunction(()=>__mall.hall.frames>=12&&__mall.photos.pending===0);await page.waitForLoadState('networkidle');
+  await page.waitForFunction(()=>__mall.hall.frames>=12&&__mall.photos.pending===0&&__mall.photos.queued===0);await page.waitForLoadState('networkidle');
   row.candidateImages=await page.evaluate(()=>{const r=performance.getEntriesByType('resource').filter(x=>x.name.includes('/urc-products/')&&x.name.includes('.webp'));return {requests:r.length,bytes:r.reduce((s,x)=>s+x.encodedBodySize,0)};});
   row.photoStats=await page.evaluate(()=>__mall.photos);assert.equal(row.photoStats.withheld,6);assert.equal(row.photoStats.errors,0);
   assert(row.photoStats.resident+row.photoStats.pending<=row.photoStats.budget);assert(row.candidateImages.bytes<row.baselineImages.bytes*.65,'Entrance image transfer should fall materially');
@@ -30,13 +30,15 @@ try{for(const [device,width,height]of[['desktop',1366,820],['phone',440,796]]){
   await page.mouse.click(ground.x,ground.y);await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(400);
   const after=await page.evaluate(()=>({x:__mall.pos.x,z:__mall.pos.z}));row.ground={before,after,distance:Math.hypot(after.x-before.x,after.z-before.z)};assert(row.ground.distance>.2,'Default-view ground click moves the visitor');
   await page.locator('#q').fill('shampoo');assert.equal(await page.locator('#results [data-id]').count(),28);
-  await page.locator('#results [data-id]').first().click();await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(900);await page.waitForFunction(()=>__mall.photos.pending===0);await capture('shelf');
+  await page.locator('#results [data-id]').first().click();await page.waitForFunction(()=>!__mall.auto);await page.waitForTimeout(900);await page.waitForFunction(()=>__mall.photos.pending===0&&__mall.photos.queued===0);await capture('shelf');
   row.shelfPhotos=await page.evaluate(()=>__mall.photos);assert(row.shelfPhotos.resident>0);assert(row.shelfPhotos.optimized>0);
   // Turn away and back. Cached images should remount without new downloads.
-  const facing=await page.evaluate(()=>__mall.yaw);await page.evaluate(()=>{__mall.yaw+=Math.PI;});
-  let frame=await page.evaluate(()=>__mall.hall.frames);await page.waitForFunction(f=>__mall.hall.frames>f+14,frame);
-  await page.evaluate(y=>{__mall.yaw=y;},facing);frame=await page.evaluate(()=>__mall.hall.frames);await page.waitForFunction(f=>__mall.hall.frames>f+14,frame);
-  row.returnPhotos=await page.evaluate(()=>__mall.photos);assert(row.returnPhotos.cacheHits>0);assert(row.returnPhotos.resident+row.returnPhotos.pending<=row.returnPhotos.budget);
+  const facing=await page.evaluate(()=>__mall.yaw), hitsBefore=await page.evaluate(()=>__mall.photos.cacheHits);
+  let scan=await page.evaluate(()=>__mall.photos.streams);await page.evaluate(()=>{__mall.yaw+=Math.PI;});
+  await page.waitForFunction(n=>__mall.photos.streams>n,scan);await page.waitForFunction(()=>__mall.photos.pending===0&&__mall.photos.queued===0);
+  scan=await page.evaluate(()=>__mall.photos.streams);await page.evaluate(y=>{__mall.yaw=y;},facing);
+  await page.waitForFunction(n=>__mall.photos.streams>n,scan);await page.waitForFunction(()=>__mall.photos.pending===0&&__mall.photos.queued===0);
+  row.returnPhotos=await page.evaluate(()=>__mall.photos);assert(row.returnPhotos.cacheHits>hitsBefore);assert(row.returnPhotos.resident+row.returnPhotos.pending<=row.returnPhotos.budget);
   await page.locator('#q').fill('Johnson Baby Lotion');await page.locator('#results [data-id="johnson-baby-lotion-200-ml"]').click();await page.waitForFunction(()=>!__mall.auto);
   // The optional device check is local, works on touch-size screens and reports real frame intervals.
   await page.locator('#urc-check-trigger').click();await page.locator('#urc-check [data-start]').click();await page.waitForFunction(()=>__urcDeviceCheck.report,{},{timeout:50000});

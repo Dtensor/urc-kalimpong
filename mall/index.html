@@ -479,7 +479,7 @@ const url = (p) => API + p;
 // On GitHub Pages this page lives at /mall/, beside the shop at /.
 const ROOT = /\/mall\/?(index\.html)?$/.test(location.pathname) ? "../" : "";
 let photoManifest = null;
-const photoStats = {version:"urc-products-20261115",requests:0,cacheHits:0,discarded:0,errors:0,optimized:0};
+const photoStats = {version:"urc-products-20261115",streams:0,requests:0,cacheHits:0,discarded:0,errors:0,optimized:0};
 const pic = (it, full = false) => !it.img ? "" : (!full && it.shelfImg ? ROOT + "complex/shared/urc-products/" + it.shelfImg : it.img.startsWith("/") ? API + it.img : ROOT + it.img);
 async function loadPhotoManifest() {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 4000);
@@ -1686,6 +1686,7 @@ function syncPhotoBody(v) {
 }
 function dropPhoto(v) { if (!v.photo || v === lifted) return; if (!v.isLabel) rememberPhoto(v.it.id,v.photo.material.map.image); scene.remove(v.photo); v.photo.material.map.dispose(); v.photo.material.dispose(); v.photo = null; loaded.delete(v); place(v, v.gone); }
 function streamPhotos() {
+  photoStats.streams++;
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw), near = [];
   const halfView = Math.atan(Math.tan(fov * Math.PI / 360) * camera.aspect) + .45;
   for (const v of ITEMS) {
@@ -2328,7 +2329,7 @@ function installDeviceCheck() {
 /* ================================================================ loop */
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize);
-let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get photos() { return {...photoStats,resident:loaded.size,pending:loading,cached:photoCache.size,budget:BUDGET,withheld:DATA?.items.filter(i=>i.photoHeld).length||0}; }, get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
+let last = performance.now(), acc = 0, acc2 = 0, frames = 0, fpsT = 0; window.__fps = 0; window.__mall = { get photos() { return {...photoStats,resident:loaded.size,pending:loading,queued:photoQueue.filter(v=>!v.photo&&!v.gone).length,cached:photoCache.size,budget:BUDGET,withheld:DATA?.items.filter(i=>i.photoHeld).length||0}; }, get hall() { return {version:HALL.version,loaded:HALL.loaded,mapsExpected:hallMaps.size,errors:HALL.errors,fans:HALL.fans.length,phase:HALL.phase,frames:HALL.frames}; }, pos, get auto() { return auto; }, get lifted() { return lifted && lifted.it.id; }, get yaw() { return yaw; }, set yaw(v) { yaw = v; pan = null; }, get wingList() { return WINGS.map(w => ({ id: w.id, phi: w.phi, hw: w.hw, D: w.D, px: w.px, pz: w.pz, ox: w.ox, oz: w.oz, lx: w.lx, lz: w.lz })); }, get R() { return HUB_R; }, get wings() { return WINGS.length; }, get items() { return ITEMS.length; }, get gaps() { return GAPS.length; }, get draws() { return renderer.info.render.calls; }, get tris() { return renderer.info.render.triangles; }, get objs() { return scene.children.length; }, get pan() { return !!pan; }, get gated() { return GATED.map(g => g.mesh.visible ? 1 : 0).join(''); } };
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (document.hidden || window.KalimpongExperience.modalOpen) { window.__urcDeviceCheck?.interrupt(); requestAnimationFrame(loop); return; }
