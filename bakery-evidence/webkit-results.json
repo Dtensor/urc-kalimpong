@@ -1,0 +1,61 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "webkit",
+    "pass": true,
+    "geometry": {
+      "version": "bakery-detail-20261115",
+      "products": 6,
+      "loaves": 12,
+      "addedDrawCalls": 2,
+      "addedTriangles": 9792
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "plaza",
+    "engine": "webkit",
+    "pass": true,
+    "maps": [
+      {
+        "name": "stone-diff.jpg",
+        "start": 34,
+        "end": 36.00000000000001,
+        "type": "link"
+      },
+      {
+        "name": "plaster-diff.jpg",
+        "start": 34,
+        "end": 42,
+        "type": "link"
+      },
+      {
+        "name": "stone-nor_gl.jpg",
+        "start": 36.00000000000001,
+        "end": 44,
+        "type": "link"
+      },
+      {
+        "name": "stone-rough.jpg",
+        "start": 42,
+        "end": 46,
+        "type": "link"
+      },
+      {
+        "name": "plaster-nor_gl.jpg",
+        "start": 44,
+        "end": 49,
+        "type": "link"
+      },
+      {
+        "name": "plaster-rough.jpg",
+        "start": 46,
+        "end": 49,
+        "type": "link"
+      }
+    ],
+    "errors": [],
+    "missing": []
+  }
+]
