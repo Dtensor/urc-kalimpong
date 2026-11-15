@@ -22,7 +22,7 @@ for it in items:
         digest=hashlib.sha256(raw).hexdigest()[:20];name=digest+'.webp';target=out/name
         with Image.open(src) as source:
             im=source.convert('RGBA');im.thumbnail((256,256),Image.Resampling.LANCZOS)
-            im.save(target,format='WEBP',quality=82,method=6)
+            im.save(target,format='WEBP',quality=82,method=3)
             width,height=im.size
         row.update(status='reference',file=name,width=width,height=height,bytes=target.stat().st_size)
         if name not in seen:derivative_bytes+=row['bytes'];seen.add(name)
