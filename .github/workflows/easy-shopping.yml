@@ -1,7 +1,7 @@
 name: URC Easy shopping acceptance
 on:
   push:
-    branches: [kalimpong-easy-mobile-20261115, main]
+    branches: [kalimpong-repeat-shopping-20261115, main]
     paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/easy-*', '.github/workflows/easy-shopping.yml']
 permissions:
   contents: read
@@ -26,6 +26,7 @@ jobs:
       - run: python -m pip install Pillow==12.2.0
       - run: python .github/scripts/easy-build-thumbs.py .
       - run: node .github/scripts/easy-core-test.cjs .
+      - run: node .github/scripts/easy-lists-core-test.cjs .
       - run: |
           npm install --prefix "$RUNNER_TEMP/check" --no-package-lock --no-audit --no-fund playwright@1.59.1 axe-core@4.10.3 acorn@8.15.0
           "$RUNNER_TEMP/check/node_modules/.bin/playwright" install --with-deps ${{ matrix.engine }}
@@ -36,6 +37,7 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
           node .github/scripts/easy-core-test.cjs .
+          node .github/scripts/easy-lists-core-test.cjs .
           node .github/scripts/easy-browser.cjs
       - uses: actions/upload-artifact@v5
         if: always()
