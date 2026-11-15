@@ -1800,7 +1800,7 @@ function walkTo(tx, tz, yawEnd, pitchEnd, done) {
   const pts = route(tx, tz);
   // round the ring a walk can get long; past a point, fade rather than trudge
   let far = 0, c = [pos.x, pos.z]; for (const q of pts) { far += Math.hypot(q[0] - c[0], q[1] - c[1]); c = q; }
-  if (far > 30) { teleport(tx, tz, yawEnd, pitchEnd, done); return; }
+  if (RM || window.KalimpongExperience.calm || far > 30) { teleport(tx, tz, yawEnd, pitchEnd, done); return; }
   const first = pts.shift(); glideTo(first[0], first[1], { path: pts, yaw: pts.length ? null : yawEnd, pitch: pts.length ? null : pitchEnd, done: pts.length ? null : done });
   auto.final = { yaw: yawEnd, pitch: pitchEnd, done };
 }
