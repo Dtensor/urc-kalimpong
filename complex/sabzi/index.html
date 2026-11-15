@@ -1495,7 +1495,7 @@ function build3D() {
   let whereKey = "";
   function where() {
     let k, n, s, c = "";
-    const st = stallAt(pos.x, pos.z);
+    const facing=-Math.sin(yaw);const st = Math.abs(facing)>.35 ? stallAt(Math.sign(facing)*(EDGE+.5),pos.z) : null;
     if (pos.z < ZC + 2.4) { k = "Weighing counter"; n = "The brass scale"; s = "Tap the scale to see your basket"; }
     else if (st) { k = `Stall ${st.sec.n}`; n = st.sec.name; s = `${st.crates.length + st.sacks.length} items · sample rates`; c = st.sec.color; }
     else if (pos.z > ZF - 2) { k = "Entrance"; n = "Sabzi Mandi"; s = "Walk in: the aisle runs to the hill window"; }

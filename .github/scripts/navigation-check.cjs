@@ -24,6 +24,7 @@ for(const venue of ['bakery','sabzi','grocery']){
  // Bakery/grocery calm arrivals are immediate; sabzi retains a short walk animation.
  
  const state=await page.evaluate(()=>navAPI.navigation());assert.equal(state.fov,70);assert(state.marker);
+ if(venue==='sabzi')assert.equal(await page.locator('#chips button').first().getAttribute('aria-current'),'true','Section label follows the shelf being viewed');
  await shot(venue+'-shelf');
  const before=await page.evaluate(v=>v==='bakery'?__bakery.state().yaw:v==='sabzi'?__sabzi.S3.info().yaw:__groc.cam.yaw,venue);
  await pause();await page.mouse.move(200,360);await page.mouse.down();await page.mouse.move(260,360,{steps:3});await page.mouse.up();
@@ -37,6 +38,8 @@ for(const venue of ['bakery','sabzi','grocery']){
  assert.equal(await page.evaluate(()=>navAPI.navigation().fov),70);
  
  await shot(venue+'-last-section');assert.deepEqual(errors,[]);
+ if(phone){await pause();await page.setViewportSize({width:796,height:440});const landscape=await page.evaluate(()=>navAPI.navigation());assert(landscape.views.every(v=>v.fits&&v.distance>=2.799),'Landscape full-bay framing');results.at(-1).landscapeCount=landscape.views.length;await page.setViewportSize({width:440,height:796});await resume();}
+
 }
 await context.close();}
 catch(e){results.push({engine,pass:false,error:e.message});throw e;}finally{fs.writeFileSync(`${out}/${engine}-results.json`,JSON.stringify(results,null,2));console.log('NAV_CASE '+JSON.stringify(results));await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
