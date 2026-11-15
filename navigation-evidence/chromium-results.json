@@ -1,0 +1,7 @@
+[
+  {
+    "engine": "chromium",
+    "pass": false,
+    "error": "page.evaluate: Error: No walkable shelf view: hard-churpi-100g\n    at fit (http://127.0.0.1:8765/complex/shared/shelf-navigation.js:26:18)\n    at Object.view (http://127.0.0.1:8765/complex/shared/shelf-navigation.js:33:124)\n    at viewPoint (http://127.0.0.1:8765/complex/bakery/:1825:45)\n    at http://127.0.0.1:8765/complex/bakery/:2061:73\n    at Array.map (<anonymous>)\n    at Object.navigation (http://127.0.0.1:8765/complex/bakery/:2061:66)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:85)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  }
+]

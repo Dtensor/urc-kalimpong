@@ -1,0 +1,7 @@
+[
+  {
+    "engine": "webkit",
+    "pass": false,
+    "error": "page.evaluate: Error: No walkable shelf view: hard-churpi-100g"
+  }
+]
