@@ -9,18 +9,19 @@
  }
  function fit(THREE,t,{aspect,eye=1.6,free}){
   const points=corners(THREE,t),cy=((t.bottom||0)+t.top)/2,ux=-t.nz,uz=t.nx;
+  const portrait=aspect<.85,topLimit=portrait?.48:.75,bottomLimit=.78;
   const half=Math.tan(FOV*Math.PI/360),desired=Math.max(MIN_DISTANCE,t.width/(2*half*Math.max(.3,aspect)*.78),(t.top-(t.bottom||0))/(2*half*.76));
   const camera=new THREE.PerspectiveCamera(FOV,aspect,.05,120);camera.rotation.order='YXZ';
   let best=null;
   const distances=[];for(let d=Math.min(6,desired);d<=6.001;d+=.15)distances.push(d);for(let d=Math.min(6,desired)-.1;d>=2.099;d-=.1)distances.push(d);
-  for(const d of distances)for(const offset of [0,.3,-.3,.6,-.6,.9,-.9]){
+  for(const d of distances)for(const offset of [0,.3,-.3,.6,-.6,.9,-.9,1.2,-1.2]){
    const x=t.x+t.nx*d+ux*offset,z=t.z+t.nz*d+uz*offset;if(!free(x,z))continue;
    let clear=true;for(let k=1;k<d;k+=.2)if(!free(t.x+t.nx*k+ux*offset,t.z+t.nz*k+uz*offset)){clear=false;break;}if(!clear)continue;
-   const dx=t.x-x,dz=t.z-z,yaw=Math.atan2(-dx,-dz),pitch=Math.atan2(cy-eye,Math.hypot(dx,dz));
+   const dx=t.x-x,dz=t.z-z,yaw=Math.atan2(-dx,-dz),pitch=Math.atan2(cy+(portrait?half*Math.hypot(dx,dz)*.14:0)-eye,Math.hypot(dx,dz));
    camera.position.set(x,eye,z);camera.rotation.set(pitch,yaw,0);camera.updateMatrixWorld();
-   let maxX=0,maxY=0;for(const point of points){const p=point.clone().project(camera);maxX=Math.max(maxX,Math.abs(p.x));maxY=Math.max(maxY,Math.abs(p.y));}
-   const score=Math.max(maxX/.86,maxY/.84),v={x,z,yaw,pitch,fov:FOV,distance:d,target:t,maxX,maxY,fits:score<=1};
-   if(v.fits&&d>=MIN_DISTANCE-.001)return v;
+   let maxX=0,maxY=0,minY=Infinity,upperY=-Infinity;for(const point of points){const p=point.clone().project(camera);maxX=Math.max(maxX,Math.abs(p.x));maxY=Math.max(maxY,Math.abs(p.y));minY=Math.min(minY,p.y);upperY=Math.max(upperY,p.y);}
+   const score=Math.max(maxX/.86,upperY/topLimit,-minY/bottomLimit),v={x,z,yaw,pitch,fov:FOV,distance:Math.hypot(dx,dz),setback:d,target:t,maxX,maxY,minY,upperY,fits:score<=1};
+   if(v.fits&&v.distance>=MIN_DISTANCE-.001)return v;
    if(!best||score<best.score)best={...v,score};
   }
   if(!best)throw Error('No walkable shelf view: '+t.id);
