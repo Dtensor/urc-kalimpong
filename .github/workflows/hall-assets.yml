@@ -15,10 +15,9 @@ jobs:
           python3 - <<'PY'
           import urllib.request,json,pathlib,hashlib
           root=pathlib.Path('complex/shared/materials/scanned');root.mkdir(parents=True,exist_ok=True)
-          with urllib.request.urlopen('https://api.polyhaven.com/files/marble_01',timeout=30) as r: meta=json.load(r)
           rows=[]
           for channel in ['diff','nor_gl','rough']:
-              spec=meta[channel]['1k']['jpg'];url=spec['url']
+              url=f'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/marble_01/marble_01_{channel}_1k.jpg'
               assert url.startswith('https://dl.polyhaven.org/file/ph-assets/Textures/')
               with urllib.request.urlopen(url,timeout=45) as r: data=r.read()
               assert len(data)<3000000 and data[:2]==b'\xff\xd8'
