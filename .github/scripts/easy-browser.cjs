@@ -1,0 +1,50 @@
+const {chromium,webkit}=require('playwright'),fs=require('node:fs'),assert=require('node:assert/strict');
+const engine=process.env.ENGINE||'chromium',out='easy-evidence',origin='http://127.0.0.1:8765';fs.mkdirSync(out,{recursive:true});
+const axe=fs.readFileSync(require.resolve('axe-core/axe.min.js'),'utf8');
+const data=JSON.parse(fs.readFileSync('menu.json')),originalBasket={'henko-detergent-bar':1};
+(async()=>{const browser=await(engine==='webkit'?webkit:chromium).launch({headless:true,...(engine==='chromium'?{args:['--enable-webgl','--enable-unsafe-swiftshader','--use-angle=swiftshader']}: {})});const results=[];
+async function run(name,fn,options={}){const row={name,engine,errors:[],checks:[]};const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce',...options});const page=await ctx.newPage();page.setDefaultTimeout(30000);page.on('pageerror',e=>row.errors.push(e.message));
+async function shot(label){await page.screenshot({path:`${out}/${engine}-${name}-${label}.jpg`,type:'jpeg',quality:86,timeout:45000});}
+async function audit(label){await page.evaluate(axe);const violations=await page.evaluate(async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}});return r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}));});row.checks.push({axe:label,violations});assert.deepEqual(violations,[],label+' accessibility violations');}
+async function reflow(){assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Horizontal overflow');}
+try{await fn({page,ctx,row,shot,audit,reflow});assert.deepEqual(row.errors,[]);row.pass=true;}catch(e){row.pass=false;row.failure=e.stack;await shot('failure').catch(()=>{});}results.push(row);fs.writeFileSync(`${out}/${engine}-results.json`,JSON.stringify(results,null,2));console.log('EASY_CASE '+JSON.stringify(row));await ctx.close();}
+try{
+await run('shopping',async({page,ctx,row,shot,audit,reflow})=>{
+ const requests=[];page.on('request',r=>requests.push(r.url()));await page.goto(origin+'/mall/',{waitUntil:'networkidle'});await page.waitForURL('**/complex/shared/easy.html#home');await page.locator('#phrase').waitFor();
+ assert(!requests.some(u=>/three-r128|materials\/|\.mp3/.test(u)),'Mobile loads heavy hall resources');assert.equal(await page.locator('canvas').count(),0);
+ row.checks.push({mobileRequests:requests.length,heavyRequests:requests.filter(u=>/three-r128|materials\//.test(u))});await reflow();await shot('welcome');await audit('welcome');
+ const targets=await page.locator('button:visible').evaluateAll(els=>els.map(el=>({text:el.textContent.trim(),h:el.getBoundingClientRect().height,w:el.getBoundingClientRect().width})));assert(targets.every(r=>r.h>=52&&r.w>=44),JSON.stringify(targets));
+ await page.locator('#phrase').fill('two soaps and toothpaste');await page.locator('#phrase-form button[type=submit]').click();assert.equal(await page.locator('.product').count(),12);await shot('phrase');await audit('phrase');
+ const first=page.locator('[data-action="choose"]').first(),soap=await first.getAttribute('data-id');await first.click();assert.equal(await page.evaluate(id=>JSON.parse(localStorage.getItem('bhandar.basket'))[id],soap),2);
+ await page.locator('[data-action="next"]').click();const second=page.locator('[data-action="choose"]').first(),paste=await second.getAttribute('data-id');assert(/toothpaste/i.test(data.items.find(it=>it.id===paste).name));await second.click();await page.locator('[data-action="next"]').click();
+ assert.equal(await page.locator('.list-row').count(),2);assert((await page.locator('#main').innerText()).includes('not a placed order'));await shot('list');await audit('list');
+ await page.locator(`[data-action="change"][data-id="${soap}"][data-delta="-1"]`).click();assert.equal(await page.evaluate(id=>JSON.parse(localStorage.getItem('bhandar.basket'))[id],soap),1);
+ await page.locator('[data-action="undo"]').click();assert.equal(await page.evaluate(id=>JSON.parse(localStorage.getItem('bhandar.basket'))[id],soap),2);
+ await page.reload({waitUntil:'networkidle'});await page.locator('#nav-list').click();assert.equal(await page.locator('.list-row').count(),2);
+ await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined}));await page.locator('[data-action="copy"]').click();assert((await page.locator('#share-text').inputValue()).includes('2 ×'));await page.locator('#nav-shop').click();
+ await page.locator('[data-group="g1"]').click();await page.locator('[data-action="details"]').first().click();await shot('detail');await audit('detail');const detailName=await page.locator('#main h1').textContent();await page.locator('[data-action="favourite"]').click();await page.locator('[data-action="back"]').click();assert.equal(await page.locator('#main h1').textContent(),'Browse products');await page.locator('#nav-shop').click();await page.locator('[data-group="saved"]').click();assert((await page.locator('#main').innerText()).includes(detailName));
+ await page.locator('#nav-help').click();await audit('help');await page.locator('#text-size').selectOption('large');await page.locator('#contrast').selectOption('strong');await page.setViewportSize({width:320,height:640});await reflow();await shot('large-help');await audit('large-help');
+ await page.locator('#language').click();assert.equal(await page.locator('html').getAttribute('lang'),'hi');await page.locator('#nav-shop').click();await reflow();await shot('hindi-large');await page.locator('#phrase').fill('दो साबुन और टूथपेस्ट');await page.locator('#phrase-form button[type=submit]').click();assert(await page.locator('.product').count()>0);await reflow();await shot('hindi-products');await audit('hindi-products');
+ await page.setViewportSize({width:760,height:360});await reflow();await shot('landscape');
+ row.checks.push({phrase:true,sharedBasket:true,undo:true,reload:true,copyFallback:true,favourites:true,hindi:true,largeText:true});
+});
+await run('resilience',async({page,ctx,row,shot,audit,reflow})=>{
+ await ctx.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Quota','QuotaExceededError');};Object.defineProperty(window,'SpeechRecognition',{value:undefined});Object.defineProperty(window,'webkitSpeechRecognition',{value:undefined});});
+ await page.route('**/urc-products/*.webp',r=>r.abort());await page.goto(origin+'/complex/shared/easy.html',{waitUntil:'networkidle'});await page.locator('[data-action="voice"]').click();assert((await page.locator('#status').textContent()).includes('Microphone unavailable'));
+ await page.locator('[data-group="g1"]').click();await page.locator('[data-action="add"]').first().click();assert((await page.locator('#main').innerText()).includes('cannot save changes'));await page.locator('#nav-list').click();assert.equal(await page.locator('.list-row').count(),1);await shot('storage-and-photos');await reflow();
+ await page.route('**/menu.json',r=>r.fulfill({status:503,body:'Unavailable'}));await page.reload({waitUntil:'networkidle'});await page.locator('[data-action="retry"]').waitFor();assert((await page.locator('#main').innerText()).includes('has not been cleared'));await shot('network-error');await page.unroute('**/menu.json');await page.locator('[data-action="retry"]').click();await page.locator('#phrase').waitFor();
+ row.checks.push({blockedStorage:true,photoFailures:true,noSpeechAPI:true,networkRetry:true});
+});
+await run('voice-keyboard',async({page,ctx,row,shot,audit,reflow})=>{
+ await ctx.addInitScript(()=>{window.__micStarts=0;window.SpeechRecognition=class {start(){window.__micStarts++;this.onresult({results:[[{transcript:'two soaps and toothpaste'}]]});this.onend();}stop(){if(this.onend)this.onend();}};});await page.goto(origin+'/complex/shared/easy.html',{waitUntil:'networkidle'});assert.equal(await page.evaluate(()=>window.__micStarts),0);await page.locator('[data-action="voice"]').click();assert.equal(await page.evaluate(()=>window.__micStarts),0);await page.locator('[data-action="voice-start"]').click();assert.equal(await page.locator('#phrase').inputValue(),'two soaps and toothpaste');assert.equal(await page.evaluate(()=>localStorage.getItem('bhandar.basket')),null);
+ await page.locator('#phrase').focus();await page.keyboard.press('Tab');await page.keyboard.press('Enter');await page.locator('[data-action="choose"]').first().waitFor();assert.equal(await page.evaluate(()=>document.activeElement.tagName),'H1');await audit('keyboard-results');
+ row.checks.push({voiceConsent:true,editableTranscript:true,noAutomaticAdd:true,keyboardSubmit:true,focusHeading:true});
+},{isMobile:false,hasTouch:false});
+await run('desktop-hall',async({page,ctx,row,shot,audit,reflow})=>{
+ const requests=[];page.on('request',r=>requests.push(r.url()));await page.goto(origin+'/mall/',{waitUntil:'domcontentloaded'});await page.locator('#quiet').click({timeout:90000});await page.waitForFunction(()=>window.__mall&&window.__mall.items===1715,{},{timeout:90000});assert(requests.some(u=>u.includes('three-r128')));assert.equal(await page.locator('#listview').textContent(),'Easy shopping');
+ await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));await shot('retained');await page.locator('#listview').click();await page.locator('#phrase').waitFor();await shot('easy-desktop');await audit('easy-desktop');
+ row.checks.push({desktopHall:true,desktopEasyLink:true});
+},{viewport:{width:1366,height:820},isMobile:false,hasTouch:false});
+await run('phone-hall-opt-in',async({page,ctx,row,shot})=>{await page.goto(origin+'/mall/?view=hall',{waitUntil:'domcontentloaded'});await page.locator('#quiet').waitFor({timeout:90000});assert(!page.url().includes('easy.html'));assert(await page.locator('#listview').getAttribute('href').then(h=>h.includes('easy.html')));row.checks.push({phoneHallOptIn:true});});
+}finally{await browser.close();}if(results.some(r=>!r.pass))process.exitCode=1;
+})().catch(e=>{console.error(e);process.exitCode=1;});
