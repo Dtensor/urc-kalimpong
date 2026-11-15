@@ -1,0 +1,103 @@
+[
+  {
+    "device": "desktop",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "plaster-rough1,2",
+        "plaster-rough3,2",
+        "plaster-rough5,2",
+        "plaster-rough6,2",
+        "plaster-rough1,1",
+        "plaster-rough4,2",
+        "plaster-diff4,2",
+        "plaster-diff3,2",
+        "plaster-diff1,1",
+        "plaster-diff6,2",
+        "plaster-diff5,2",
+        "plaster-diff1,2",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl3,2",
+        "plaster-nor_gl5,2"
+      ],
+      "errors": [],
+      "fans": 4,
+      "phase": 0
+    },
+    "geometry": {
+      "draws": 389,
+      "triangles": 105554,
+      "items": 1715,
+      "wings": 7
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 1.1811834854873968,
+        "z": 9.307318432627167
+      },
+      "distance": 4.790583112984433
+    },
+    "motion": "moves normally; freezes with system reduce motion and Calm view",
+    "pass": true
+  },
+  {
+    "device": "phone",
+    "engine": "webkit",
+    "errors": [],
+    "missing": [],
+    "hall": {
+      "version": "urc-hall-20261115",
+      "loaded": [
+        "plaster-diff1,2",
+        "plaster-diff5,2",
+        "plaster-diff3,2",
+        "plaster-diff6,2",
+        "plaster-diff4,2",
+        "plaster-diff1,1",
+        "plaster-nor_gl6,2",
+        "plaster-nor_gl1,2",
+        "plaster-nor_gl3,2",
+        "plaster-nor_gl4,2",
+        "plaster-nor_gl1,1",
+        "plaster-nor_gl5,2",
+        "plaster-rough4,2",
+        "plaster-rough6,2",
+        "plaster-rough3,2",
+        "plaster-rough5,2",
+        "plaster-rough1,2",
+        "plaster-rough1,1"
+      ],
+      "errors": [],
+      "fans": 4,
+      "phase": 0
+    },
+    "geometry": {
+      "draws": 214,
+      "triangles": 86328,
+      "items": 1715,
+      "wings": 7
+    },
+    "ground": {
+      "before": {
+        "x": 0,
+        "z": 13.95
+      },
+      "after": {
+        "x": 0.39016280883353177,
+        "z": 9.283851718110771
+      },
+      "distance": 4.682431719307251
+    },
+    "pass": true
+  }
+]
