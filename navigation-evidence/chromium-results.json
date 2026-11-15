@@ -1,0 +1,35 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "chromium",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 227.5,
+      "y": 746,
+      "width": 911,
+      "height": 58,
+      "display": "flex",
+      "buttons": 6
+    }
+  },
+  {
+    "venue": "sabzi",
+    "engine": "chromium",
+    "count": 56,
+    "bad": [],
+    "controls": {
+      "x": 16,
+      "y": 766,
+      "width": 1334,
+      "height": 38,
+      "display": "flex",
+      "buttons": 7
+    }
+  },
+  {
+    "engine": "chromium",
+    "pass": false,
+    "error": "Visible warp controls"
+  }
+]
