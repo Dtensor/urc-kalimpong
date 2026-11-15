@@ -1804,7 +1804,7 @@ function step(dt) {
   let f = 0, s = 0, turn = 0;
   if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1; if (keys.KeyA) s -= 1; if (keys.KeyD) s += 1;
   if (keys.ArrowLeft) turn += 1; if (keys.ArrowRight) turn -= 1;
-  f += -stick.y; turn += -stick.x * 1.15;
+  f += -stick.y; s += stick.x;
   yaw += turn * 1.8 * dt;
   const sp = keys.ShiftLeft || keys.ShiftRight ? 4.2 : 2.6;
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
