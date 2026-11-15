@@ -30,12 +30,14 @@ const engine=process.env.ENGINE||'chromium',out='photo-evidence';fs.mkdirSync(ou
    assert.equal(stats.products,venue==='sabzi'?55:66);assert.equal(stats.loadedSheets,venue==='sabzi'?7:9);assert.deepEqual(stats.errors,[]);
    assert(stats.displayCards>=stats.products);assert.equal(stats.displayDrawCalls,stats.loadedSheets);
    await capture(venue+'-arrival');
-   if(venue==='sabzi')await page.evaluate(()=>__sabzi.S3.look(-1.6,5,Math.PI/2,-.25));
+   if(venue==='sabzi')await page.evaluate(()=>__sabzi.S3.look(-1.2,-1.5,Math.PI/2,-.25));
    else await page.evaluate(()=>{const a=__groc.anch['mustard-oil-1l'].stand;Object.assign(__groc.cam,{x:a.x,z:a.z,yaw:a.yaw,pitch:-.12});});
    await page.waitForTimeout(700);await capture(venue+'-display');
    if(engine==='chromium')await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
    await page.evaluate(v=>v==='sabzi'?__sabzi.hold('tomato'):__groc.holdId('mustard-oil-1l'),venue);
    assert(await page.locator('#hold').isVisible());assert((await page.locator('#card').innerText()).includes('AI-generated'));
+   assert.equal(await page.locator('#obj .back').evaluate(el=>getComputedStyle(el).visibility),'hidden');
+   assert(await page.locator('#obj .front img').evaluate(el=>el.complete&&el.naturalWidth>0));
    await capture(venue+'-detail');
    if(engine==='chromium')await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,get:()=>true}));
    await page.locator(venue==='sabzi'?'#card [data-add]':'#card [data-a="add"]').click();

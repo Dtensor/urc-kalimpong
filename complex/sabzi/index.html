@@ -255,6 +255,8 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
   .brow .btn{flex:1 1 100%}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+#obj.photographic .front{background:transparent;box-shadow:none;border-radius:0;overflow:visible}#obj.photographic .front img{object-fit:contain}
 </style>
 <script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
 <body data-venue="sabzi" data-material-root="../shared/">
@@ -893,7 +895,7 @@ $("#handsvg").innerHTML = `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2
   <path d="M226 96 C 256 64, 288 66, 290 84 C 292 102, 268 116, 248 126 Z" fill="url(#sk)"/>
   <path d="M40 112 C 16 88, 20 56, 40 58 C 58 60, 66 92, 78 112 Z" fill="url(#sk)" opacity=".96"/>
   <path d="M80 150 C 120 160, 190 160, 240 148" stroke="#b07c58" stroke-width="3" fill="none" opacity=".5"/>`;
-function paintObj() { $("#obj").style.transform = `scale(${zoom}) rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
+function paintObj() { const front=Math.cos(rotY*Math.PI/180)>=0; for(const f of $("#obj").querySelectorAll(".front,.back"))f.style.visibility=(f.classList.contains("front")===front)?"visible":"hidden"; $("#obj").style.transform = `scale(${zoom}) rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
 function scaleSVG() {
   return `<svg viewBox="0 0 190 86" id="pan" aria-hidden="true"><defs><linearGradient id="br" x1="0" x2="1"><stop offset="0" stop-color="#8a6418"/><stop offset=".45" stop-color="#f1cf6a"/><stop offset="1" stop-color="#9a7020"/></linearGradient></defs>
     <path d="M80 84h30l-6-10h-18z" fill="url(#br)"/><rect x="93" y="18" width="4" height="58" fill="url(#br)"/><circle cx="95" cy="15" r="5" fill="url(#br)"/>
@@ -920,6 +922,7 @@ function paintCard() {
 }
 function tiltSVG(a) { const b = document.querySelector("#pan .beam"); if (b) b.style.transform = `rotate(${a}deg)`; const l = document.querySelector("#pan .load"); if (l) l.setAttribute("r", Math.min(9, 3 + holdQ * 3)); }
 function hold(it) {
+  $("#obj").classList.toggle("photographic",PhotographicProducts.has(it));
   HOLD = it; holdQ = U(it).def; rotX = -8; rotY = -18; zoom = 1; hideGaze();
   const s = secOf(it);
   $("#obj").innerHTML = `<div class="f front">${img(it)}</div><div class="f back"><small>${esc(s.name)}</small><b>${esc(it.name)}</b><div class="p">₹ ${it.price} <i>/ ${esc(U(it).per)}</i></div><small>Sample rate</small></div>`;

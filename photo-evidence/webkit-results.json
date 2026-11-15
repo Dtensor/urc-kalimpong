@@ -1,0 +1,96 @@
+[
+  {
+    "venue": "bakery",
+    "engine": "webkit",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 7,
+      "products": 55,
+      "errors": []
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "sabzi",
+    "engine": "webkit",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 7,
+      "products": 55,
+      "errors": [],
+      "displayCards": 55,
+      "displayDrawCalls": 7
+    },
+    "basket": {
+      "tomato": 1
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "grocery",
+    "engine": "webkit",
+    "pass": true,
+    "photography": {
+      "version": "photographic-products-20261115",
+      "loadedSheets": 9,
+      "products": 66,
+      "errors": [],
+      "displayCards": 523,
+      "displayDrawCalls": 9
+    },
+    "basket": {
+      "mustard-oil-1l": 1
+    },
+    "errors": [],
+    "missing": []
+  },
+  {
+    "venue": "plaza",
+    "engine": "webkit",
+    "pass": true,
+    "maps": [
+      {
+        "name": "stone-diff.jpg",
+        "start": 24,
+        "end": 30,
+        "type": "link"
+      },
+      {
+        "name": "plaster-diff.jpg",
+        "start": 28,
+        "end": 32,
+        "type": "link"
+      },
+      {
+        "name": "stone-nor_gl.jpg",
+        "start": 31,
+        "end": 34,
+        "type": "link"
+      },
+      {
+        "name": "stone-rough.jpg",
+        "start": 32,
+        "end": 36.00000000000001,
+        "type": "link"
+      },
+      {
+        "name": "plaster-nor_gl.jpg",
+        "start": 34,
+        "end": 37,
+        "type": "link"
+      },
+      {
+        "name": "plaster-rough.jpg",
+        "start": 36.00000000000001,
+        "end": 39,
+        "type": "link"
+      }
+    ],
+    "errors": [],
+    "missing": []
+  }
+]

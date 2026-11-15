@@ -1,7 +1,5 @@
 name: Photographic product acceptance
 on:
-  push:
-    branches: ["kalimpong-photo-20261115"]
   workflow_dispatch:
 permissions:
   contents: read

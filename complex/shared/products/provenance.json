@@ -1,0 +1,13 @@
+{
+  "version": "photographic-products-20261115",
+  "created": "2026-11-15",
+  "method": "AI-generated photographic cutout illustrations, arranged in original 4 by 2 atlases",
+  "generator": "OpenAI built-in image generation tool",
+  "localGpu": "Unavailable during this run; no local GPU job was submitted",
+  "transformation": "PNG sources encoded to WebP quality 82 with alpha preserved; occupied alpha bounds used for cropping",
+  "scope": {"bakery": 56, "sabzi": 56, "grocery": 67},
+  "actualPhotos": "Existing supplied product photos always take precedence; 176 generated images are used across 179 catalogue entries",
+  "disclosure": "AI-generated product illustrations; appearance may differ from actual stock.",
+  "representation": "Photographic cutouts in the existing 3D shops, not multi-view scans or verified stock photography",
+  "catalogue": "Existing names, rates, sample notices, units and product data are preserved"
+}

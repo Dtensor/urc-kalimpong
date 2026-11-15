@@ -4,11 +4,14 @@ from PIL import Image
 import hashlib,json
 w=Path('.')
 plan=json.loads((w/'photographic-source/plan.json').read_text());dest=w/'complex/shared/products';dest.mkdir(parents=True,exist_ok=True)
+previous=json.loads((dest/'manifest.json').read_text()) if (dest/'manifest.json').exists() else {'venues':{}}
 manifest={'version':'photographic-products-20261115','disclosure':'AI-generated product illustrations; appearance may differ from actual stock. Supplied product photos take precedence.','venues':{}}
 for sheet in plan:
  if sheet['status']!='generated_reviewed':continue
  source=w/sheet['source'];im=Image.open(source).convert('RGBA');target=dest/(sheet['id']+'.webp')
- im.save(target,'WEBP',quality=82,method=6)
+ prior=next((s for s in previous['venues'].get(sheet['venue'],{}).get('sheets',[]) if s['file']==target.name),None)
+ if not (prior and target.exists() and prior['sourceSha256']==hashlib.sha256(source.read_bytes()).hexdigest() and prior['sha256']==hashlib.sha256(target.read_bytes()).hexdigest()):
+  im.save(target,'WEBP',quality=82,method=6)
  alpha=im.getchannel('A');cw,ch=im.width//4,im.height//2
  venue=manifest['venues'].setdefault(sheet['venue'],{'sheets':[],'items':{}});venue['sheets'].append({'file':target.name,'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'sourceSha256':hashlib.sha256(source.read_bytes()).hexdigest()})
  for idx,item in enumerate(sheet['items']):
