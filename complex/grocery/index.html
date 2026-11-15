@@ -89,7 +89,7 @@ button{cursor:pointer}
 #credit{position:fixed;right:18px;bottom:calc(60px + env(safe-area-inset-bottom));z-index:3;font-size:10.5px;letter-spacing:.02em;color:#3a3f4c;padding:3px 9px;border-radius:999px;background:rgba(250,248,242,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 1px 3px rgba(0,0,0,.12);pointer-events:none}
 @keyframes bump{30%{transform:scale(1.12)}}
 .fly{position:fixed;z-index:30;width:64px;height:64px;object-fit:contain;pointer-events:none;transition:transform .7s cubic-bezier(.5,-.3,.7,1),opacity .7s}
-#hold{position:fixed;inset:0;z-index:10;display:grid;grid-template-columns:minmax(0,1fr) 380px;background:rgba(12,14,22,.4);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#hold{position:fixed;inset:0;z-index:30;display:grid;grid-template-columns:minmax(0,1fr) 380px;background:rgba(12,14,22,.4);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 #stagehand{position:relative;perspective:900px;display:grid;place-items:center;touch-action:none;cursor:grab;overflow:hidden}
 #stagehand.drag{cursor:grabbing}
 .obj{position:relative;transform-style:preserve-3d;transition:transform .08s linear}
@@ -223,8 +223,9 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
   #ledger .page h3,#ledger .empty{padding-left:44px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+#obj.photographic .front{background:transparent;box-shadow:none;border:0}#obj.photographic .front img{object-fit:contain}
 </style>
-<meta name="kalimpong-release" content="visual-extension-20261114">
 </head>
 <body data-venue="grocery" data-material-root="../shared/">
 <canvas id="gl" aria-label="3D view of Station Grocery"></canvas>
@@ -524,6 +525,7 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
 
 </script>
 <script src="../shared/nav.js"></script>
+<script src="../shared/photographic-products.js"></script>
 <script>
 'use strict';
 /* Station Grocery: a kirana that grew into a small supermarket. Everything on the
@@ -699,6 +701,7 @@ function buildPriceAtlas(list){
 /* thumbnails and hand-view faces, drawn lazily and cached */
 const THUMB={};const PHOTO={};
 function thumb(it){
+  if(PhotographicProducts.has(it))return PhotographicProducts.url(it);
   if(THUMB[it.id])return THUMB[it.id];
   const c=document.createElement('canvas');c.width=c.height=160;const g=c.getContext('2d');g.fillStyle='#f6f2ea';g.fillRect(0,0,160,160);
   const k=it.look.kind;
@@ -727,13 +730,15 @@ function drawJarArt(g,w,h,it){
 }
 /* the big front face for the hand view */
 function frontFace(it){
+  if(PhotographicProducts.has(it))return{src:PhotographicProducts.url(it),a:1};
   const k=it.look.kind;if(PHOTO[it.id]){const a=labelAspect(k==='bin'?'pack':k),c=document.createElement('canvas');c.width=Math.round(440*Math.min(1,a));c.height=Math.round(c.width/a);drawPhoto(c.getContext('2d'),c.width,c.height,PHOTO[it.id]);return{src:c.toDataURL('image/jpeg',.9),a}}
   if(k==='bin'||it.look.spot==='counter'){const c=document.createElement('canvas');c.width=c.height=440;const g=c.getContext('2d');g.fillStyle='#f3efe6';g.fillRect(0,0,440,440);(k==='bin'?drawBag:drawJarArt)(g,440,440,it);return{src:c.toDataURL('image/png'),a:1}}
   const a=labelAspect(k),c=document.createElement('canvas');let W=440,H=W/a;if(H>520){H=520;W=H*a}c.width=Math.round(W);c.height=Math.round(H);drawLabel(c.getContext('2d'),c.width,c.height,it);return{src:c.toDataURL('image/png'),a:c.width/c.height};
 }
 
 /* ================================ 3D scene ================================ */
-let renderer,scene,camera;const EYE=1.55;
+let renderer,scene,camera,photographs;const EYE=1.55;
+function photoAt(it,x,y,z,ry,w,h,rx=0){const o=new THREE.Object3D();o.position.set(x,y,z);o.rotation.set(rx,ry,0,"YXZ");o.updateMatrix();return photographs.add(it,o.matrix,w,h);}
 const cam={x:0,z:6.2,yaw:0,pitch:-.05};
 const ROOM={x:5.2,zn:-9.2,zs:7.8,h:4.6};
 const WIN={zc:1.25,w:2.2,sill:.95,spring:2.55,apex:3.45,z0:-.6,z1:3.1};
@@ -940,7 +945,8 @@ function fillSlot(it,bay,t,h,first){
   const stack=(fh<.15&&k==='box')?2:1,ry=bay.side>0?-Math.PI/2:Math.PI/2,uv=cellUV(it);
   for(let j=0;j<n;j++)for(let r=0;r<rows;r++)for(let st=0;st<stack;st++){
     const z=zc+(-usable/2+(j+.5)*usable/n)*bay.dir,x=bay.side*(SH.front+.035+fd/2+r*(fd+.018));
-    (KL[k]=KL[k]||[]).push({x,y:by+st*fh*1.002,z,ry:ry+(rnd()-.5)*.07,s,uv})}
+    if(PhotographicProducts.has(it)){if(r===0&&st===0)photoAt(it,x,by,z,ry,Math.min(fw*1.18,usable/n*.94),Math.min(fh*1.1,.32));}
+    else (KL[k]=KL[k]||[]).push({x,y:by+st*fh*1.002,z,ry:ry+(rnd()-.5)*.07,s,uv})}
   addHit(it.id,bay.side*(SH.front+.2),by+.2,zc,.42,.4,half-.03);
   PRICE.push({x:bay.side*(SH.front-.009),y:by-.013,z:zc,ry,it,w:.2,h:.05});
   if(first)ANCH[it.id]={x:bay.side*(SH.front+.08),y:by+fh*.6,z:zc,stand:{x:bay.side*2.85,z:zc,yaw:ry}};
@@ -956,7 +962,7 @@ function layoutIsland(bins){
     const z=zmid-(rows-1)*pitch/2+j*pitch,dz=pitch-.14,H=.74;
     bx('l',cx,.1,z,.96,H-.1,dz,'#8a5a2e');bx('l',cx+side*.481,.16,z,.01,H-.2,dz-.12,'#6e4526');
     for(const e of[-1,1]){bx('p',cx+e*.48,H-.02,z,.03,.05,dz+.03,'#c9ccd1');bx('p',cx,H-.02,z+e*dz/2,.99,.05,.03,'#c9ccd1')}
-    heaps.push({x:cx,y:H-.07,z,sx:.45,sy:.2,sz:dz/2-.02,col:it.look.tint||'#eee'});
+    if(!photoAt(it,cx,H-.01,z,side*Math.PI/2,Math.min(.85,dz*.96),.42,-.38))heaps.push({x:cx,y:H-.07,z,sx:.45,sy:.2,sz:dz/2-.02,col:it.look.tint||'#eee'});
     ba('p',cx+side*.12,H+.06,z+dz*.18,.075,'#dfe3e8',.55);bx('p',cx-side*.02,H+.08,z+dz*.18,.22,.018,.035,'#c9ccd1',side*.35);
     TAGS.push({x:cx+side*.49,y:.42,z,ry:side>0?Math.PI/2:-Math.PI/2,it});
     addHit(it.id,cx,.55,z,.98,1.1,dz);
@@ -981,11 +987,13 @@ function layoutCounter(jars){
   for(let x=-C0.x+.1;x<C0.x-.3;x+=.63){bx('l',x+.28,.2,C0.z1+.01,.52,.58,.02,'#8a5a2e');bx('l',x+.28,.26,C0.z1+.02,.4,.46,.02,'#6e4526');ba('brass',x+.28,.49,C0.z1+.035,.018,'#c9a227')}
   /* big glass candy jars */
   jars.forEach((it,i)=>{const row=Math.floor(i/6),x=1.35+(i%6)*.46,zz=-6.42-row*.3,y=1.0,t=it.look.tint||'#e0457a';
+    if(!photoAt(it,x,y,zz,0,.38,.46)){
     cy('glass',x,y,zz,.13,.32,'#e6f2f6');cy('p',x,y,zz,.135,.015,'#dfe3e8');
     const lolly=it.look.motif==='lolly';seed=i*13+5;
     for(let k=0;k<38;k++){const a=rnd()*6.28,d=Math.sqrt(rnd())*.095;ba('l',x+Math.cos(a)*d,y+.04+rnd()*.2,zz+Math.sin(a)*d,.026,[t,shade(t,.35),shade(t,-.25),'#f6d23a','#fff4e0'][k%5])}
     if(lolly){for(let k=0;k<7;k++){const a=k*.9,d=.05;cy('l',x+Math.cos(a)*d,y+.16,zz+Math.sin(a)*d,.006,.3,'#f4efe4',Math.cos(a)*.18,-Math.sin(a)*.18);ba('l',x+Math.cos(a)*(d+.03),y+.47,zz+Math.sin(a)*(d+.03),.045,['#d0281c','#f6d23a','#e0457a','#f08a1c','#6aa85a','#9a4ad0','#2f6fb3'][k],.7)}}
     else{cy('brass',x,y+.32,zz,.12,.04,'#c9a227');ba('brass',x,y+.37,zz,.03,'#c9a227')}
+    }
     PRICE.push({x,y:.965,z:C0.z1-.03,ry:0,it,w:.22,h:.055});
     addHit(it.id,x,y+.2,zz,.3,.5,.3);ANCH[it.id]={x,y:y+.2,z:zz,stand:{x:Math.max(-3.9,Math.min(3.9,x)),z:-5.0,yaw:0,pitch:-.26}};
     if(!SECANCH[it.section])SECANCH[it.section]={x:2.2,z:-5.0,yaw:0,pitch:-.2};
@@ -1045,16 +1053,18 @@ function layoutSacks(sacks){
   if(!sacks.length)return;bx('l',-4.72,0,WIN.zc,.8,.12,3.3,'#8a5a2e');bx('l',-4.72,.12,WIN.zc,.82,.02,3.34,'#6e4526');
   const n=sacks.length*2;let i=0;
   for(const it of sacks)for(let k=0;k<2;k++,i++){const z=WIN.zc-1.35+(i+.5)*2.7/n,s=it.look.size||1;
-    (KL.sack=KL.sack||[]).push({x:-4.72,y:.14,z,ry:Math.PI/2+(k?-.2:.15),s,uv:cellUV(it)});
+    if(!photoAt(it,-4.72,.14,z,Math.PI/2,.45,.64)) (KL.sack=KL.sack||[]).push({x:-4.72,y:.14,z,ry:Math.PI/2+(k?-.2:.15),s,uv:cellUV(it)});
     if(!k){addHit(it.id,-4.6,.45,z+1.35/n,.7,.9,2.7/n*2-.05);PRICE.push({x:-4.305,y:.07,z:z+1.35/n,ry:Math.PI/2,it,w:.26,h:.065});
       ANCH[it.id]={x:-4.62,y:.55,z,stand:{x:-2.9,z:z+1.35/n,yaw:Math.PI/2,pitch:-.3}}}}
   if(!SECANCH.__sacks)SECANCH.__sacks={x:-2.9,z:WIN.zc,yaw:Math.PI/2,pitch:-.1};
 }
 function buildProducts(){
+  photographs=PhotographicProducts.createBatch(THREE,scene);
   const shelf=[],bins=[],jars=[],sacks=[];
   for(const it of ITEMS){const k=it.look.kind;if(k==='bin')bins.push(it);else if(it.look.spot==='counter')jars.push(it);else if(k==='sack')sacks.push(it);else shelf.push(it)}
   buildAtlas(shelf.concat(sacks));buildPriceAtlas(ITEMS);
   seed=21;layoutShelves(shelf);layoutIsland(bins);layoutCounter(jars);layoutSacks(sacks);layoutBackWalls();layoutJute();
+  photographs.finish();
   ATL.tex=canvasTex(ATL.canvas);ATL.tex.generateMipmaps=true;const am=atlasMaterial(ATL.tex);
   for(const k in KL)cellMesh(kindGeo(k),am,KL[k]);
   /* price strips and bin slates share one quad and the per-instance cell trick */
@@ -1224,8 +1234,8 @@ function dims(it){const k=it.look.kind,s=it.look.size||1;if(k==='bin')return{w:.
 function hold(it){
   if(!it)return;hideGaze();held=it;hq=basket[it.id]||(loose(it)?1:1);rot={x:-.12,y:-.5};
   const ff=frontFace(it),dm=dims(it),sc=SECT[it.section]||{},side=it.look.spot==='counter'?'rgba(200,225,235,.7)':lidColor(it);
-  let H=300,W=H*ff.a;if(W>260){W=260;H=W/ff.a}const D=Math.max(34,Math.min(W*.9,W*dm.d/dm.w));
-  const o=$('#obj');o.style.width=W+'px';o.style.height=H+'px';o.style.setProperty('--sidec',side);
+  let H=300,W=H*ff.a;if(W>260){W=260;H=W/ff.a}const D=PhotographicProducts.has(it)?2:Math.max(34,Math.min(W*.9,W*dm.d/dm.w));
+  const o=$('#obj');o.classList.toggle('photographic',PhotographicProducts.has(it));if(PhotographicProducts.has(it))rot={x:0,y:0};o.style.width=W+'px';o.style.height=H+'px';o.style.setProperty('--sidec',side);
   const f=(cls,fw,fh,tr,inner='',st='')=>`<div class="f ${cls}" style="width:${fw}px;height:${fh}px;margin:${-fh/2}px 0 0 ${-fw/2}px;transform:${tr};${st}">${inner}</div>`;
   const rad=dm.round?`border-radius:${D/2}px`:'';
   o.innerHTML=f('front',W,H,`translateZ(${D/2}px)`,`<img src="${ff.src}" alt="" draggable="false">`)+
@@ -1235,7 +1245,7 @@ function hold(it){
   o.dataset.h=H;drawHand();card(it);$('#hold').hidden=false;
   const st=$('#stagehand');zoom=Math.min(1,(st.clientHeight*.6)/(H+70),(st.clientWidth*.56)/W);turn();
 }
-function turn(){$('#obj').style.transform=`scale(${zoom}) rotateX(${rot.x}rad) rotateY(${rot.y}rad)`;$('#hand').style.transform=`translate(-50%, ${(+$('#obj').dataset.h/2)*zoom-78}px) scale(${zoom})`}
+function turn(){const front=Math.cos(rot.y)>=0;for(const f of $("#obj").querySelectorAll(".front,.back"))f.style.visibility=(f.classList.contains("front")===front)?"visible":"hidden";$('#obj').style.transform=`scale(${zoom}) rotateX(${rot.x}rad) rotateY(${rot.y}rad)`;$('#hand').style.transform=`translate(-50%, ${(+$('#obj').dataset.h/2)*zoom-78}px) scale(${zoom})`}
 function drawHand(){const h=$('#hand');h.setAttribute('viewBox','0 0 300 230');h.setAttribute('width','300');h.setAttribute('height','230');
   h.innerHTML=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a57e"/><stop offset="1" stop-color="#b57f5a"/></linearGradient></defs>
   <path d="M40 150 C 30 110, 60 90, 90 96 L 225 96 C 262 96, 282 118, 276 150 L 262 200 C 250 218, 70 222, 56 204 Z" fill="url(#sk)"/>
@@ -1260,7 +1270,7 @@ function card(it){
   <div class="stock ${low?'low':''}">${it.qty==null?'':low?`Only ${esc(fmtQty(it,it.qty))} left`:loose(it)?'Plenty in the bin, weighed to order':'On the shelf'}</div>
   <div class="qrow"><span class="qty"><button data-a="dec" aria-label="Less">−</button><span id="hq"></span><button data-a="inc" aria-label="More">+</button></span><span class="sum" id="hsum"></span></div>
   <div class="acts"><button class="btn pri" data-a="add" id="hadd">${inB?'Update basket':'Add to basket'}</button><button class="btn" data-a="sim">Show similar</button>${inB?'<button class="btn" data-a="rm">Take it out</button>':''}</div>
-  <p class="note">${loose(it)?'Loose: steps of 250 g. Weighed at the counter. ':''}Sample item: real list and rates coming soon.</p>
+  <p class="note">${loose(it)?'Loose: steps of 250 g. Weighed at the counter. ':''}Sample item: real list and rates coming soon. ${PhotographicProducts.has(it)?PhotographicProducts.disclosure:""}</p>
   ${sim.length?`<div class="sec">Also in ${esc(SHORT[it.section]||sc.name||'')}</div><div class="sim">${sim.map(x=>`<button data-id="${esc(x.id)}"><img src="${thumb(x)}" alt=""><b>${esc(x.name)}</b><small>${INR(x.price)} ${esc(unitShort(x))}</small></button>`).join('')}</div>`:''}`;
   hqPaint();
 }
@@ -1361,8 +1371,10 @@ async function boot(){
   let d;try{const r=await fetch('data.json',{cache:'no-cache'});if(!r.ok)throw new Error(r.status);d=await r.json()}catch(e){$('#itag').textContent='The shop list could not be loaded. Please refresh.';return}
   DATA=d;SECTS=(d.sections||[]).filter(s=>s&&s.id);SECT={};for(const s of SECTS)SECT[s.id]=s;
   ITEMS=(d.items||[]).filter(it=>it&&it.id&&it.name&&SECT[it.section]).map(normalise);BYID={};for(const it of ITEMS)BYID[it.id]=it;
+  const productImages=PhotographicProducts.prepare("grocery",ITEMS,"../shared/");
   loadBasket();paintTrolley();
   try{await Promise.race([Promise.all(['500 20px Fraunces','600 20px Fraunces','400 16px "Instrument Sans"','600 16px "Instrument Sans"','700 16px "Instrument Sans"'].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))])}catch(e){}
+  await productImages;
   const shop=d.shop||{},bins=ITEMS.filter(i=>i.look.kind==='bin').length;
   $('#istats').innerHTML=`<div><b>${ITEMS.length}</b><span>items</span></div><div><b>${SECTS.length}</b><span>sections</span></div><div><b>${bins}</b><span>open bins</span></div>`;
   if(shop.note)$('#inote').textContent=shop.note;

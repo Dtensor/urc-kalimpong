@@ -1,0 +1,1952 @@
+{
+  "version": "photographic-products-20261115",
+  "disclosure": "AI-generated product illustrations; appearance may differ from actual stock. Supplied product photos take precedence.",
+  "venues": {
+    "bakery": {
+      "sheets": [
+        {
+          "file": "bakery-01.webp",
+          "bytes": 374252,
+          "sha256": "f80d8597cae224d0779ac754d56af380d27157cacecd604ceb8ced072b24f1fd",
+          "sourceSha256": "a311184a8649db1b83a0625ae8d38049944c5665fe33990a686882ebe6d30988"
+        },
+        {
+          "file": "bakery-02.webp",
+          "bytes": 288210,
+          "sha256": "855cd9be716e42eb425f9ebf1ee14f822f63f6e552067163d74b6a655fc4b335",
+          "sourceSha256": "2e7cf4f93932f7954efd622f6a5382fcc11ebdd03ee908dbb25b6c062d211664"
+        },
+        {
+          "file": "bakery-03.webp",
+          "bytes": 244316,
+          "sha256": "e0f81cfe936e8801fd74bd30c49d3486327fa71fbb4c97211fdfab556059c54c",
+          "sourceSha256": "4df4151392b973bb7d4ca0c6e9095180dada70e6506b73dde61bbc92f6ba088d"
+        },
+        {
+          "file": "bakery-04.webp",
+          "bytes": 327216,
+          "sha256": "8b11f0cd5c63a1673d53468eff4249f62cf2bdb8fbed348c83dc4fca971b4708",
+          "sourceSha256": "6aef6fc84221e83e26b9954cab7252a6afe70b180d30377aa359614f0bba57e4"
+        },
+        {
+          "file": "bakery-05.webp",
+          "bytes": 318122,
+          "sha256": "3f67d86b46228eff9909980f8f22293c3a0d011d103e01c18206f1012ef04f3b",
+          "sourceSha256": "6da42e4f14f66016e2f684a2cc66eb92e2cd5f34a8666f307773307b6de08d48"
+        },
+        {
+          "file": "bakery-06.webp",
+          "bytes": 322438,
+          "sha256": "4eb6aea958516d46d311c6692abe523daa01840543700fa70c5b077f342b9421",
+          "sourceSha256": "a95843b84dd70f194f15385fd879e74d24812cea42907f1716dbf0da80bf5f86"
+        },
+        {
+          "file": "bakery-07.webp",
+          "bytes": 327594,
+          "sha256": "c89760568636ddc30b2430cdf2511925364adb09b33c752ba4fbb4a874165dea",
+          "sourceSha256": "9fab50506ee15e50c6ec6f656dc0027c2bb31d597f7d5685b027c12f068198b3"
+        }
+      ],
+      "items": {
+        "milk-bread-400g": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            7,
+            96,
+            364,
+            382
+          ],
+          "generated": true
+        },
+        "brown-bread-400g": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            400,
+            101,
+            347,
+            376
+          ],
+          "generated": true
+        },
+        "multigrain-loaf": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            773,
+            106,
+            350,
+            372
+          ],
+          "generated": true
+        },
+        "fruit-bread": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            1153,
+            107,
+            368,
+            373
+          ],
+          "generated": true
+        },
+        "ladi-pav-6": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            11,
+            615,
+            368,
+            314
+          ],
+          "generated": true
+        },
+        "burger-buns-4": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            396,
+            595,
+            361,
+            322
+          ],
+          "generated": true
+        },
+        "sweet-bun": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            780,
+            605,
+            372,
+            308
+          ],
+          "generated": true
+        },
+        "garlic-baguette": {
+          "sheet": "bakery-01.webp",
+          "rect": [
+            1152,
+            636,
+            379,
+            268
+          ],
+          "generated": true
+        },
+        "hill-sourdough": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            10,
+            100,
+            366,
+            349
+          ],
+          "generated": true
+        },
+        "toast-rusk-200g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            401,
+            125,
+            348,
+            306
+          ],
+          "generated": true
+        },
+        "black-forest-500g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            777,
+            67,
+            358,
+            379
+          ],
+          "generated": true
+        },
+        "pineapple-cake-500g": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            1166,
+            97,
+            353,
+            352
+          ],
+          "generated": true
+        },
+        "red-velvet-slice": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            27,
+            582,
+            325,
+            374
+          ],
+          "generated": true
+        },
+        "truffle-slice": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            404,
+            583,
+            333,
+            376
+          ],
+          "generated": true
+        },
+        "butter-croissant": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            777,
+            611,
+            365,
+            303
+          ],
+          "generated": true
+        },
+        "chocolate-eclair": {
+          "sheet": "bakery-02.webp",
+          "rect": [
+            1163,
+            629,
+            364,
+            283
+          ],
+          "generated": true
+        },
+        "cream-roll": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            8,
+            119,
+            370,
+            332
+          ],
+          "generated": true
+        },
+        "strawberry-cupcake": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            413,
+            51,
+            321,
+            423
+          ],
+          "generated": true
+        },
+        "glazed-doughnut": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            769,
+            135,
+            371,
+            300
+          ],
+          "generated": true
+        },
+        "fruit-danish": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            1154,
+            118,
+            374,
+            324
+          ],
+          "generated": true
+        },
+        "choco-chip-cookies": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            9,
+            610,
+            371,
+            333
+          ],
+          "generated": true
+        },
+        "butter-cookies": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            395,
+            606,
+            359,
+            328
+          ],
+          "generated": true
+        },
+        "coconut-macaroons": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            780,
+            625,
+            361,
+            311
+          ],
+          "generated": true
+        },
+        "nankhatai": {
+          "sheet": "bakery-03.webp",
+          "rect": [
+            1161,
+            604,
+            367,
+            336
+          ],
+          "generated": true
+        },
+        "jeera-biscuits": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            31,
+            121,
+            333,
+            318
+          ],
+          "generated": true
+        },
+        "almond-biscotti": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            392,
+            111,
+            373,
+            346
+          ],
+          "generated": true
+        },
+        "salt-biscuits": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            789,
+            111,
+            336,
+            328
+          ],
+          "generated": true
+        },
+        "oat-raisin-cookies": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            1156,
+            126,
+            357,
+            303
+          ],
+          "generated": true
+        },
+        "assorted-cookie-jar": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            52,
+            568,
+            280,
+            379
+          ],
+          "generated": true
+        },
+        "veg-puff": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            386,
+            608,
+            357,
+            305
+          ],
+          "generated": true
+        },
+        "egg-puff": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            768,
+            613,
+            358,
+            297
+          ],
+          "generated": true
+        },
+        "chicken-patty": {
+          "sheet": "bakery-04.webp",
+          "rect": [
+            1160,
+            619,
+            343,
+            296
+          ],
+          "generated": true
+        },
+        "paneer-roll": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            17,
+            120,
+            361,
+            319
+          ],
+          "generated": true
+        },
+        "veg-momos-8": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            399,
+            122,
+            356,
+            309
+          ],
+          "generated": true
+        },
+        "chicken-momos-8": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            778,
+            121,
+            358,
+            317
+          ],
+          "generated": true
+        },
+        "sausage-roll": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            1159,
+            114,
+            356,
+            323
+          ],
+          "generated": true
+        },
+        "cheese-garlic-bun": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            21,
+            606,
+            347,
+            332
+          ],
+          "generated": true
+        },
+        "pizza-bun": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            398,
+            607,
+            346,
+            331
+          ],
+          "generated": true
+        },
+        "kalimpong-lollipops-10": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            778,
+            598,
+            353,
+            346
+          ],
+          "generated": true
+        },
+        "kalimpong-ginger-biscuits": {
+          "sheet": "bakery-05.webp",
+          "rect": [
+            1154,
+            601,
+            362,
+            352
+          ],
+          "generated": true
+        },
+        "kalimpong-cheese-200g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            32,
+            116,
+            352,
+            321
+          ],
+          "generated": true
+        },
+        "hard-churpi-100g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            384,
+            105,
+            353,
+            320
+          ],
+          "generated": true
+        },
+        "soft-churpi-250g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            769,
+            118,
+            383,
+            317
+          ],
+          "generated": true
+        },
+        "darjeeling-tea-cake": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            1152,
+            94,
+            363,
+            359
+          ],
+          "generated": true
+        },
+        "mandarin-marmalade": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            41,
+            555,
+            343,
+            399
+          ],
+          "generated": true
+        },
+        "cardamom-rusk-200g": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            384,
+            557,
+            361,
+            396
+          ],
+          "generated": true
+        },
+        "dalle-chilli-pickle": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            788,
+            554,
+            364,
+            398
+          ],
+          "generated": true
+        },
+        "mandarin-muffin": {
+          "sheet": "bakery-06.webp",
+          "rect": [
+            1152,
+            580,
+            360,
+            346
+          ],
+          "generated": true
+        },
+        "kanchenjunga-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            16,
+            111,
+            359,
+            315
+          ],
+          "generated": true
+        },
+        "christmas-plum-cake": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            394,
+            123,
+            362,
+            290
+          ],
+          "generated": true
+        },
+        "birthday-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            779,
+            88,
+            359,
+            335
+          ],
+          "generated": true
+        },
+        "losar-khapse-box": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            1159,
+            59,
+            362,
+            388
+          ],
+          "generated": true
+        },
+        "diwali-cookie-hamper": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            21,
+            584,
+            351,
+            382
+          ],
+          "generated": true
+        },
+        "photo-cake-1kg": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            395,
+            615,
+            362,
+            323
+          ],
+          "generated": true
+        },
+        "cupcake-dozen": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            779,
+            615,
+            368,
+            317
+          ],
+          "generated": true
+        },
+        "tiered-wedding-cake": {
+          "sheet": "bakery-07.webp",
+          "rect": [
+            1162,
+            536,
+            360,
+            434
+          ],
+          "generated": true
+        }
+      }
+    },
+    "sabzi": {
+      "sheets": [
+        {
+          "file": "sabzi-01.webp",
+          "bytes": 279326,
+          "sha256": "3e1df45ea6b907a74eaa9736a7b9f1e030527edae7d9f4435b64f16595781727",
+          "sourceSha256": "638079bfb86dac8a3f70a8e21b3022aa341167425130ed62904906081577399c"
+        },
+        {
+          "file": "sabzi-02.webp",
+          "bytes": 258370,
+          "sha256": "3c886ac9389b9329407432980afb9a094cae35199380d30c9acfa581ec221779",
+          "sourceSha256": "25da39ebd1ecf2fa270c1fc249d189a0ad97a1cb51b01c100525b112e3437a1d"
+        },
+        {
+          "file": "sabzi-03.webp",
+          "bytes": 335088,
+          "sha256": "457df6798f0e69f246d65cd52ff3c34a4ecc646dcb90fdb4349b887a2285c1d2",
+          "sourceSha256": "0375f830361a2f6df7a4d75879c2f193dda3f79d9a8c009ad77c943c57788697"
+        },
+        {
+          "file": "sabzi-04.webp",
+          "bytes": 301072,
+          "sha256": "6a7bfd27af8252df0871a04fb2464553d33811b96ed1a6643d4f5257a0d91085",
+          "sourceSha256": "e9556049524c9b5ee6c848b627d10d01fbe5f662f878bd3a9bb4073d0b093215"
+        },
+        {
+          "file": "sabzi-05.webp",
+          "bytes": 270248,
+          "sha256": "17b4f965ec91a8e70cedf264f9ba0fcc5554d50175925ff1a980bc130f4dbbd8",
+          "sourceSha256": "e699655247644b337525e44e807fdfd59f9f4ddc46cf15f0c8b2bd8ad33e54c2"
+        },
+        {
+          "file": "sabzi-06.webp",
+          "bytes": 306296,
+          "sha256": "6612c2d58efa6e5e160c3920118022cf80ba8a59e9daa848f0b7b9817c2d6177",
+          "sourceSha256": "df72a1b4401bdf793999346ca1ee731091879ec7eca545bb8a7764f1c752ee62"
+        },
+        {
+          "file": "sabzi-07.webp",
+          "bytes": 261972,
+          "sha256": "935ba4c7a2d366c0c9ff5ac679afdb6e86ca8a3de197e18a25e68a50d4921d2c",
+          "sourceSha256": "b958fe288a2082588c16de4c462c4f56b4db3321efceb06950c5a67e659005af"
+        }
+      ],
+      "items": {
+        "tomato": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            18,
+            76,
+            354,
+            347
+          ],
+          "generated": true
+        },
+        "potato": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            411,
+            110,
+            340,
+            294
+          ],
+          "generated": true
+        },
+        "onion": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            782,
+            87,
+            354,
+            342
+          ],
+          "generated": true
+        },
+        "cauliflower": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            1153,
+            73,
+            366,
+            358
+          ],
+          "generated": true
+        },
+        "cabbage": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            20,
+            580,
+            346,
+            356
+          ],
+          "generated": true
+        },
+        "carrot": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            401,
+            536,
+            356,
+            442
+          ],
+          "generated": true
+        },
+        "brinjal": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            780,
+            563,
+            358,
+            394
+          ],
+          "generated": true
+        },
+        "okra": {
+          "sheet": "sabzi-01.webp",
+          "rect": [
+            1162,
+            582,
+            360,
+            364
+          ],
+          "generated": true
+        },
+        "green-peas": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            25,
+            122,
+            349,
+            292
+          ],
+          "generated": true
+        },
+        "french-beans": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            401,
+            124,
+            349,
+            319
+          ],
+          "generated": true
+        },
+        "cucumber": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            775,
+            131,
+            353,
+            283
+          ],
+          "generated": true
+        },
+        "capsicum": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            1154,
+            94,
+            359,
+            330
+          ],
+          "generated": true
+        },
+        "bottle-gourd": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            29,
+            586,
+            341,
+            373
+          ],
+          "generated": true
+        },
+        "pumpkin": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            394,
+            591,
+            354,
+            340
+          ],
+          "generated": true
+        },
+        "radish": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            791,
+            529,
+            349,
+            462
+          ],
+          "generated": true
+        },
+        "beetroot": {
+          "sheet": "sabzi-02.webp",
+          "rect": [
+            1154,
+            592,
+            357,
+            375
+          ],
+          "generated": true
+        },
+        "spinach": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            21,
+            79,
+            341,
+            369
+          ],
+          "generated": true
+        },
+        "methi": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            390,
+            82,
+            357,
+            382
+          ],
+          "generated": true
+        },
+        "mustard-greens": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            769,
+            76,
+            369,
+            381
+          ],
+          "generated": true
+        },
+        "lettuce": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            1152,
+            97,
+            369,
+            341
+          ],
+          "generated": true
+        },
+        "pak-choi": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            7,
+            579,
+            377,
+            333
+          ],
+          "generated": true
+        },
+        "spring-onion": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            384,
+            532,
+            384,
+            425
+          ],
+          "generated": true
+        },
+        "amaranth": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            768,
+            534,
+            379,
+            426
+          ],
+          "generated": true
+        },
+        "broccoli": {
+          "sheet": "sabzi-03.webp",
+          "rect": [
+            1161,
+            554,
+            355,
+            377
+          ],
+          "generated": true
+        },
+        "iskus": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            13,
+            95,
+            353,
+            339
+          ],
+          "generated": true
+        },
+        "dalle": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            404,
+            110,
+            346,
+            314
+          ],
+          "generated": true
+        },
+        "ginger": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            783,
+            113,
+            351,
+            307
+          ],
+          "generated": true
+        },
+        "large-cardamom": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            1163,
+            112,
+            361,
+            303
+          ],
+          "generated": true
+        },
+        "rayo-saag": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            12,
+            543,
+            362,
+            436
+          ],
+          "generated": true
+        },
+        "bamboo-shoot": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            399,
+            538,
+            349,
+            429
+          ],
+          "generated": true
+        },
+        "yam": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            782,
+            599,
+            352,
+            322
+          ],
+          "generated": true
+        },
+        "ningro": {
+          "sheet": "sabzi-04.webp",
+          "rect": [
+            1181,
+            545,
+            325,
+            433
+          ],
+          "generated": true
+        },
+        "bhatmas": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            14,
+            154,
+            360,
+            247
+          ],
+          "generated": true
+        },
+        "mandarin": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            396,
+            104,
+            354,
+            317
+          ],
+          "generated": true
+        },
+        "kiwi": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            772,
+            115,
+            360,
+            313
+          ],
+          "generated": true
+        },
+        "banana": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            1157,
+            100,
+            365,
+            327
+          ],
+          "generated": true
+        },
+        "apple": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            11,
+            598,
+            363,
+            363
+          ],
+          "generated": true
+        },
+        "pear": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            401,
+            570,
+            367,
+            403
+          ],
+          "generated": true
+        },
+        "papaya": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            768,
+            584,
+            368,
+            388
+          ],
+          "generated": true
+        },
+        "pineapple": {
+          "sheet": "sabzi-05.webp",
+          "rect": [
+            1183,
+            530,
+            327,
+            457
+          ],
+          "generated": true
+        },
+        "guava": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            17,
+            120,
+            349,
+            330
+          ],
+          "generated": true
+        },
+        "pomegranate": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            397,
+            86,
+            354,
+            370
+          ],
+          "generated": true
+        },
+        "lemon": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            784,
+            103,
+            338,
+            344
+          ],
+          "generated": true
+        },
+        "coriander": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            1160,
+            73,
+            362,
+            399
+          ],
+          "generated": true
+        },
+        "mint": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            10,
+            567,
+            370,
+            405
+          ],
+          "generated": true
+        },
+        "curry-leaf": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            392,
+            592,
+            374,
+            354
+          ],
+          "generated": true
+        },
+        "green-chilli": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            772,
+            599,
+            380,
+            347
+          ],
+          "generated": true
+        },
+        "garlic": {
+          "sheet": "sabzi-06.webp",
+          "rect": [
+            1152,
+            600,
+            377,
+            345
+          ],
+          "generated": true
+        },
+        "lemongrass": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            16,
+            90,
+            368,
+            388
+          ],
+          "generated": true
+        },
+        "timur": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            384,
+            148,
+            370,
+            280
+          ],
+          "generated": true
+        },
+        "toor-dal": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            782,
+            147,
+            356,
+            276
+          ],
+          "generated": true
+        },
+        "masoor-dal": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            1170,
+            150,
+            347,
+            277
+          ],
+          "generated": true
+        },
+        "rajma": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            13,
+            620,
+            364,
+            290
+          ],
+          "generated": true
+        },
+        "chana": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            397,
+            616,
+            359,
+            291
+          ],
+          "generated": true
+        },
+        "groundnut": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            781,
+            609,
+            354,
+            291
+          ],
+          "generated": true
+        },
+        "dry-chilli": {
+          "sheet": "sabzi-07.webp",
+          "rect": [
+            1157,
+            554,
+            367,
+            398
+          ],
+          "generated": true
+        }
+      }
+    },
+    "grocery": {
+      "sheets": [
+        {
+          "file": "grocery-01.webp",
+          "bytes": 241528,
+          "sha256": "8f4fdc7ff53abc1b88e59b41c238eba4c0645a9ec5d737ba7aad78772469b70f",
+          "sourceSha256": "0fc6c037ff0daa17a3a6e613504d84ccc70a5220414292aee01a9a12fd8bdcb2"
+        },
+        {
+          "file": "grocery-02.webp",
+          "bytes": 283412,
+          "sha256": "d8d8cc32ad225a10f550eaebcbf5df25aff8fa7ca8c133d4fe6e82afc424530d",
+          "sourceSha256": "ec07263679ad04a2bf7e224b140299e0ec30fd162f90f962fdf5b3e4f026f923"
+        },
+        {
+          "file": "grocery-03.webp",
+          "bytes": 276056,
+          "sha256": "86a99ffc3cf2838dca3e108d3e73ee21ed5a74c51a4c80e4f52d4a10a0422233",
+          "sourceSha256": "a04373b74a2ff215b19e17ce1c67f167b42a9fe9fee282419aca38b8ecf62227"
+        },
+        {
+          "file": "grocery-04.webp",
+          "bytes": 333616,
+          "sha256": "18eb822d96680c477c46eadb8729ee500d8b30f9a1539f69f3b31a095df00a1f",
+          "sourceSha256": "f157c338ffd2fad5071fdedac594144ea107c3ff5ac733c1d0606840a5008dc9"
+        },
+        {
+          "file": "grocery-05.webp",
+          "bytes": 139600,
+          "sha256": "c8c7531c028775577f9794b0e115425baa294039e5478929aec23d14fa526dba",
+          "sourceSha256": "1c04760885cf4e9dcd4b143cb2ac6057da4ec2647f76c1f3707ad110210395ff"
+        },
+        {
+          "file": "grocery-06.webp",
+          "bytes": 216544,
+          "sha256": "3ec147591114d8937f7dddd2f72c81e9a204f4e23e8aac3dbdc4996793c05a5b",
+          "sourceSha256": "93b7b3dbc24f82f3e69558236718f63762987fb8946a889677b6b3536c04bd4f"
+        },
+        {
+          "file": "grocery-07.webp",
+          "bytes": 277070,
+          "sha256": "0759f8f1b8c09e4ecc0203b58ab55d6f17c9fa9e24745ca61cce818170b0828b",
+          "sourceSha256": "19b8d3e96cf37629cb7837d157a6dcf0948cf2e8583a9a09830193d0527870cf"
+        },
+        {
+          "file": "grocery-08.webp",
+          "bytes": 198722,
+          "sha256": "e7f09f3798f6b7b9ec22083c0903f530930b4789935934aa97a90ffbf8fb7489",
+          "sourceSha256": "bc640a1c438b4a2a9602517f350fdbd381f191e849cc9a3e14a152e9dabfa241"
+        },
+        {
+          "file": "grocery-09.webp",
+          "bytes": 93068,
+          "sha256": "81eafcb5541207b451d83386083aa2ec045ba8e4395815ecc3575b6e056d7449",
+          "sourceSha256": "12f27088d80cbfecf059bde2bd682ac5a563e70dac7b011a3ea13d7fc97b7d19"
+        }
+      ],
+      "items": {
+        "sona-masoori-loose": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            12,
+            155,
+            372,
+            252
+          ],
+          "generated": true
+        },
+        "gobindobhog-loose": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            384,
+            192,
+            370,
+            206
+          ],
+          "generated": true
+        },
+        "chakki-atta-loose": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            769,
+            164,
+            374,
+            245
+          ],
+          "generated": true
+        },
+        "sugar-loose": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            1159,
+            175,
+            366,
+            239
+          ],
+          "generated": true
+        },
+        "poha-loose": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            15,
+            626,
+            369,
+            277
+          ],
+          "generated": true
+        },
+        "basmati-1kg": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            384,
+            531,
+            338,
+            439
+          ],
+          "generated": true
+        },
+        "hill-red-rice-1kg": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            803,
+            532,
+            349,
+            434
+          ],
+          "generated": true
+        },
+        "chakki-atta-5kg": {
+          "sheet": "grocery-01.webp",
+          "rect": [
+            1152,
+            547,
+            373,
+            398
+          ],
+          "generated": true
+        },
+        "maida-1kg": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            51,
+            58,
+            300,
+            452
+          ],
+          "generated": true
+        },
+        "suji-500g": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            434,
+            75,
+            294,
+            414
+          ],
+          "generated": true
+        },
+        "besan-500g": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            813,
+            78,
+            339,
+            410
+          ],
+          "generated": true
+        },
+        "rice-sack-25kg": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            1152,
+            64,
+            375,
+            430
+          ],
+          "generated": true
+        },
+        "atta-sack-10kg": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            6,
+            546,
+            378,
+            427
+          ],
+          "generated": true
+        },
+        "toor-dal-loose": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            384,
+            639,
+            373,
+            328
+          ],
+          "generated": true
+        },
+        "masoor-dal-loose": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            770,
+            639,
+            368,
+            269
+          ],
+          "generated": true
+        },
+        "moong-dal-loose": {
+          "sheet": "grocery-02.webp",
+          "rect": [
+            1157,
+            636,
+            369,
+            270
+          ],
+          "generated": true
+        },
+        "chana-dal-loose": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            27,
+            148,
+            350,
+            282
+          ],
+          "generated": true
+        },
+        "rajma-chitra-loose": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            405,
+            144,
+            346,
+            288
+          ],
+          "generated": true
+        },
+        "urad-whole-1kg": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            810,
+            61,
+            298,
+            419
+          ],
+          "generated": true
+        },
+        "kabuli-chana-1kg": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            1187,
+            62,
+            293,
+            417
+          ],
+          "generated": true
+        },
+        "turmeric-100g": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            46,
+            558,
+            302,
+            423
+          ],
+          "generated": true
+        },
+        "kashmiri-chilli-100g": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            426,
+            558,
+            301,
+            423
+          ],
+          "generated": true
+        },
+        "coriander-100g": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            804,
+            559,
+            302,
+            422
+          ],
+          "generated": true
+        },
+        "cumin-100g": {
+          "sheet": "grocery-03.webp",
+          "rect": [
+            1184,
+            560,
+            299,
+            421
+          ],
+          "generated": true
+        },
+        "garam-masala-50g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            47,
+            39,
+            295,
+            422
+          ],
+          "generated": true
+        },
+        "large-cardamom-50g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            427,
+            40,
+            297,
+            421
+          ],
+          "generated": true
+        },
+        "timur-50g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            812,
+            39,
+            297,
+            421
+          ],
+          "generated": true
+        },
+        "black-pepper-50g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            1196,
+            40,
+            294,
+            420
+          ],
+          "generated": true
+        },
+        "mustard-seeds-100g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            44,
+            552,
+            295,
+            420
+          ],
+          "generated": true
+        },
+        "dalle-pickle-200g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            412,
+            566,
+            325,
+            399
+          ],
+          "generated": true
+        },
+        "iskus-achar-250g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            800,
+            566,
+            324,
+            399
+          ],
+          "generated": true
+        },
+        "ginger-powder-100g": {
+          "sheet": "grocery-04.webp",
+          "rect": [
+            1198,
+            552,
+            296,
+            420
+          ],
+          "generated": true
+        },
+        "momo-masala-50g": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            62,
+            89,
+            258,
+            368
+          ],
+          "generated": true
+        },
+        "kasuri-methi-25g": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            447,
+            87,
+            258,
+            370
+          ],
+          "generated": true
+        },
+        "mustard-oil-1l": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            879,
+            20,
+            161,
+            470
+          ],
+          "generated": true
+        },
+        "sunflower-oil-1l": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            1200,
+            62,
+            275,
+            411
+          ],
+          "generated": true
+        },
+        "rice-bran-oil-1l": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            115,
+            531,
+            158,
+            460
+          ],
+          "generated": true
+        },
+        "coconut-oil-500ml": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            494,
+            585,
+            164,
+            383
+          ],
+          "generated": true
+        },
+        "desi-ghee-1l": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            815,
+            614,
+            277,
+            353
+          ],
+          "generated": true
+        },
+        "mustard-oil-15l": {
+          "sheet": "grocery-05.webp",
+          "rect": [
+            1186,
+            542,
+            318,
+            446
+          ],
+          "generated": true
+        },
+        "darjeeling-first-flush-100g": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            71,
+            112,
+            260,
+            374
+          ],
+          "generated": true
+        },
+        "darjeeling-tea-250g": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            409,
+            33,
+            311,
+            454
+          ],
+          "generated": true
+        },
+        "ctc-tea-500g": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            791,
+            30,
+            328,
+            457
+          ],
+          "generated": true
+        },
+        "tulsi-green-tea-25": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            1163,
+            71,
+            327,
+            420
+          ],
+          "generated": true
+        },
+        "instant-coffee-100g": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            57,
+            599,
+            280,
+            392
+          ],
+          "generated": true
+        },
+        "mandarin-squash-750ml": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            493,
+            535,
+            167,
+            468
+          ],
+          "generated": true
+        },
+        "lemon-squash-750ml": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            868,
+            534,
+            284,
+            465
+          ],
+          "generated": true
+        },
+        "kalimpong-lollipop": {
+          "sheet": "grocery-06.webp",
+          "rect": [
+            1152,
+            597,
+            361,
+            365
+          ],
+          "generated": true
+        },
+        "orange-toffee": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            9,
+            160,
+            375,
+            273
+          ],
+          "generated": true
+        },
+        "mint-sweets": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            384,
+            169,
+            363,
+            269
+          ],
+          "generated": true
+        },
+        "imli-candy": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            771,
+            116,
+            371,
+            347
+          ],
+          "generated": true
+        },
+        "churpi-100g": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            1190,
+            72,
+            308,
+            419
+          ],
+          "generated": true
+        },
+        "bhujia-400g": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            36,
+            551,
+            348,
+            415
+          ],
+          "generated": true
+        },
+        "cream-biscuits-150g": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            384,
+            638,
+            376,
+            287
+          ],
+          "generated": true
+        },
+        "milk-rusk-300g": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            773,
+            618,
+            369,
+            317
+          ],
+          "generated": true
+        },
+        "peanut-chikki-200g": {
+          "sheet": "grocery-07.webp",
+          "rect": [
+            1159,
+            604,
+            377,
+            341
+          ],
+          "generated": true
+        },
+        "instant-noodles-5": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            15,
+            80,
+            358,
+            398
+          ],
+          "generated": true
+        },
+        "jaggery-1kg": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            395,
+            115,
+            366,
+            318
+          ],
+          "generated": true
+        },
+        "detergent-1kg": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            792,
+            35,
+            332,
+            443
+          ],
+          "generated": true
+        },
+        "dishwash-bars-3": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            1173,
+            112,
+            344,
+            338
+          ],
+          "generated": true
+        },
+        "floor-cleaner-1l": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            96,
+            524,
+            194,
+            487
+          ],
+          "generated": true
+        },
+        "phenyl-1l": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            476,
+            527,
+            199,
+            484
+          ],
+          "generated": true
+        },
+        "bath-soap-4": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            776,
+            584,
+            354,
+            397
+          ],
+          "generated": true
+        },
+        "matchboxes-10": {
+          "sheet": "grocery-08.webp",
+          "rect": [
+            1168,
+            604,
+            350,
+            364
+          ],
+          "generated": true
+        },
+        "agarbatti-100": {
+          "sheet": "grocery-09.webp",
+          "rect": [
+            24,
+            94,
+            359,
+            385
+          ],
+          "generated": true
+        },
+        "candles-6": {
+          "sheet": "grocery-09.webp",
+          "rect": [
+            469,
+            45,
+            227,
+            437
+          ],
+          "generated": true
+        },
+        "mosquito-coils-10": {
+          "sheet": "grocery-09.webp",
+          "rect": [
+            779,
+            41,
+            358,
+            453
+          ],
+          "generated": true
+        }
+      }
+    }
+  }
+}
