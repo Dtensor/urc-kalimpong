@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const out='browser-evidence';fs.mkdirSync(out,{recursive:true});
-const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet'],['bakery','complex/bakery/','#enterQ'],['sabzi','complex/sabzi/','#quiet'],['grocery','complex/grocery/','#goquiet'],['cinema','complex/cinema/','#quiet']];
+const cases=[],venues=[['urc','mall/?view=hall','#quiet'],['plaza','complex/?view=hall','#enterQuiet'],['bakery','complex/bakery/?view=hall','#enterQ'],['sabzi','complex/sabzi/?view=hall','#quiet'],['grocery','complex/grocery/?view=hall','#goquiet'],['cinema','complex/cinema/?view=hall','#quiet']];
 (async()=>{
  const browser=await chromium.launch({headless:true,args:['--enable-webgl','--enable-unsafe-swiftshader','--use-angle=swiftshader']});
  try {
@@ -78,3 +78,4 @@ const cases=[],venues=[['urc','mall/','#quiet'],['plaza','complex/','#enterQuiet
  const expected=process.env.KALIMPONG_CASES?process.env.KALIMPONG_CASES.split(',').length:12;
  if(cases.length!==expected||cases.some(r=>!r.pass))process.exitCode=1;
 })();
+

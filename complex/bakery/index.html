@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>window.URC_EASY_REDIRECT=new URLSearchParams(location.search).get('view') !== 'hall' && (matchMedia('(max-width: 760px)').matches || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width,screen.height)<=760));if(window.URC_EASY_REDIRECT)location.replace(new URL("../shared/easy.html?venue=bakery",location.href).href);</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Station Bakehouse</title>
 <meta name="description" content="Walk into Station Bakehouse, Kalimpong: warm loaves, rose-pink cakes and a window full of Kanchenjunga. Sample items and rates.">
 <meta name="theme-color" content="#f6eee6">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">");</script>
 <style>
 :root{--bg:#f6eee6;--panel:#fcfbf8;--panel-2:#f3f0ea;--ink:#1d1e21;--muted:#62666d;--line:#dedad2;--accent:#a8445e;--accent-ink:#fff;--warm:#c0643c;--glass:rgba(252,251,248,.9);--bad:#b3261e;--ok:#1f8a4c;
   --shadow:0 18px 50px rgba(28,29,32,.18),0 2px 6px rgba(28,29,32,.08);
@@ -342,8 +343,10 @@ body.nogl #list .close{display:none}
 </div>
 <div id="fade"></div>
 
-<script src="../shared/vendor/three-r128.min.js"></script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/vendor/three-r128.min.js\"><\/script>");</script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 /* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
  * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
  * Existing labels, product photographs, picking meshes and catalogue data stay intact.
@@ -586,11 +589,15 @@ body.nogl #list .close{display:none}
   updateUI();
 })();
 
+
+}
 </script>
-<script src="../shared/nav.js"></script>
-<script src="../shared/photographic-products.js"></script>
-<script src="../shared/shelf-navigation.js"></script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/nav.js\"><\/script>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/photographic-products.js\"><\/script>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/shelf-navigation.js\"><\/script>");</script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 'use strict';
 /* ================= basics ================= */
 const $ = s => document.querySelector(s);
@@ -2068,6 +2075,8 @@ window.__bakery = {
   look: (x, z, y, p) => { auto = null; inside = true; pos.x = x; pos.z = z; yaw = y; pitch = p; },
 };
 start();
+
+}
 </script>
 </body>
 </html>

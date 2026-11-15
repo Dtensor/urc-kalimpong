@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><script>window.URC_EASY_REDIRECT=new URLSearchParams(location.search).get('view')!=='list'&&(matchMedia('(max-width:760px)').matches||(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<=760));if(window.URC_EASY_REDIRECT)location.replace(new URL('complex/shared/easy.html',location.href).href);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#faf6ee">
 <title>URC Kalimpong</title>
@@ -248,7 +248,7 @@ footer a{color:inherit}
 .hidden{display:none!important}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
-<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
+</head>
 <body>
 
 <header class="mast wrap">
@@ -329,10 +329,11 @@ footer a{color:inherit}
 <div class="toast" id="toast" data-on="false"></div>
 <button class="totop" id="totop" data-on="false" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
-<script>window.BHANDAR_API="https://kings-macbook-pro.tail35a127.ts.net";</script>
+<script>window.BHANDAR_API="";</script>
 <script>
 (() => {
 "use strict";
+if(window.URC_EASY_REDIRECT)return;
 const API = (window.BHANDAR_API || "").replace(/\/$/, "");
 const url = (p) => API + p;
 // Photos: absolute from the live server, relative when this page is a static copy.
@@ -400,6 +401,7 @@ async function load() {
     snap.items.forEach(i => { if (i.img && !i.img.startsWith("/")) BUNDLED[i.id] = i.img; });
     DATA = snap; LIVE = false; paint();
   }
+  if (!API) return;
   try {
     const r = await fetch(url("/api/menu"), { cache: "no-store" });
     if (!r.ok) throw 0;
@@ -587,6 +589,7 @@ async function want(it, h, c) {
   if (LOVED.has(it.id)) { toast("Already on your list"); return; }
   h.dataset.on = "true"; h.classList.remove("pop"); void h.offsetWidth; h.classList.add("pop");
   LOVED.add(it.id); store.set("loved", [...LOVED]);
+  if (!API) { toast("Saved on this device."); return; }
   try {
     const r = await fetch(url("/api/want"), { method: "POST", headers: { "Content-Type": "application/json", "X-Device": DEV }, body: JSON.stringify({ id: it.id }) });
     const j = await r.json();
@@ -618,14 +621,14 @@ function paintSheet() {
   const rows = basketRows();
   if (!rows.length) {
     s.append(el("h2", null, "Your basket"));
-    const e = el("div", "empty"); e.append(el("div", "big", "🧺"), el("div", null, "Nothing in it yet. Tap “Add to basket” on anything you fancy and we will have it packed before you arrive."));
+    const e = el("div", "empty"); e.append(el("div", "big", "🧺"), el("div", null, "Nothing in it yet. Tap “Add to basket” on anything you fancy and keep a shopping list on this device."));
     s.append(e);
     const mine = myBaskets(); if (mine) s.append(mine);
     const b = el("button", "ghost", "Back to the shelves"); b.onclick = closeSheet; s.append(b);
     return;
   }
   s.append(el("h2", null, "Your basket")); s.firstChild.id = "sheet-title";
-  s.append(el("p", "sub", "We pack it, you collect it, the counter bills it as always."));
+  s.append(el("p", "sub", "Your shopping list is saved on this device. The counter confirms stock and the bill."));
   rows.forEach(({ it, q }) => {
     const ln = el("div", "sline");
     if (it.img) { const im = el("img"); im.src = pic(it); im.alt = ""; ln.append(im); } else ln.append(el("div", "mono", initials(it.name)));
@@ -651,11 +654,13 @@ function paintSheet() {
   const err = el("div", "err"); s.append(err);
   const go = el("button", "reserve"); go.innerHTML = "Reserve my basket";
   go.onclick = () => reserve(inp.value.trim(), go, err);
+  if (!API) { nm.hidden=true; go.disabled=true; go.textContent="Confirm and order at the counter"; }
   s.append(go);
   const b = el("button", "ghost", "Keep browsing"); b.onclick = closeSheet; s.append(b);
 }
 
 async function reserve(name, btn, err) {
+  if (!API) { err.textContent="This list is saved on this device. Confirm stock and order at the counter."; return; }
   err.textContent = "";
   if (name.length < 2) { err.textContent = "Just a name, so we know whose basket to hand over."; return; }
   store.set("who", name);
@@ -747,6 +752,7 @@ function paintNotices() {
   });
 }
 async function loadComments() {
+  if (!API) { $("#csend").disabled=true; $("#csend").textContent="Please speak to the counter"; return; }
   try {
     const r = await fetch(url("/api/comments"), { cache: "no-store" });
     const j = await r.json();
@@ -755,6 +761,7 @@ async function loadComments() {
   } catch {}
 }
 $("#csend").onclick = async () => {
+  if (!API) return;
   const text = $("#ctext").value.trim(), name = $("#cname").value.trim();
   if (text.length < 2) { toast("Say a little more"); return; }
   const r = await fetch(url("/api/comment"), { method: "POST", headers: { "Content-Type": "application/json", "X-Device": DEV }, body: JSON.stringify({ text, name }) });
@@ -786,6 +793,7 @@ function watchAttention() {
   document.querySelectorAll("#shelves .card").forEach(c => observer.observe(c));
 }
 function flush(beacon) {
+  if (!API) return;
   const now = performance.now();
   since.forEach((t, id) => { dwell.set(id, (dwell.get(id) || 0) + (now - t)); since.set(id, now); });
   const seen = [...dwell.entries()].filter(([, ms]) => ms >= 300).map(([id, ms]) => ({ id, ms: Math.round(ms) }));
@@ -806,6 +814,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) flush
 const SID = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
 const BACK = store.get("seen", false); store.set("seen", true);
 function beat(ev, extra) {
+  if (!API) return;
   // Plain text keeps it a simple request: no preflight, and it survives the tab closing.
   const body = JSON.stringify({ sid: SID, dev: DEV, ev, ...extra });
   try { if (navigator.sendBeacon && navigator.sendBeacon(url("/api/visit"), body)) return; } catch {}

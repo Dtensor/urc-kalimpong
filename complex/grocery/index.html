@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>window.URC_EASY_REDIRECT=new URLSearchParams(location.search).get('view') !== 'hall' && (matchMedia('(max-width: 760px)').matches || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width,screen.height)<=760));if(window.URC_EASY_REDIRECT)location.replace(new URL("../shared/easy.html?venue=grocery",location.href).href);</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Station Grocery</title>
 <meta name="description" content="Walk into Station Grocery, Station Complex, Kalimpong: grain bins, a spice wall, a steel tin wall and glass candy jars at the counter.">
 <link rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">");</script>
 <style>
 :root{
   --bg:#eef0f4;--panel:#fcfbf8;--panel-2:#f3f0ea;--ink:#1d1e21;--muted:#62666d;--line:#dedad2;
@@ -280,8 +281,10 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
     <div class="fine" id="inote">Sample items: real list and rates coming soon</div>
   </div>
 </div>
-<script src="../shared/vendor/three-r128.min.js"></script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/vendor/three-r128.min.js\"><\/script>");</script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 /* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
  * Explicitly embedded by prepare.py, so Bhandar exports stay self-contained.
  * Existing labels, product photographs, picking meshes and catalogue data stay intact.
@@ -524,11 +527,15 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
   updateUI();
 })();
 
+
+}
 </script>
-<script src="../shared/nav.js"></script>
-<script src="../shared/photographic-products.js"></script>
-<script src="../shared/shelf-navigation.js"></script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/nav.js\"><\/script>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/photographic-products.js\"><\/script>");</script>
+<script>if(!window.URC_EASY_REDIRECT)document.write("<script src=\"../shared/shelf-navigation.js\"><\/script>");</script>
 <script>
+if(!window.URC_EASY_REDIRECT){
+
 'use strict';
 /* Station Grocery: a kirana that grew into a small supermarket. Everything on the
    shelves is rendered from data.json; nothing below names an item. */
@@ -1407,4 +1414,6 @@ async function boot(){
 }
 $('#golist').onclick=()=>{openLedger()};
 boot();
+
+}
 </script></body></html>
