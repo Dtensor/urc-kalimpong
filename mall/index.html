@@ -881,37 +881,24 @@ function pot(x, z, o = {}) {
   const h = top + (o.plant === "cone" ? .9 : o.plant === "none" ? 0 : .55) * s;
   POTS.push({ x, y: h / 2, z, hx: .38 * s, hy: h / 2, hz: .38 * s, c: 1, s: 0, r: Math.hypot(.38 * s, h / 2, .38 * s) });
   dmesh(DG.pad, "#4a3a2c", x, top - .05 * s, z, s * .55, s * .5);
-  if (o.plant === "cone") dmesh(DG.cone, o.leaf || "#3f6d3a", x, top + .42 * s, z, s * 1.05, s * 1.15, Math.random());
-  else if (o.plant !== "none") {
-    dmesh(DG.bush, o.leaf || "#3f6d3a", x, top + .3 * s, z, s * 1.05, s * .9, Math.random());
-    const nb = o.blooms == null ? (COARSE ? 3 : 6) : o.blooms;
-    for (let i = 0; i < nb; i++) {
-      const a = i / nb * 6.283 + x, r = .3 * s * (.6 + Math.random() * .5);
-      dmesh(DG.bloom, o.bloom || FLOWERS[(i + Math.round(x * 3)) % FLOWERS.length], x + Math.cos(a) * r, top + .3 * s + Math.sin(i * 2.1) * .18 * s, z + Math.sin(a) * r, s);
-    }
-  }
+  if(o.plant!=='none')HALL.foliage.push({x,z,y:top,s,tall:o.plant==='cone'});
+
 }
 
 /* ---------- the round hall ---------- */
-function hubFloor(R) {
-  const S=2048,C=S/2,k=S/(R*2);
-  const c=cvs(S,S,g=>{
-    g.fillStyle='#c9c1af';g.fillRect(0,0,S,S);
-    const tile=1.6*k;
-    for(let y=0;y<S;y+=tile)for(let x=0;x<S;x+=tile){
-      const v=hash(`${x}:${y}`);g.fillStyle=`rgb(${191+v*23},${183+v*22},${167+v*20})`;g.fillRect(x+1,y+1,tile-2,tile-2);
-      g.strokeStyle='rgba(255,255,255,.17)';g.strokeRect(x+2,y+2,tile-4,tile-4);
-    }
-    for(let i=0;i<18000;i++){const x=hash('x'+i)*S,y=hash('y'+i)*S;g.fillStyle=i%2?'rgba(255,255,255,.045)':'rgba(60,51,40,.035)';g.fillRect(x,y,1+i%3,1);}
-    // Narrow stone inlays guide visitors; the walking surface remains neutral.
-    for(const w of WINGS){const a=w.phi, n=[Math.sin(a),-Math.cos(a)];
-      g.strokeStyle=tint(w.col,.45,'#817c6d');g.lineWidth=.075*k;g.beginPath();g.moveTo(C+n[0]*3.1*k,C+n[1]*3.1*k);g.lineTo(C+n[0]*(R-.8)*k,C+n[1]*(R-.8)*k);g.stroke();}
+function marble(repeat){return new THREE.MeshStandardMaterial({
+  map:hallMap('marble-diff',repeat,true),normalMap:hallMap('marble-nor_gl',repeat),roughnessMap:hallMap('marble-rough',repeat),
+  normalScale:new THREE.Vector2(.22,.22),roughness:.63,metalness:.02,envMapIntensity:.4
+});}
+function hubFloor(R){
+  const geo=new THREE.CircleGeometry(R,COARSE?64:96),disc=new THREE.Mesh(geo,marble([R/2,R/2]));
+  disc.rotation.x=-Math.PI/2;disc.position.y=.002;disc.userData.floor=true;scene.add(disc);
+  const S=1024,C=S/2,k=S/(2*R),c=cvs(S,S,g=>{
+    for(const w of WINGS){const n=[Math.sin(w.phi),-Math.cos(w.phi)];g.strokeStyle=tint(w.col,.45,'#817c6d');g.lineWidth=.075*k;g.beginPath();g.moveTo(C+n[0]*3.1*k,C+n[1]*3.1*k);g.lineTo(C+n[0]*(R-.8)*k,C+n[1]*(R-.8)*k);g.stroke();}
     for(const r of [2.85,R-.55]){g.strokeStyle='#77684b';g.lineWidth=.055*k;g.beginPath();g.arc(C,C,r*k,0,Math.PI*2);g.stroke();}
     g.fillStyle='#596861';g.beginPath();g.arc(C,C,2.65*k,0,Math.PI*2);g.fill();
   });
-  const mat=new THREE.MeshStandardMaterial({map:ctex(c),roughness:.68,metalness:.03,envMapIntensity:.5});
-  const disc=new THREE.Mesh(new THREE.CircleGeometry(R,COARSE?64:96),mat);
-  disc.rotation.x=-Math.PI/2;disc.position.y=.002;disc.userData.floor=true;scene.add(disc);
+  const inlay=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({map:ctex(c),transparent:true,depthWrite:false,roughness:.7,envMapIntensity:.3}));inlay.rotation.x=-Math.PI/2;inlay.position.y=.008;scene.add(inlay);
 }
 
 function hubWalls(R) {
@@ -963,7 +950,7 @@ function lotus(g, x, y, r, petal, ring, eye) {
   g.fillStyle = ring; g.beginPath(); g.arc(x, y, r * .36, 0, 7); g.fill();
   g.fillStyle = eye; g.beginPath(); g.arc(x, y, r * .16, 0, 7); g.fill();
 }
-const HALL={version:'urc-hall-20261115',loaded:[],errors:[],fans:[],ripples:null,phase:0};
+const HALL={version:'urc-hall-20261115',loaded:[],errors:[],fans:[],foliage:[],ripples:null,phase:0};
 const hallMaps=new Map();
 function hallMap(name,repeat=[1,1],colour=false){
   const key=name+repeat.join(',');if(hallMaps.has(key))return hallMaps.get(key);
@@ -1123,6 +1110,19 @@ function updateHall(dt){
     hallDummy.position.set(Math.cos(a)*1.82,.66+i*.00002,Math.sin(a)*1.82);hallDummy.rotation.set(-Math.PI/2,0,0);hallDummy.scale.set(rad,rad,1);hallDummy.updateMatrix();HALL.ripples.setMatrixAt(i,hallDummy.matrix);
   }HALL.ripples.instanceMatrix.needsUpdate=true;}
 }
+function hallFoliage(){
+  const leaf=new THREE.Shape();leaf.moveTo(0,0);leaf.quadraticCurveTo(-.13,.17,-.025,.43);leaf.quadraticCurveTo(.12,.19,0,0);
+  const geo=new THREE.ShapeGeometry(leaf,5),tex=ctex(cvs(64,128,(g,W,H)=>{
+    const grad=g.createLinearGradient(0,0,W,0);grad.addColorStop(0,'#4a6135');grad.addColorStop(.45,'#8c9f61');grad.addColorStop(.5,'#b1b77c');grad.addColorStop(.55,'#748d4c');grad.addColorStop(1,'#314c2d');g.fillStyle=grad;g.fillRect(0,0,W,H);
+    g.strokeStyle='rgba(193,205,147,.3)';g.lineWidth=1;for(let y=20;y<H;y+=17){g.beginPath();g.moveTo(W/2,y);g.lineTo(4,y-14);g.moveTo(W/2,y);g.lineTo(W-4,y-12);g.stroke();}
+  }));
+  const mat=new THREE.MeshStandardMaterial({map:tex,roughness:.85,side:THREE.DoubleSide,envMapIntensity:.2});
+  const n=COARSE?28:40,m=new THREE.InstancedMesh(geo,mat,HALL.foliage.length*n),c=new THREE.Color();
+  HALL.foliage.forEach((p,j)=>{for(let i=0;i<n;i++){
+    const a=i*2.399963,q=hash(`leaf:${j}:${i}`),h=(p.tall?.62:.35)*(i/n),r=(.05+.13*q)*(1-i/n*.7)*p.s;
+    hallDummy.position.set(p.x+Math.sin(a)*r,p.y+h*p.s,p.z+Math.cos(a)*r);hallDummy.rotation.set(.25+q*.95,a,(q-.5)*.8,'YXZ');hallDummy.scale.setScalar(p.s*(.55+q*.6));hallDummy.updateMatrix();m.setMatrixAt(j*n+i,hallDummy.matrix);m.setColorAt(j*n+i,c.setHSL(.25+q*.07,.22,.48+q*.1));
+  }});m.frustumCulled=false;scene.add(m);
+}
 function hallContactShadows(){
   const t=ctex(cvs(64,64,g=>{const r=g.createRadialGradient(32,32,3,32,32,32);r.addColorStop(0,'rgba(0,0,0,.35)');r.addColorStop(.45,'rgba(0,0,0,.19)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);}));
   const spots=[[0,0,3.1],...POTS.map(p=>[p.x,p.z,Math.max(p.hx,p.hz)*1.9]),...OBST.filter(o=>o.podium).map(o=>[o.cx,o.cz,.9])];
@@ -1139,7 +1139,7 @@ function build() {
   for (const w of WINGS) for (const sgn of [1, -1]) { const [x, z] = toW(w, -1.05, sgn * (w.hw + .95)); pot(x, z, { kind: sgn > 0 ? "urn" : "vase", col: tint(w.col, .3), s: 1.1, leaf: "#3f6d3a" }); }
   WINGS.forEach(buildWing);
   hallBoards();
-  flushChandeliers(); hallContactShadows();
+  flushChandeliers(); hallFoliage(); hallContactShadows();
 }
 
 // each wing gets its own tile, so you know which department you are in by the floor
@@ -1152,11 +1152,7 @@ function wingTile(col) {return cvs(256,256,(g,S)=>{
 function buildWing(w) {
   const hw = w.hw, W = hw * 2, D = w.D, cellar = w.st.cellar;
   const wallC = cellar ? "#433026" : "#d0c7b5", dadoC = cellar ? "#2f211a" : "#657268", ceil = cellar ? "#31231c" : "#d8d0c0";
-  const floorMat = new THREE.MeshLambertMaterial({
-    map: cellar ? (() => { const t = TX.wood.clone(); t.needsUpdate = true; t.repeat.set(D / 2.6, W / 2.6); return t; })() : ctex(wingTile(w.col), [Math.max(1, Math.round(D / 2.4)), Math.max(1, Math.round(W / 2.4))]),
-    color: cellar ? "#a88" : "#fff",
-  });
-  floorMat.userData.kxSurface = {kind: cellar ? 'wood' : 'stone'};
+  const floorMat=cellar?new THREE.MeshStandardMaterial({map:(()=>{const t=TX.wood.clone();t.needsUpdate=true;t.repeat.set(D/2.6,W/2.6);return t;})(),roughness:.7,envMapIntensity:.3}):marble([D/4,W/4]);
   lplane(w, floorMat, D, W, D / 2, .003, 0, 0, -Math.PI / 2);
   lbox(w, D / 2, WALLH + .1, 0, D, .2, W, ceil);
   // walls: back, both sides, then the shopfront glass either side of the way in
