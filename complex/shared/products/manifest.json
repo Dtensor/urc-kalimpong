@@ -1246,9 +1246,9 @@
         },
         {
           "file": "grocery-05.webp",
-          "bytes": 130978,
-          "sha256": "33d1b5410789e2e30e0075775b15629eb9f8bd5091355c2330077ccaa2b22f4b",
-          "sourceSha256": "e673dda4cffafc8ccdd171b591834698a8d8cca6dec7cc30e57ff87bcbb154e5"
+          "bytes": 139600,
+          "sha256": "c8c7531c028775577f9794b0e115425baa294039e5478929aec23d14fa526dba",
+          "sourceSha256": "1c04760885cf4e9dcd4b143cb2ac6057da4ec2647f76c1f3707ad110210395ff"
         },
         {
           "file": "grocery-06.webp",
@@ -1599,20 +1599,20 @@
         "momo-masala-50g": {
           "sheet": "grocery-05.webp",
           "rect": [
-            63,
-            90,
-            256,
-            366
+            62,
+            89,
+            258,
+            368
           ],
           "generated": true
         },
         "kasuri-methi-25g": {
           "sheet": "grocery-05.webp",
           "rect": [
-            449,
+            447,
             87,
-            255,
-            369
+            258,
+            370
           ],
           "generated": true
         },
@@ -1622,27 +1622,27 @@
             879,
             20,
             161,
-            469
+            470
           ],
           "generated": true
         },
         "sunflower-oil-1l": {
           "sheet": "grocery-05.webp",
           "rect": [
-            1263,
-            20,
-            160,
-            468
+            1200,
+            62,
+            275,
+            411
           ],
           "generated": true
         },
         "rice-bran-oil-1l": {
           "sheet": "grocery-05.webp",
           "rect": [
-            116,
-            533,
-            156,
-            458
+            115,
+            531,
+            158,
+            460
           ],
           "generated": true
         },
@@ -1650,29 +1650,29 @@
           "sheet": "grocery-05.webp",
           "rect": [
             494,
-            587,
+            585,
             164,
-            380
+            383
           ],
           "generated": true
         },
         "desi-ghee-1l": {
           "sheet": "grocery-05.webp",
           "rect": [
-            818,
-            627,
-            282,
-            317
+            815,
+            614,
+            277,
+            353
           ],
           "generated": true
         },
         "mustard-oil-15l": {
           "sheet": "grocery-05.webp",
           "rect": [
-            1187,
-            543,
-            314,
-            444
+            1186,
+            542,
+            318,
+            446
           ],
           "generated": true
         },
