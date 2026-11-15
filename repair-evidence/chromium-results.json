@@ -1,0 +1,84 @@
+[
+  {
+    "device": "desktop",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "ariel-2kg-front-load-powergel",
+        "detail": "../complex/shared/urc-products/e1ed3c10e34405e6ac94-full.webp",
+        "imageState": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      {
+        "id": "wonder-clean-1l-liquid-deter",
+        "detail": "../complex/shared/urc-products/6f3bc5ec26a4cba93aef-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "johnson-baby-lotion-200-ml",
+        "detail": "../complex/shared/urc-products/2afb6daaf27e37f0b2ab-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      },
+      {
+        "id": "himalaya-100ml-baby-cream",
+        "detail": "../complex/shared/urc-products/bef9ab380a1f3f692b71-full.jpg",
+        "imageState": {
+          "width": 1200,
+          "height": 1200
+        }
+      }
+    ],
+    "photos": {
+      "version": "urc-products-20261115",
+      "streams": 21,
+      "requests": 402,
+      "cacheHits": 177,
+      "discarded": 0,
+      "errors": 0,
+      "optimized": 402,
+      "resident": 6,
+      "pending": 0,
+      "queued": 189,
+      "cached": 219,
+      "budget": 220,
+      "withheld": 1
+    },
+    "pass": true
+  },
+  {
+    "device": "phone",
+    "engine": "chromium",
+    "errors": [],
+    "missing": [],
+    "products": [
+      {
+        "id": "henko-detergent-bar",
+        "detail": "../complex/shared/urc-products/9ddfa970a665fb061b40-full.png",
+        "imageState": {
+          "width": 500,
+          "height": 500
+        }
+      }
+    ],
+    "pass": false,
+    "failure": "locator.click: Timeout 120000ms exceeded.\nCall log:\n  - waiting for locator('#card .close')\n    - locator resolved to <button class=\"close\" aria-label=\"Put it back\">✕</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button type=\"button\" id=\"kx-trigger\" aria-haspopup=\"dialog\" aria-controls=\"kx-panel\">View settings</button> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <button type=\"button\" id=\"kx-trigger\" aria-haspopup=\"dialog\" aria-controls=\"kx-panel\">View settings</button> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    90 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <button type=\"button\" id=\"kx-trigger\" aria-haspopup=\"dialog\" aria-controls=\"kx-panel\">View settings</button> intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n    - waiting for element to be visible, enabled and stable\n\n    at /home/runner/work/urc-kalimpong/urc-kalimpong/.github/scripts/repair-browser.cjs:42:39"
+  }
+]
