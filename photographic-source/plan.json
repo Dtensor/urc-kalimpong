@@ -387,5 +387,860 @@
       1024
     ],
     "transparentPct": 33.6
+  },
+  {
+    "id": "sabzi-01",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "tomato",
+        "name": "Tomato",
+        "existingPhoto": null
+      },
+      {
+        "id": "potato",
+        "name": "Potato",
+        "existingPhoto": null
+      },
+      {
+        "id": "onion",
+        "name": "Onion",
+        "existingPhoto": null
+      },
+      {
+        "id": "cauliflower",
+        "name": "Cauliflower",
+        "existingPhoto": null
+      },
+      {
+        "id": "cabbage",
+        "name": "Cabbage",
+        "existingPhoto": null
+      },
+      {
+        "id": "carrot",
+        "name": "Carrot",
+        "existingPhoto": null
+      },
+      {
+        "id": "brinjal",
+        "name": "Brinjal (Baingan)",
+        "existingPhoto": null
+      },
+      {
+        "id": "okra",
+        "name": "Okra (Bhindi)",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-01.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 54.9
+  },
+  {
+    "id": "sabzi-02",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "green-peas",
+        "name": "Green Peas",
+        "existingPhoto": null
+      },
+      {
+        "id": "french-beans",
+        "name": "French Beans",
+        "existingPhoto": null
+      },
+      {
+        "id": "cucumber",
+        "name": "Cucumber",
+        "existingPhoto": null
+      },
+      {
+        "id": "capsicum",
+        "name": "Capsicum",
+        "existingPhoto": null
+      },
+      {
+        "id": "bottle-gourd",
+        "name": "Bottle Gourd (Lauki)",
+        "existingPhoto": null
+      },
+      {
+        "id": "pumpkin",
+        "name": "Pumpkin (Kaddu)",
+        "existingPhoto": null
+      },
+      {
+        "id": "radish",
+        "name": "Radish (Mooli)",
+        "existingPhoto": null
+      },
+      {
+        "id": "beetroot",
+        "name": "Beetroot",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-02.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 58.4
+  },
+  {
+    "id": "sabzi-03",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "spinach",
+        "name": "Spinach (Palak)",
+        "existingPhoto": null
+      },
+      {
+        "id": "methi",
+        "name": "Fenugreek (Methi)",
+        "existingPhoto": null
+      },
+      {
+        "id": "mustard-greens",
+        "name": "Mustard Greens (Sarson)",
+        "existingPhoto": null
+      },
+      {
+        "id": "lettuce",
+        "name": "Lettuce",
+        "existingPhoto": null
+      },
+      {
+        "id": "pak-choi",
+        "name": "Pak Choi",
+        "existingPhoto": null
+      },
+      {
+        "id": "spring-onion",
+        "name": "Spring Onion",
+        "existingPhoto": null
+      },
+      {
+        "id": "amaranth",
+        "name": "Red Amaranth (Lal Saag)",
+        "existingPhoto": null
+      },
+      {
+        "id": "broccoli",
+        "name": "Broccoli",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-03.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 51.1
+  },
+  {
+    "id": "sabzi-04",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "iskus",
+        "name": "Iskus (Squash)",
+        "existingPhoto": null
+      },
+      {
+        "id": "dalle",
+        "name": "Dalle Chilli",
+        "existingPhoto": null
+      },
+      {
+        "id": "ginger",
+        "name": "Ginger (Aduwa)",
+        "existingPhoto": null
+      },
+      {
+        "id": "large-cardamom",
+        "name": "Large Cardamom (Alaichi)",
+        "existingPhoto": null
+      },
+      {
+        "id": "rayo-saag",
+        "name": "Rayo Saag",
+        "existingPhoto": null
+      },
+      {
+        "id": "bamboo-shoot",
+        "name": "Bamboo Shoot (Tama)",
+        "existingPhoto": null
+      },
+      {
+        "id": "yam",
+        "name": "Yam (Tarul)",
+        "existingPhoto": null
+      },
+      {
+        "id": "ningro",
+        "name": "Ningro (Fiddlehead Fern)",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-04.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 51.4
+  },
+  {
+    "id": "sabzi-05",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "bhatmas",
+        "name": "Local Soybean (Bhatmas)",
+        "existingPhoto": null
+      },
+      {
+        "id": "mandarin",
+        "name": "Darjeeling Mandarin",
+        "existingPhoto": "photos/mandarin.png"
+      },
+      {
+        "id": "kiwi",
+        "name": "Kiwi",
+        "existingPhoto": null
+      },
+      {
+        "id": "banana",
+        "name": "Banana",
+        "existingPhoto": null
+      },
+      {
+        "id": "apple",
+        "name": "Apple",
+        "existingPhoto": null
+      },
+      {
+        "id": "pear",
+        "name": "Pear (Nashpati)",
+        "existingPhoto": null
+      },
+      {
+        "id": "papaya",
+        "name": "Papaya",
+        "existingPhoto": null
+      },
+      {
+        "id": "pineapple",
+        "name": "Pineapple",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-05.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 54.1
+  },
+  {
+    "id": "sabzi-06",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "guava",
+        "name": "Guava",
+        "existingPhoto": null
+      },
+      {
+        "id": "pomegranate",
+        "name": "Pomegranate",
+        "existingPhoto": null
+      },
+      {
+        "id": "lemon",
+        "name": "Lemon",
+        "existingPhoto": null
+      },
+      {
+        "id": "coriander",
+        "name": "Coriander (Dhaniya)",
+        "existingPhoto": null
+      },
+      {
+        "id": "mint",
+        "name": "Mint (Pudina)",
+        "existingPhoto": null
+      },
+      {
+        "id": "curry-leaf",
+        "name": "Curry Leaves",
+        "existingPhoto": null
+      },
+      {
+        "id": "green-chilli",
+        "name": "Green Chilli",
+        "existingPhoto": null
+      },
+      {
+        "id": "garlic",
+        "name": "Garlic",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-06.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 55.2
+  },
+  {
+    "id": "sabzi-07",
+    "venue": "sabzi",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "lemongrass",
+        "name": "Lemongrass",
+        "existingPhoto": null
+      },
+      {
+        "id": "timur",
+        "name": "Timur (Sichuan Pepper)",
+        "existingPhoto": null
+      },
+      {
+        "id": "toor-dal",
+        "name": "Toor Dal",
+        "existingPhoto": null
+      },
+      {
+        "id": "masoor-dal",
+        "name": "Masoor Dal",
+        "existingPhoto": null
+      },
+      {
+        "id": "rajma",
+        "name": "Rajma (Local Red)",
+        "existingPhoto": null
+      },
+      {
+        "id": "chana",
+        "name": "Kala Chana",
+        "existingPhoto": null
+      },
+      {
+        "id": "groundnut",
+        "name": "Groundnut",
+        "existingPhoto": null
+      },
+      {
+        "id": "dry-chilli",
+        "name": "Dry Red Chilli",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/sabzi-07.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 60.5
+  },
+  {
+    "id": "grocery-01",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "sona-masoori-loose",
+        "name": "Sona Masoori Rice (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "gobindobhog-loose",
+        "name": "Gobindobhog Rice (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "chakki-atta-loose",
+        "name": "Chakki Atta (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "sugar-loose",
+        "name": "Sugar (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "poha-loose",
+        "name": "Poha, thick (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "basmati-1kg",
+        "name": "Basmati Rice 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "hill-red-rice-1kg",
+        "name": "Hill Red Rice 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "chakki-atta-5kg",
+        "name": "Chakki Atta 5 kg",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-01.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 54.4
+  },
+  {
+    "id": "grocery-02",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "maida-1kg",
+        "name": "Maida 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "suji-500g",
+        "name": "Suji (Rava) 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "besan-500g",
+        "name": "Besan 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "rice-sack-25kg",
+        "name": "Sona Masoori Rice 25 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "atta-sack-10kg",
+        "name": "Chakki Atta 10 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "toor-dal-loose",
+        "name": "Toor Dal (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "masoor-dal-loose",
+        "name": "Masoor Dal (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "moong-dal-loose",
+        "name": "Moong Dal (loose)",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-02.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 43.6
+  },
+  {
+    "id": "grocery-03",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "chana-dal-loose",
+        "name": "Chana Dal (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "rajma-chitra-loose",
+        "name": "Rajma Chitra (loose)",
+        "existingPhoto": null
+      },
+      {
+        "id": "urad-whole-1kg",
+        "name": "Urad Dal, whole 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "kabuli-chana-1kg",
+        "name": "Kabuli Chana 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "turmeric-100g",
+        "name": "Turmeric Powder 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "kashmiri-chilli-100g",
+        "name": "Kashmiri Chilli Powder 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "coriander-100g",
+        "name": "Coriander Powder 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "cumin-100g",
+        "name": "Cumin Seeds 100 g",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-03.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 44.5
+  },
+  {
+    "id": "grocery-04",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "garam-masala-50g",
+        "name": "Garam Masala 50 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "large-cardamom-50g",
+        "name": "Large Cardamom, hill-grown 50 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "timur-50g",
+        "name": "Timur (hill pepper) 50 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "black-pepper-50g",
+        "name": "Black Pepper 50 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "mustard-seeds-100g",
+        "name": "Mustard Seeds 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "dalle-pickle-200g",
+        "name": "Dalle Chilli Pickle 200 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "iskus-achar-250g",
+        "name": "Iskus Achar (squash pickle) 250 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "ginger-powder-100g",
+        "name": "Kalimpong Ginger Powder 100 g",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-04.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 35.5
+  },
+  {
+    "id": "grocery-05",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "momo-masala-50g",
+        "name": "Momo Masala 50 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "kasuri-methi-25g",
+        "name": "Kasuri Methi 25 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "mustard-oil-1l",
+        "name": "Mustard Oil 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "sunflower-oil-1l",
+        "name": "Sunflower Oil 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "rice-bran-oil-1l",
+        "name": "Rice Bran Oil 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "coconut-oil-500ml",
+        "name": "Coconut Oil 500 ml",
+        "existingPhoto": null
+      },
+      {
+        "id": "desi-ghee-1l",
+        "name": "Desi Ghee 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "mustard-oil-15l",
+        "name": "Mustard Oil 15 L",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-05.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 57.0
+  },
+  {
+    "id": "grocery-06",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "darjeeling-first-flush-100g",
+        "name": "Darjeeling Tea, first flush 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "darjeeling-tea-250g",
+        "name": "Darjeeling Tea 250 g",
+        "existingPhoto": "photo-sample.jpg"
+      },
+      {
+        "id": "ctc-tea-500g",
+        "name": "CTC Tea 500 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "tulsi-green-tea-25",
+        "name": "Tulsi Green Tea, 25 bags",
+        "existingPhoto": null
+      },
+      {
+        "id": "instant-coffee-100g",
+        "name": "Instant Coffee 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "mandarin-squash-750ml",
+        "name": "Hill Mandarin Squash 750 ml",
+        "existingPhoto": null
+      },
+      {
+        "id": "lemon-squash-750ml",
+        "name": "Lemon Squash 750 ml",
+        "existingPhoto": null
+      },
+      {
+        "id": "kalimpong-lollipop",
+        "name": "Kalimpong Lollipop",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-06.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 46.3
+  },
+  {
+    "id": "grocery-07",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "orange-toffee",
+        "name": "Orange Toffee",
+        "existingPhoto": null
+      },
+      {
+        "id": "mint-sweets",
+        "name": "Mint Sweets",
+        "existingPhoto": null
+      },
+      {
+        "id": "imli-candy",
+        "name": "Imli Candy",
+        "existingPhoto": null
+      },
+      {
+        "id": "churpi-100g",
+        "name": "Churpi, hard cheese 100 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "bhujia-400g",
+        "name": "Bhujia 400 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "cream-biscuits-150g",
+        "name": "Cream Biscuits 150 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "milk-rusk-300g",
+        "name": "Milk Rusk 300 g",
+        "existingPhoto": null
+      },
+      {
+        "id": "peanut-chikki-200g",
+        "name": "Peanut Chikki 200 g",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-07.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 49.3
+  },
+  {
+    "id": "grocery-08",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "instant-noodles-5",
+        "name": "Instant Noodles, pack of 5",
+        "existingPhoto": null
+      },
+      {
+        "id": "jaggery-1kg",
+        "name": "Jaggery (gur) 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "detergent-1kg",
+        "name": "Detergent Powder 1 kg",
+        "existingPhoto": null
+      },
+      {
+        "id": "dishwash-bars-3",
+        "name": "Dishwash Bars, pack of 3",
+        "existingPhoto": null
+      },
+      {
+        "id": "floor-cleaner-1l",
+        "name": "Floor Cleaner 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "phenyl-1l",
+        "name": "Phenyl 1 L",
+        "existingPhoto": null
+      },
+      {
+        "id": "bath-soap-4",
+        "name": "Bath Soap, pack of 4",
+        "existingPhoto": null
+      },
+      {
+        "id": "matchboxes-10",
+        "name": "Matchboxes, pack of 10",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-08.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 45.1
+  },
+  {
+    "id": "grocery-09",
+    "venue": "grocery",
+    "columns": 4,
+    "rows": 2,
+    "items": [
+      {
+        "id": "agarbatti-100",
+        "name": "Agarbatti, 100 sticks",
+        "existingPhoto": null
+      },
+      {
+        "id": "candles-6",
+        "name": "Candles, pack of 6",
+        "existingPhoto": null
+      },
+      {
+        "id": "mosquito-coils-10",
+        "name": "Mosquito Coils, 10",
+        "existingPhoto": null
+      }
+    ],
+    "status": "generated_reviewed",
+    "source": "photographic-source/grocery-09.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "transparentPct": 81.4
   }
 ]

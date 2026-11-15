@@ -256,8 +256,7 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<meta name="kalimpong-release" content="visual-extension-20261114">
-</head>
+<script defer src="https://shala-stats.shalas.workers.dev/f.js"></script></head>
 <body data-venue="sabzi" data-material-root="../shared/">
 <canvas id="gl" aria-label="The sabzi mandi, in 3D. Drag to look around, tap the floor to walk, tap a crate to pick something up."></canvas>
 
@@ -322,6 +321,7 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
 </div>
 
 <script src="../shared/nav.js"></script>
+<script src="../shared/photographic-products.js"></script>
 <script src="../shared/vendor/three-r128.min.js"></script>
 <script>
 /* Kalimpong visual review candidate. Three.js r128; locally bundled material studies.
@@ -652,6 +652,7 @@ function leaf(g, x, y, len, wid, ang, col, rib = true) {
 }
 function calyx(g, x, y, s, col = "#3f7a2a") { for (let k = 0; k < 5; k++) leaf(g, x, y, s, s * .32, k * 1.2566, col, false); g.fillStyle = dark(col, .2); g.fillRect(x - .8, y - s * .9, 1.6, s * .9); }
 function paintItem(g, it, S, withBg = true) {
+  if(PhotographicProducts.draw(g,it,S*.03,S*.03,S*.94,S*.94))return;
   const k = it.look.kind, t = it.look.tint, r = rng(hashStr(it.id)), sec = secOf(it);
   g.save(); g.scale(S / 100, S / 100);
   if (withBg) {
@@ -827,7 +828,7 @@ function openBasket() {
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="lt">${money(it.price * q)}</span><div class="qty"><button data-m="${esc(it.id)}" aria-label="Less">−</button><span>${esc(U(it).fmt(q))}</span><button data-p="${esc(it.id)}" aria-label="More">+</button></div></div></div>`).join("")}
     <div class="tot"><span>Total</span><span>${money(t)}</span></div>
     <div class="counter-note"><b>Show this list at the counter</b>There is no online payment or reservation yet. The stall weighs your produce and you pay there.</div>
-    <p class="fine">Sample items: real list and rates coming soon.</p>
+    <p class="fine">Sample items: real list and rates coming soon. AI-generated product illustrations; appearance may differ from actual stock.</p>
     <div class="acts">${lines.length ? `<button class="btn" data-clear>Empty the basket</button>` : ""}<button class="btn pri" data-x>Keep shopping</button></div>`;
   $("#sheetbg").hidden = false;
 }
@@ -907,7 +908,7 @@ function paintCard() {
   $("#card").innerHTML = `<button class="close" data-back aria-label="Put it back">✕</button>
     <div class="ey">${esc(s.name)}</div><h2>${esc(it.name)}</h2>
     <div class="price">₹ ${it.price} <small>/ ${esc(u.per)}</small></div>
-    <div class="note">Sample rate · real list and rates coming soon</div>
+    <div class="note">Sample rate · real list and rates coming soon. ${PhotographicProducts.has(it)?PhotographicProducts.disclosure:""}</div>
     <div class="weigh"><div class="lbl">${u.w ? "Weigh it out" : "How many"}</div>
       <div class="qty"><button data-dq="-1" aria-label="Less">−</button><span id="hq">${esc(u.fmt(holdQ))}</span><button data-dq="1" aria-label="More">+</button></div>
       <div class="live"><span id="hp">${money(it.price * holdQ)}</span><small>${u.w ? (it.unit === "kg" ? "in 250 g steps" : "in 250 g packs") : "live price"}</small></div>
@@ -1149,9 +1150,11 @@ function build3D() {
   /* ---------- stalls ---------- */
   const HITS = [], LEAFY = [], RECTS = [], TAGS = [], LINES = [];
   const SLOT = new Map();
+  const photographs=PhotographicProducts.createBatch(THREE,scene);
   const wood = ["#b07a45", "#c08a52", "#9a6a3a", "#b88450"];
   const sizeFor = (it) => { const k = it.look.kind, u = it.unit; if (k === "gourd") return .075; if (k === "leafy") return .06; if (k === "pod") return .032; if (k === "root") return .05; if (k === "bunch") return .05; if (k === "long") return u === "250g" ? .03 : .05; if (u === "piece" || u === "each") return .085; if (u === "250g") return .03; return .052; };
   function heap(P, it, w, d, y0, r, dry) {
+    if(photographs.add(it,M4().multiplyMatrices(P,mat(0,y0+.025,d*.12,-.32)),w*.98,dry?.3:.4))return;
     const k = it.look.kind, t = it.look.tint, R = sizeFor(it);
     const jc = (a = .08) => { const c = C(t); c.offsetHSL((r() - .5) * .02, (r() - .5) * .1, (r() - .5) * a * 2); return c; };
     put(SPH, P, 0, y0 + .015, 0, w * .47, dry ? .12 : .045, d * .47, 0, 0, 0, dry ? C(t) : C(dark(t, .35)));
@@ -1185,7 +1188,7 @@ function build3D() {
     const col = C("#ffffff"); col.offsetHSL(0, 0, (r() - .5) * .1);
     const P = mat(x, y, z, 0, r() * 6.28, 0);
     SACK.push([P, col]); put(RIM, P, 0, .56, 0, 1, 1, 1, 0, 0, 0, col);
-    heap(P, it, .44, .44, .5, r, isDrySec(secOf(it)));
+    heap(PhotographicProducts.has(it)?mat(x,y,z,0,-side*Math.PI/2,0):P, it, .44, .44, .5, r, isDrySec(secOf(it)));
     const ry = -side * Math.PI / 2;
     const T = M4().multiplyMatrices(mat(x - side * .0, y + .98, z, 0, ry, 0), mat(0, 0, .02, -.12));
     tagAt(it, T); box(WOOD, .018, .42, .018, "#7a5a36", null, x, y + .64, z);
@@ -1224,7 +1227,7 @@ function build3D() {
       const stand = { x: side * (EDGE - .9), z };
       SLOT.set(it.id, { x: c.x, y: c.y, z, stand, yaw: faceYaw(c.x - stand.x, 0), side });
       HITS.push({ box: new THREE.Box3().setFromCenterAndSize(c, new THREE.Vector3(side ? .62 : .5, .42, .62)), it });
-      if (it.look.kind === "leafy") LEAFY.push(c);
+      if (it.look.kind === "leafy" && !PhotographicProducts.has(it)) LEAFY.push(c);
     });
     // sacks: at the stall end, or two rows for dry goods
     st.sacks.forEach((it, k) => {
@@ -1316,6 +1319,7 @@ function build3D() {
   /* ---------- flush instanced geometry ---------- */
   const woodMaterial = new THREE.MeshLambertMaterial({ map: woodT });
   woodMaterial.userData.kxSurface = {kind:'wood'};
+  photographs.finish();
   flush(WOOD, new THREE.BoxGeometry(1, 1, 1), woodMaterial);
   flush(PLAIN, new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial());
   flush(CYL, new THREE.CylinderGeometry(1, 1, 1, 8, 1), new THREE.MeshLambertMaterial({ map: bambooT }));
@@ -1603,9 +1607,11 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && !GL_OK) { if (!$(
   } catch (err) {
     $("#enter").textContent = "Could not load the stalls"; $("#istats").innerHTML = `<span class="fine">${esc(err.message)}</span>`; return;
   }
+  const productImages=PhotographicProducts.prepare("sabzi",ITEMS,"../shared/");
   try { await Promise.race([Promise.all([document.fonts.load("600 40px Fraunces"), document.fonts.load("600 20px 'Instrument Sans'")]), sleep(2500)]); } catch {}
   $("#intro").style.setProperty("--sky", `url(${cvs(1200, 700, (g, w, h) => paintView(g, w, h, 7)).toDataURL("image/jpeg", .85)})`);
   $("#istats").innerHTML = `<div><b>${ITEMS.length}</b><span>sample items</span></div><div><b>${SECS.length}</b><span>stalls</span></div><div><b>250 g</b><span>weighed in steps</span></div>`;
+  await productImages;
   buildBoard(); paintBasket();
   if (!GL_OK) {
     document.body.classList.add("flat"); $("#intro").hidden = true; setListing(true);

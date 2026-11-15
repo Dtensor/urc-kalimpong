@@ -24,5 +24,23 @@
   const scale=Math.min(w/sw,h/sh),dw=sw*scale,dh=sh*scale;g.drawImage(image,sx,sy,sw,sh,x+(w-dw)/2,y+h-dh,dw,dh);return true;
  }
  function url(it){if(!has(it))return null;if(!urls.has(it.id)){const canvas=document.createElement('canvas');canvas.width=canvas.height=384;draw(canvas.getContext('2d'),it,12,12,360,360);urls.set(it.id,canvas.toDataURL('image/webp',.88));}return urls.get(it.id);}
- window.PhotographicProducts={prepare,has,draw,url,statistics,disclosure:'AI-generated product illustrations; appearance may differ from actual stock.'};
+ // One mesh per atlas keeps the photographic displays inexpensive on mobile.
+ function createBatch(THREE,scene){
+  const groups=new Map();let count=0;
+  function add(it,matrix,w,h){
+   if(!has(it))return false;const entry=entries.get(it.id),im=images.get(entry.sheet),[sx,sy,sw,sh]=entry.rect;
+   const scale=Math.min(w/sw,h/sh),dw=sw*scale,dh=sh*scale;
+   if(!groups.has(entry.sheet))groups.set(entry.sheet,{positions:[],uvs:[]});const group=groups.get(entry.sheet);
+   const corners=[[-dw/2,0,sx,sy+sh],[dw/2,0,sx+sw,sy+sh],[dw/2,dh,sx+sw,sy],[-dw/2,dh,sx,sy]];
+   for(const index of [0,1,2,0,2,3]){const [x,y,u,v]=corners[index],p=new THREE.Vector3(x,y,0).applyMatrix4(matrix);group.positions.push(p.x,p.y,p.z);group.uvs.push(u/im.width,1-v/im.height);}count++;return true;
+  }
+  function finish(){
+   for(const [file,g] of groups){const texture=new THREE.Texture(images.get(file));texture.encoding=THREE.sRGBEncoding;texture.needsUpdate=true;texture.anisotropy=2;
+    const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(g.positions,3));geometry.setAttribute('uv',new THREE.Float32BufferAttribute(g.uvs,2));geometry.computeBoundingSphere();
+    const material=new THREE.MeshBasicMaterial({map:texture,alphaTest:.12,side:THREE.DoubleSide,toneMapped:false});scene.add(new THREE.Mesh(geometry,material));}
+   statistics.displayCards=count;statistics.displayDrawCalls=groups.size;
+  }
+  return {add,finish};
+ }
+ window.PhotographicProducts={prepare,has,draw,url,createBatch,statistics,disclosure:'AI-generated product illustrations; appearance may differ from actual stock.'};
 })();
