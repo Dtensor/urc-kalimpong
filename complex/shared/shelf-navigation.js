@@ -34,7 +34,7 @@
   function select(target,callback){selected=view(target);returnTo=callback;marker.position.set(selected.x,.035,selected.z);marker.visible=true;return selected;}
   function pick(ray){marker.updateMatrixWorld();return marker.visible&&ray.intersectObject(marker).length>0;}
   function activate(){if(returnTo)returnTo();}
-  function nearFloor(x,z,targets){let best=null,dist=Infinity;for(const t of targets){const dx=x-t.x,dz=z-t.z,front=dx*t.nx+dz*t.nz,along=dx*(-t.nz)+dz*t.nx;if(front>=-.15&&front<2.2&&Math.abs(along)<=t.width/2+.2){const d=Math.hypot(dx,dz);if(d<dist){dist=d;best=t;}}}return best;}
+  function nearFloor(x,z,targets){let best=null,dist=Infinity;for(const t of targets){const dx=x-t.x,dz=z-t.z,front=dx*t.nx+dz*t.nz,along=dx*(-t.nz)+dz*t.nx;if(front>=-(t.depth||0)-.15&&front<2.2&&Math.abs(along)<=t.width/2+.2){const d=Math.hypot(dx,dz);if(d<dist){dist=d;best=t;}}}return best;}
   return {view,select,pick,activate,nearFloor,marker,get selected(){return selected;},get cached(){return cache.size;}};
  }
  window.ShelfNavigation={fit,corners,create,FOV,MIN_DISTANCE,version:'shelf-navigation-20261115'};

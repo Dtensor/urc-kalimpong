@@ -308,7 +308,7 @@ body.nogl #list .close{display:none}
   <div id="ret"></div>
   <div id="gaze" class="glass" hidden></div>
   <div id="map" class="glass"><canvas id="mapc" width="360" height="360" aria-label="Map: tap to walk there"></canvas><div class="cap"><b id="here">Entrance</b><span>tap to walk</span></div></div>
-  <nav id="wings" class="glass" aria-label="Sections"></nav>
+  <nav id="wings" class="glass" aria-label="Jump to a bakery section"></nav>
   <div id="foot">Sample items: real list and rates coming soon</div>
   <div id="stick" class="glass" aria-hidden="true"><div class="k"></div></div>
 </div>
@@ -1964,7 +1964,7 @@ function init3D() {
   $('#wings').innerHTML = SECS.map(s => `<button data-id="${esc(s.id)}" style="--c:${esc(s.color)}">${esc(s.name)} <i>${ITEMS.filter(i => i.section === s.id).length}</i></button>`).join('');
   $('#wings').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (!inside) { inside = true; auto = null; } visitSection(SEC[b.dataset.id]); };
   bindInput();
-  addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = baseFov(); cam.updateProjectionMatrix(); });
+  addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = shelfNav?.selected ? 70 : baseFov(); cam.updateProjectionMatrix(); });
   renderer.setAnimationLoop(loop);
 }
 let frames = 0, fpsT = 0, mapT = 0; window.__fps = 0;
@@ -2034,7 +2034,7 @@ function bindInput() {
   const rel = () => { stick.id = null; stick.x = stick.y = 0; K.style.transform = ''; };
   S.addEventListener('pointerup', rel); S.addEventListener('pointercancel', rel);
   // map
-  mapC.addEventListener('click', e => { if (!inside) return; const r = mapC.getBoundingClientRect(); const [x, z] = fromMap((e.clientX - r.left) / r.width * 360, (e.clientY - r.top) / r.height * 360); hideGaze(); glideTo(x, z, {}); });
+  mapC.addEventListener('click', e => { if (!inside) return; const r = mapC.getBoundingClientRect(); const [x, z] = fromMap((e.clientX - r.left) / r.width * 360, (e.clientY - r.top) / r.height * 360); hideGaze(); if(!safeFloor(x,z))glideTo(x, z, {}); });
 }
 // HUD wiring that does not need 3D
 $('#music').onclick = () => setMusic(!musicOn);

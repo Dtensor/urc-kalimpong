@@ -225,6 +225,7 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 #obj.photographic .front{background:transparent;box-shadow:none;border:0}#obj.photographic .front img{object-fit:contain}
+#wings button{min-height:44px;touch-action:manipulation}
 </style>
 </head>
 <body data-venue="grocery" data-material-root="../shared/">
@@ -1098,6 +1099,7 @@ function route(tx,tz){
     if(ok&&L<bl){bl=L;best=p}}
   return best}
 function glideTo(tx,tz,yaw,pitch,done){
+  if(window.KalimpongExperience.calm&&free(tx,tz)){S.glide=null;cam.x=tx;cam.z=tz;if(yaw!=null)cam.yaw=yaw;if(pitch!=null)cam.pitch=pitch;unpin();done&&done();return;}
   const pts=route(tx,tz);unpin();
   if(!pts){fadeJump(tx,tz,yaw,pitch,done);return}
   const segs=[[cam.x,cam.z],...pts];let L=0;for(let i=1;i<segs.length;i++)L+=Math.hypot(segs[i][0]-segs[i-1][0],segs[i][1]-segs[i-1][1]);
@@ -1127,7 +1129,7 @@ function init3D(){
   scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(66,1,.05,60);camera.rotation.order='YXZ';
   buildRoom();buildProducts();flushInstances();resize();addEventListener('resize',resize);
 }
-function resize(){if(!renderer)return;const w=innerWidth,h=innerHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=w/h<.8?74:66;camera.updateProjectionMatrix()}
+function resize(){if(!renderer)return;const w=innerWidth,h=innerHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=shelfNav?.selected?70:w/h<.8?74:66;camera.updateProjectionMatrix()}
 const KEYS={};let last=0,fN=0,fT=0,stickV=[0,0],tick=0;window.__fps=0;
 function frame(t){requestAnimationFrame(frame);const rdt=Math.min(.25,((t-last)||16)/1000),dt=Math.min(.05,rdt);last=t;
   if(document.hidden || window.KalimpongExperience.modalOpen)return;
@@ -1213,7 +1215,7 @@ function drawMap(){if(!mapBase)drawMapBase();const c=$('#mapc'),g=c.getContext('
   g.fillStyle='#c8961c';g.strokeStyle='#fff';g.lineWidth=2.5;g.beginPath();g.moveTo(0,-11);g.lineTo(8,8);g.lineTo(0,4);g.lineTo(-8,8);g.closePath();g.stroke();g.fill();g.restore()}
 $('#map').addEventListener('click',e=>{const m=$('#map');if(!m.classList.contains('big')){m.classList.add('big');return}
   const r=$('#mapc').getBoundingClientRect(),px=(e.clientX-r.left)/r.width*340,py=(e.clientY-r.top)/r.height*340,x=(px-66)/MAPK-5.2,z=py/MAPK-9.2;
-  if(e.target.id==='mapc'&&free(x,z)){fadeJump(x,z);unpin()}else if(e.target.id==='mapc')toast('Pick an open spot on the floor');m.classList.remove('big')});
+  if(e.target.id==='mapc'&&safeFloor(x,z)){}else if(e.target.id==='mapc'&&free(x,z)){fadeJump(x,z);unpin()}else if(e.target.id==='mapc')toast('Pick an open spot on the floor');m.classList.remove('big')});
 
 /* ---------- search ---------- */
 (()=>{const q=$('#q'),res=$('#res');let hits=[],sel=0;

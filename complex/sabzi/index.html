@@ -257,6 +257,7 @@ body.flat #gl,body.flat #bclose,body.flat #listbtn,body.flat #music{display:none
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 #obj.photographic .front{background:transparent;box-shadow:none;border-radius:0;overflow:visible}#obj.photographic .front img{object-fit:contain}
+#chips button{min-height:44px;touch-action:manipulation}
 </style>
 </head>
 <body data-venue="sabzi" data-material-root="../shared/">
@@ -1412,7 +1413,7 @@ function build3D() {
     const f = $("#fade"); f.style.opacity = 1;
     setTimeout(() => { const [rx, rz] = resolve(x, z); pos.x = rx; pos.z = rz; if (yw != null) yaw = yw; if (pt != null) pitch = pt; glide = null; vel.set(0, 0); f.style.opacity = 0; cb && cb(); }, 260);
   }
-  function go(x, z, yw, pt, cb) { if (Math.hypot(x - pos.x, z - pos.z) > 14 && !(RM || window.KalimpongExperience.calm)) teleport(x, z, yw, pt, cb); else glideTo(x, z, yw, pt, cb); }
+  function go(x, z, yw, pt, cb) { if(RM || window.KalimpongExperience.calm){const [rx,rz]=resolve(x,z);glide=null;vel.set(0,0);pos.x=rx;pos.z=rz;if(yw!=null)yaw=yw;if(pt!=null)pitch=pt;cb&&cb();return;} if (Math.hypot(x - pos.x, z - pos.z) > 14 && !(RM || window.KalimpongExperience.calm)) teleport(x, z, yw, pt, cb); else glideTo(x, z, yw, pt, cb); }
   function step(dt) {
     let fz = 0, fx = 0, turn = 0;
     if (keys.has("w") || keys.has("arrowup")) fz += 1; if (keys.has("s") || keys.has("arrowdown")) fz -= 1;
@@ -1457,7 +1458,7 @@ function build3D() {
   let drag = null, hoverAt = 0;
   canvas.addEventListener("pointerdown", (e) => { if (e.button > 0) return; drag = { id: e.pointerId, x: e.clientX, y: e.clientY, yaw, pitch, moved: 0 }; canvas.setPointerCapture(e.pointerId); canvas.classList.add("drag"); yawT = null; pitchT = null; });
   canvas.addEventListener("pointermove", (e) => {
-    if (drag && drag.id === e.pointerId) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.moved = Math.max(drag.moved, Math.hypot(dx, dy)); if (drag.moved > 6) { yaw = drag.yaw + dx * .005; pitch = clamp(drag.pitch + dy * .004, -1.1, 1.0); } return; }
+    if (drag && drag.id === e.pointerId) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.moved = Math.max(drag.moved, Math.hypot(dx, dy)); if (drag.moved > 6) { glide=null;vel.set(0,0);yaw = drag.yaw + dx * .005; pitch = clamp(drag.pitch + dy * .004, -1.1, 1.0); } return; }
     if (COARSE) return; const now = performance.now(); if (now - hoverAt < 60) return; hoverAt = now;
     const p = pickRay(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); canvas.classList.toggle("hot", !!(p.hit && p.d < 7));
   });
@@ -1536,7 +1537,7 @@ function build3D() {
     const [, , k] = m2c(0, 0), [ox, oz] = m2c(MX0, MZ0); const x = MX0 + (cx - ox) / k, z = MZ0 + (cy - oz) / k;
     m.classList.remove("big");
     if (z < ZC + 1) return goCounter();
-    const st = stallAt(x, z); if (st) goSection(st); else glideTo(x, z);
+    const st = stallAt(x, z); if (st) goSection(st); else if(!safeFloor(x,z))glideTo(x, z);
   });
   document.addEventListener("pointerdown", (e) => { const m = $("#map"); if (m.classList.contains("big") && !m.contains(e.target)) m.classList.remove("big"); });
 
@@ -1551,7 +1552,7 @@ function build3D() {
   function weigh(it) { swing = { t: 0, amp: .32 }; const p = pans[0]; p.load.visible = true; p.load.material.color.copy(C(it.look.tint)); }
 
   /* ---------- sizing + loop ---------- */
-  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 74 : 66; camera.updateProjectionMatrix(); const b = $("#top").getBoundingClientRect().bottom; $("#where").style.top = (b + 8) + "px"; document.body.style.setProperty("--below", (b + 8) + "px"); }
+  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = shelfNav.selected ? 70 : w < h ? 74 : 66; camera.updateProjectionMatrix(); const b = $("#top").getBoundingClientRect().bottom; $("#where").style.top = (b + 8) + "px"; document.body.style.setProperty("--below", (b + 8) + "px"); }
   addEventListener("resize", resize); resize();
   let last = performance.now(), fN = 0, fT = 0, mapT = 1, gazeT = 0, fps = 0; window.__fps = 0;
   const cen = new THREE.Vector2(0, 0);

@@ -22,15 +22,20 @@ for(const venue of ['bakery','sabzi','grocery']){
  await page.locator(dock+' button').first().click();await resume();
  await page.waitForFunction(()=>!!navAPI.navigation().selected);await page.waitForTimeout(1800);
  // Bakery/grocery calm arrivals are immediate; sabzi retains a short walk animation.
- if(venue==='sabzi')await page.waitForTimeout(12000);
+ 
  const state=await page.evaluate(()=>navAPI.navigation());assert.equal(state.fov,70);assert(state.marker);
  await shot(venue+'-shelf');
+ const before=await page.evaluate(v=>v==='bakery'?__bakery.state().yaw:v==='sabzi'?__sabzi.S3.info().yaw:__groc.cam.yaw,venue);
+ await pause();await page.mouse.move(200,360);await page.mouse.down();await page.mouse.move(260,360,{steps:3});await page.mouse.up();
+ const after=await page.evaluate(v=>v==='bakery'?__bakery.state().yaw:v==='sabzi'?__sabzi.S3.info().yaw:__groc.cam.yaw,venue);assert(Math.abs(after-before)>.2,'Free look after shelf arrival');
+ await resume();
+
  await pause();
  // A zoomed-in camera must reset on the next shelf jump.
  await page.locator('#gl').dispatchEvent('wheel',{deltaY:-900});
  await page.locator(dock+' button').last().click();await resume();await page.waitForTimeout(1500);
  assert.equal(await page.evaluate(()=>navAPI.navigation().fov),70);
- if(venue==='sabzi')await page.waitForTimeout(12000);
+ 
  await shot(venue+'-last-section');assert.deepEqual(errors,[]);
 }
 await context.close();}
