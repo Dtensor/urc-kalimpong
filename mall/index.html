@@ -1716,16 +1716,18 @@ function streamStrips() {
   }
 }
 function makeStrip(f) {
-  const w = f.w, o = f.off || 0, n = Math.max(1, f.cols.length - o), SH = .075, H = 72, px = Math.min(Math.round(H * w.slot / SH), Math.floor(4096 / n)), grp = new THREE.Group();
+  const w = f.w, o = f.off || 0, n = Math.max(1, f.cols.length - o), SH = .075, H = 72, px = Math.round(H * w.slot / SH), ticketScale = Math.min(1,4096/(n*px)), grp = new THREE.Group();
   f.tiers.forEach((y, t) => {
-    const c = cvs(n * px, H, (g, W) => {
+    const c = cvs(Math.round(n * px * ticketScale), Math.max(1,Math.round(H * ticketScale)), (g) => {
+      g.scale(ticketScale,ticketScale); const W=n*px;
       g.fillStyle = w.st.cellar ? "#1d130f" : "#fffdf8"; g.fillRect(0, 0, W, H); g.textAlign = "center"; g.textBaseline = "middle";
       f.cols.forEach((col, ci) => { const v = col && col[t]; if (!v) return; const x = f.n > 0 ? ci - o : n - 1 - (ci - o);
+        g.save();g.beginPath();g.rect(x*px,0,px,H);g.clip();
         g.fillStyle = v.gone ? "#999" : v.it.qty != null && v.it.qty <= 5 ? "#c62d22" : w.st.cellar ? "#f3d9a4" : "#1d1e21";
         fitText(g, v.it.name, px - 10, 15, 500); g.fillText(v.it.name, x * px + px / 2, 16);
         fitText(g, v.gone ? "sold out" : money(v.it.price), px - 10, 31, 700); g.fillText(v.gone ? "sold out" : money(v.it.price), x * px + px / 2, 47);
         g.fillStyle = "#b4a387"; g.fillRect(x * px + 5, 68, px - 10, 2);
-        g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(x * px, 6, 1, H - 12); });
+        g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(x * px, 6, 1, H - 12); g.restore(); });
     });
     const t2 = ctex(c); t2.anisotropy = Math.min(8, MAXANISO);
     const m = new THREE.Mesh(PLANE, new THREE.MeshBasicMaterial({ map: t2 }));
