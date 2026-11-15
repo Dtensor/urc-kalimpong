@@ -1509,7 +1509,7 @@ function build3D() {
   function safeFloor(x,z){const target=shelfNav.nearFloor(x,z,Array.from(SLOT.keys(),shelfTarget));if(target){arriveShelf(target.id);return true;}return false;}
   function goSection(st) {const its=ITEMS.filter(it=>it.section===st.sec.id&&SLOT.has(it.id));if(its.length)arriveShelf(its[Math.floor(its.length/2)].id);}
 
-  function goCounter() { go(0, ZC + 1.45, 0, -.34); }
+  function goCounter() { camera.fov=70;camera.updateProjectionMatrix();yawT=pitchT=null;vel.set(0,0);go(0, ZC + 1.45, 0, -.34); }
   $("#chips").innerHTML = stalls.map(st => `<button class="glass" data-s="${esc(st.sec.id)}" style="--c:${st.sec.color}"><i>${st.sec.n}</i>${esc(st.sec.name)}</button>`).join("") + `<button class="glass" data-s="__counter" style="--c:#b0832a"><i>⚖</i>Counter</button>`;
   $("#chips").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.s === "__counter") return goCounter(); const st = stalls.find(s => s.sec.id === b.dataset.s); if (st) goSection(st); });
   const mapc = $("#mapc"), mg = mapc.getContext("2d");

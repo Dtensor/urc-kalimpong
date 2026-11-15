@@ -1376,7 +1376,7 @@ const FIX_DEFS = [
   { type: 'counter', z0: -8.8, z1: -3.4 },
   { type: 'counter', z0: -1.2, z1: 4.2 },
   { type: 'rack', side: -1, z0: -1.6, z1: 3.8 },
-  { type: 'shelf', x0: 3.3, x1: 8.6 },
+  { type: 'shelf', x0: -1.0, x1: 4.3 },
   { type: 'ring' },
 ];
 const PLAT = { x: 0, z: -2.4, r: 1.7 };
@@ -1540,7 +1540,7 @@ function buildRacksCounters() {
       for (const y of [.36, .96, 1.56]) box(xc, y, -11.5, W + .1, .05, .72, wood);
       box(xc, 2.02, -11.5, W + .2, .08, .76, rose); box(xc, 2.02, -11.12, W + .2, .1, .02, brass);
       for (const x of [x0 - .05, xc, x1 + .05]) box(x, 1.0, -11.5, .06, 2.0, .72, wood);
-      OBST.push({ rect: [x0 - .2, 9, -12, -10.9] });
+      OBST.push({ rect: [x0 - .2, x1 + .2, -12, -10.9] });
     }
   });
   // ring platform (festive) — two tiers
