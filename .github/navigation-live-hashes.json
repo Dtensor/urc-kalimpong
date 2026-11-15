@@ -1,0 +1,18 @@
+[
+  {
+    "path": "complex/bakery/index.html",
+    "sha256": "4aef65ee653b1d1f66a4dd6678edcc73738232ddee368ac27056aa6180dadd3b"
+  },
+  {
+    "path": "complex/grocery/index.html",
+    "sha256": "6c52ff14307c7c7c13b35ba816e696c97a7c77e6b7129a5cc48c9882658f3c6e"
+  },
+  {
+    "path": "complex/sabzi/index.html",
+    "sha256": "8145e54c135e4896c30d0d2cd3652555db9a35e7f24000642d5e41f0f1924c2b"
+  },
+  {
+    "path": "complex/shared/shelf-navigation.js",
+    "sha256": "12620c7baefd9f806df949a665edcf4b24c47e75b70860ded1e10ed188df1ef4"
+  }
+]
