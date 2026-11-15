@@ -1804,7 +1804,7 @@ function step(dt) {
   let f = 0, s = 0, turn = 0;
   if (keys.KeyW || keys.ArrowUp) f += 1; if (keys.KeyS || keys.ArrowDown) f -= 1; if (keys.KeyA) s -= 1; if (keys.KeyD) s += 1;
   if (keys.ArrowLeft) turn += 1; if (keys.ArrowRight) turn -= 1;
-  f += -stick.y; turn += -stick.x * 1.15;
+  f += -stick.y; s += stick.x;
   yaw += turn * 1.8 * dt;
   const sp = keys.ShiftLeft || keys.ShiftRight ? 4.2 : 2.6;
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
@@ -1827,7 +1827,7 @@ function arriveShelf(target,done){shelfQuiet=!done;const n=getShelfNav(),v=n.sel
 function visitSection(s) {if(!s||!s.fx)return;const slots=s.fx.slots.filter(x=>x.it.section===s.id);if(slots.length)arriveShelf(shelfTarget(slots[Math.floor(slots.length/2)]));}
 function viewPoint(s) {return getShelfNav().view(shelfTarget(s));}
 function visitItem(it) {if(!it)return;const s=it.slot;if(!s){if(it===heroItem)arriveShelf({id:it.id,x:0,z:PLAT.z+PLAT.r,nx:0,nz:1,width:3.4,bottom:0,top:3.0,depth:1.7},()=>showGaze(it,true));return;}arriveShelf(shelfTarget(s),()=>{ringOn([s],3.5);showGaze(it,true);});}
-function safeFloor(x,z){const t=getShelfNav().nearFloor(x,z,SLOTS.map(shelfTarget));if(t){arriveShelf(t);return true;}return false;}
+function safeFloor(x,z){const targets=SLOTS.filter(s=>s.fx.type!=='ring'||Math.hypot(x-PLAT.x,z-PLAT.z)<=PLAT.r+.45).map(shelfTarget);const t=getShelfNav().nearFloor(x,z,targets);if(t){arriveShelf(t);return true;}return false;}
 let rings = [], ringUntil = 0;
 function ringOn(slots, secs) { rings = slots.slice(0, 24); ringUntil = clock.getElapsedTime() + (secs || 7); }
 function highlight(it) {
