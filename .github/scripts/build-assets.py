@@ -21,10 +21,16 @@ for it in items:
         raw=src.read_bytes();original_bytes+=len(raw)
         digest=hashlib.sha256(raw).hexdigest()[:20];name=digest+'.webp';target=out/name
         with Image.open(src) as source:
-            im=source.convert('RGBA');im.thumbnail((256,256),Image.Resampling.LANCZOS)
+            im=source.convert('RGBA')
+            alpha=im.getchannel('A');bbox=alpha.getbbox();transparent=alpha.getextrema()[0]<230
+            if transparent and bbox:im=im.crop(bbox)
+            im.thumbnail((256,256),Image.Resampling.LANCZOS)
+            pixels=list(im.getdata());opaque=[px for px in pixels if px[3]>230]
+            rectangular=transparent and len(opaque)/len(pixels)>.90
+            color='#'+''.join(f'{int(sum(px[c] for px in opaque)/len(opaque)):02x}' for c in range(3)) if opaque else '#ddd5c4'
             im.save(target,format='WEBP',quality=82,method=3)
             width,height=im.size
-        row.update(status='reference',file=name,width=width,height=height,bytes=target.stat().st_size)
+        row.update(status='reference',file=name,width=width,height=height,bytes=target.stat().st_size,rect=rectangular,color=color)
         if name not in seen:derivative_bytes+=row['bytes'];seen.add(name)
         counts['reference']+=1
     manifest['items'][it['id']]=row
