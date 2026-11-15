@@ -24,7 +24,7 @@ jobs:
           KALIMPONG_CASES: plaza:desktop
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
-          node .github/scripts/visual-smoke.cjs
+          node .github/scripts/plaza-followup.cjs
       - uses: actions/upload-artifact@v5
         if: always()
         with:
