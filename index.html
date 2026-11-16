@@ -248,6 +248,7 @@ footer a{color:inherit}
 .hidden{display:none!important}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script defer src="complex/shared/contact.js"></script>
 </head>
 <body>
 
@@ -842,6 +843,7 @@ beat("open", { ref: document.referrer, w: innerWidth, back: BACK, copy: API ? "s
 load().catch(() => { $("#shelves").innerHTML = ""; const e = el("div", "empty"); e.append(el("div", "big", "☕"), el("div", null, "The shelves are not answering just now. Give it a moment and pull to refresh.")); $("#shelves").append(e); });
 })();
 </script>
+<footer style="text-align:center;padding:16px;font-size:13px">E Mall Developed by Naveen</footer>
 </body>
 </html>
 
