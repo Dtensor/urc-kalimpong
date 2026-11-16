@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const base=process.argv[2]||path.join(__dirname,'site'),C=require(path.resolve(base,'complex/shared/easy-core.js'));
 const data=JSON.parse(fs.readFileSync(path.join(base,'menu.json'))),manifest=JSON.parse(fs.readFileSync(path.join(base,'complex/shared/urc-products/manifest.json'))),cats=Object.fromEntries(data.categories.map(c=>[c.id,c.label]));
-assert.equal(data.items.length,1715);const publicRoot=fs.readFileSync(path.join(base,'index.html'),'utf8');assert(!/\.ts\.net|shala-stats/.test(publicRoot));assert(publicRoot.includes('if (!API) return;'));
+assert.equal(data.items.length,1715);const publicRoot=fs.readFileSync(path.join(base,'index.html'),'utf8');assert(!/\.ts\.net/.test(publicRoot));assert.equal((publicRoot.match(/<script\s+defer\s+src="https:\/\/shala-stats\.shalas\.workers\.dev\/k\.js"><\/script>/g)||[]).length,1);assert(!/shala-stats\.shalas\.workers\.dev\/(?:s|f)\.js/.test(publicRoot));assert(publicRoot.includes('if (!API) return;'));
 assert.deepEqual(C.parse('two soaps and toothpaste'),[{raw:'two soaps',query:'soaps',quantity:2,maxPrice:null},{raw:'toothpaste',query:'toothpaste',quantity:1,maxPrice:null}]);
 assert.equal(C.parse('मुझे दो साबुन और टूथपेस्ट चाहिए')[0].quantity,2);
 assert.equal(C.parse('२ साबुन')[0].quantity,2);assert.equal(C.parse('2 kg atta')[0].quantity,1);
