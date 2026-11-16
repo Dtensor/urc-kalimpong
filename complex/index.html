@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><script data-kalimpong-entry>(function(){try{var p=new URLSearchParams(location.search),v=p.get('view'),mobile=matchMedia('(max-width:760px)').matches||(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<=760);if(!mobile)return;var path=location.pathname.replace(/index\.html$/,''),venue=path.match(/\/complex\/(bakery|sabzi|grocery|cinema)\/$/),entry='',to='';if(/\/complex\/$/.test(path)&&v!=='hall'){entry='plaza-main';to='plaza-easy';}else if(venue&&v!=='hall'){entry=venue[1]+'-hall';to=venue[1]+'-easy';}else if(/\/mall\/$/.test(path)&&v!=='hall'){entry='urc-hall';to='urc-easy';}else if(/\/urc-kalimpong\/$/.test(path)&&v!=='list'){entry='urc-list';to='urc-easy';}if(entry)sessionStorage.setItem('kalimpong.redirect',JSON.stringify({entry:entry,to:to,at:Date.now(),source:['whatsapp','sms','email','qr','facebook','instagram','telegram','keep'].indexOf(p.get('utm_source')||p.get('source'))>=0?(p.get('utm_source')||p.get('source')):''}));}catch(e){}})();</script><script defer src="https://shala-stats.shalas.workers.dev/k.js"></script>
 <script>window.URC_EASY_REDIRECT=new URLSearchParams(location.search).get('view') !== 'hall' && (matchMedia('(max-width: 760px)').matches || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width,screen.height)<=760));if(window.URC_EASY_REDIRECT)location.replace(new URL("shared/easy.html?venue=plaza",location.href).href);</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>The Plaza · Station Complex</title>
@@ -1929,3 +1929,4 @@ boot();
 </script>
 </body>
 </html>
+
