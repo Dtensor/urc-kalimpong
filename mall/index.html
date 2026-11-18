@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <script>
 window.URC_EASY_REDIRECT = new URLSearchParams(location.search).get('view') !== 'hall' && (matchMedia('(max-width: 760px)').matches || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) <= 760));
-if (window.URC_EASY_REDIRECT) location.replace(new URL('../complex/shared/easy.html', location.href).href);
+if (!location.hash && Array.from(new URLSearchParams(location.search).keys()).every(k => k.startsWith('utm_') || k==='source')) { window.URC_EASY_REDIRECT=true; const dest=new URL('../complex/shared/station/#hall',location.href); dest.search=location.search; location.replace(dest.href); } else if (window.URC_EASY_REDIRECT) location.replace(new URL('../complex/shared/easy.html', location.href).href);
 </script>
 <title>Canteen Walk-through</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
