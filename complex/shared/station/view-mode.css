@@ -9,5 +9,4 @@
 .km-classic-view{--km-row:calc(52px + env(safe-area-inset-top,0px))}
 #km-classic-switch{position:fixed;inset:0 0 auto;z-index:1000;padding-top:calc(4px + env(safe-area-inset-top,0px))}
 .km-classic-view :is(#intro,#list,#ledger,#board){top:var(--km-row)}
-.km-classic-view :is(#top,#where,#mapw,#dirw){margin-top:var(--km-row)}
-@media(min-width:761px){.km-classic-view #map{margin-top:var(--km-row)}}
+.km-classic-view :is(#top,#where,#mapw,#map,#dirw){margin-top:var(--km-row)}
