@@ -10,3 +10,21 @@
 #km-classic-switch{position:fixed;inset:0 0 auto;z-index:1000;padding-top:calc(4px + env(safe-area-inset-top,0px))}
 .km-classic-view :is(#intro,#list,#ledger,#board){top:var(--km-row)}
 .km-classic-view :is(#top,#where,#mapw,#map,#dirw){margin-top:var(--km-row)}
+
+.km-modes>.km-basket-button{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-height:44px;min-width:0;margin:0 0 0 3px;padding:0 13px;border:1px solid #839887;border-radius:7px;background:#234c3d;color:#fff7e1;font:600 14px/1.15 system-ui,sans-serif;text-transform:none;letter-spacing:normal;white-space:nowrap;cursor:pointer}
+.km-basket-button:hover{background:#305b49}
+.km-basket-button:focus-visible{outline:3px solid #ffd786;outline-offset:1px}
+#km-trip-dialog{box-sizing:border-box;position:fixed;inset:0 0 0 auto;width:min(440px,100vw);height:100%;height:100dvh;max-width:100%;max-height:100%;padding:0;margin:0;border:0;background:#fbf7ed;box-shadow:-10px 0 46px #182b2444;overflow:hidden}
+#km-trip-dialog::backdrop{background:#11221dcc}
+#km-trip-dialog iframe{width:100%;height:100%;display:block;border:0}
+@media(max-width:460px){
+  .km-modes>span{padding-inline:5px}.km-modes>a{padding-inline:8px}
+  .km-modes>.km-basket-button{margin-left:0;padding-inline:9px}
+  #km-trip-dialog{inset:auto 0 0;width:100%;height:86vh;height:86dvh;border-radius:16px 16px 0 0}
+}
+
+#km-trip-dialog[open]{display:flex;flex-direction:column}
+#km-trip-dialog .km-trip-head{position:static;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;padding:14px 20px;background:#18392e;color:#fff6df}
+#km-trip-title{margin:0;font:normal 32px/1.2 Georgia,serif;color:inherit;letter-spacing:normal;text-shadow:none;text-transform:none}
+#km-trip-dialog .km-trip-head button{position:static;font:600 14px/1 system-ui,sans-serif;color:#fff6df;background:transparent;border:1px solid #9cab9d;border-radius:7px;min-height:44px;padding:0 13px;cursor:pointer}
+#km-trip-dialog iframe{position:static;flex:1 1 auto;min-height:0;height:0}

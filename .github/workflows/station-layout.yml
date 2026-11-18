@@ -1,7 +1,7 @@
 name: Station shopping layout
 on:
   pull_request:
-    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/station-browser.py', '.github/workflows/station-layout.yml']
+    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/station-browser.py', '.github/scripts/basket-browser.py', '.github/workflows/station-layout.yml']
   push:
     branches: [main]
     paths: ['index.html', 'mall/index.html', 'complex/shared/station/**']
@@ -10,9 +10,13 @@ permissions:
   contents: read
 jobs:
   shopping:
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [station, basket]
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/playwright/python:v1.59.0-noble
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v6
         with:
@@ -32,10 +36,10 @@ jobs:
             python -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/station.log" 2>&1 &
             curl --fail --retry 8 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/ --output /dev/null
           fi
-          python .github/scripts/station-browser.py
+          python .github/scripts/${{ matrix.suite }}-browser.py
       - uses: actions/upload-artifact@v5
         if: always()
         with:
-          name: station-screenshots
+          name: ${{ matrix.suite }}-screenshots
           path: station-evidence
           retention-days: 5

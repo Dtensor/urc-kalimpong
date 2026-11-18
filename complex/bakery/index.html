@@ -966,6 +966,13 @@ function openList(asPage) {
 function closeList() { $('#list').hidden = true; document.body.classList.remove('listing'); if (canvasEl) canvasEl.focus(); }
 
 /* ================= basket ================= */
+window.addEventListener('storage', event => {
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== 'complex.cart.bakery')) return;
+    try { cart = JSON.parse(lsGet(CART_KEY) || '{}') || {}; } catch { return; }
+    updTrolley();
+    if (!$('#sheet').hidden) renderBasket();
+    if (!$('#list').hidden) renderList();
+});
 function cartCount() { return Object.entries(cart).reduce((n, [id, q]) => n + (BYID[id] ? q : 0), 0); }
 function cartTotal() { return Object.entries(cart).reduce((n, [id, q]) => n + (BYID[id] ? BYID[id].price * q : 0), 0); }
 function updTrolley() { $('#bn').textContent = cartCount(); $('#bt').textContent = rupee(cartTotal()); }

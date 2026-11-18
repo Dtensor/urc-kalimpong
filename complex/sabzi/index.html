@@ -819,6 +819,12 @@ const lotusSVG = `<circle cx="50" cy="50" r="48" fill="#e8a21c"/><circle cx="50"
 
 /* ================================================================ basket, card, board (shared by 3D and flat) */
 function basketTotal() { let t = 0, n = 0; for (const [k, q] of Object.entries(BASKET)) { const it = BY.get(k); if (it) { t += it.price * q; n++; } } return [t, n]; }
+window.addEventListener('storage', event => {
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== 'complex.cart.sabzi')) return;
+    BASKET = store.get(CART, {});
+    paintBasket();
+    if (!$('#sheetbg').hidden) openBasket();
+});
 function paintBasket() { const [t, n] = basketTotal(); $("#bt").textContent = money(t); $("#bn").textContent = n; refreshBoardCounts(); }
 function setQty(it, q) { const u = U(it); q = Math.round(q / u.step) * u.step; if (q < u.min - 1e-9) delete BASKET[it.id]; else BASKET[it.id] = +q.toFixed(3); saveCart(); paintBasket(); }
 function addToBasket(it, q, fromEl) {

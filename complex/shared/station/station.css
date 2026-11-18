@@ -57,3 +57,6 @@ header .km-modes{margin-left:12px;flex-shrink:0}
 .film-actions a{display:inline-flex;align-items:center;min-height:44px}
 #film-board iframe{display:block;width:min(100%,700px);aspect-ratio:16/9;border:0}
 @media(max-width:700px){#film-board summary span{display:block;margin:5px 0 0 18px}}
+
+.counter-links{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}.counter-links #basket{color:#214336}
+@media(max-width:700px){.sectionhead{align-items:flex-start}.counter-links{gap:5px}.counter-links a{white-space:nowrap}}

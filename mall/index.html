@@ -2100,6 +2100,14 @@ function goWing(w) { fovT = 70; yawT = null; yawV = pitchV = 0; closeHold(); set
 function goHall() { closeHold(); setMap(false); teleport(0, HUB_R - 3.2, 0, -.06); }
 
 /* ================================================================ basket */
+window.addEventListener('storage', event => {
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== 'bhandar.basket')) return;
+    BASKET = store.get('basket', {});
+    if (DATA) {
+      paintTrolley();
+      if (!$('#sheetbg').hidden && $('#sheet h2')?.textContent === 'Your trolley') openBasket();
+    }
+});
 function saveBasket() { store.set("basket", BASKET); paintTrolley(); }
 function paintTrolley() {
   const ids = Object.keys(BASKET).filter(id => BYID.has(id)); let n = 0, t = 0;
