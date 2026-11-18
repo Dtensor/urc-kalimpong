@@ -2,6 +2,7 @@ const featured=['lipton-darjeeling-tea-250-g','coffee-nescafe-50g-jar','biscuit-
 const rupees = value => Number.isFinite(value) ? '₹'+value.toFixed(2) : 'Price at counter';
 const venues={
   urc:{key:'bhandar.basket',easy:'../easy.html',title:'Canteen shelves',menu:'../../../menu.json',images:'../urc-products/manifest.json'},
+  sabzi:{key:'complex.cart.sabzi',easy:'../easy.html?venue=sabzi',title:'Produce at the stall',menu:'../../sabzi/data.json',images:'../easy-products/manifest.json'},
   bakery:{key:'complex.cart.bakery',easy:'../easy.html?venue=bakery',title:'Bakehouse menu',menu:'../../bakery/data.json',images:'../easy-products/manifest.json'}
 };
 let venue,shop;
@@ -13,25 +14,25 @@ function node(tag,text,cls){
   return el;
 }
 function readBasket(){
-  return EasyCore.cleanBasket(JSON.parse(localStorage.getItem(venues[venue].key)||'{}'),venue==='bakery');
+  return EasyCore.cleanBasket(JSON.parse(localStorage.getItem(venues[venue].key)||'{}'),venue!=='urc');
 }
 function updateCount(){
-  let count=0;try{count=Object.values(readBasket()).reduce((a,b)=>a+b,0);}catch{}
-  document.querySelector('#basket').textContent=(venue==='bakery'?'Bakery basket · ':'Basket · ')+count;
+  let count=0;try{const bag=readBasket();count=venue==='sabzi'?Object.keys(bag).length:Object.values(bag).reduce((a,b)=>a+b,0);}catch{}
+  document.querySelector('#basket').textContent=({bakery:'Bakery basket · ',sabzi:'Produce list · ',urc:'Basket · '}[venue])+count;
 }
-function addItem(item){
+function addItem(item,amount=1){
   const msg=node('p','','success');detail.querySelector('.success')?.remove();detail.append(msg);msg.setAttribute('role','status');
   try{
     const basket=readBasket(),qty=basket[item.id]||0;
-    if(qty>=99){msg.textContent='This item has reached the basket limit.';return;}
-    basket[item.id]=Math.min(99,qty+(venue==='bakery'&&item.unit==='kg'?.25:1));localStorage.setItem(venues[venue].key,JSON.stringify(basket));updateCount();
-    msg.textContent='Added to your basket · '+basket[item.id]+' of this item';
+    if(qty+amount>99){msg.textContent='This amount would exceed the basket limit.';return;}
+    basket[item.id]=qty+amount;localStorage.setItem(venues[venue].key,JSON.stringify(basket));updateCount();
+    msg.textContent=item.unit==='kg'?'In your basket · '+weightLabel(basket[item.id]):'Added to your basket · '+basket[item.id]+' of this item';
   }catch{msg.textContent='Your browser could not save this item.';}
 }
 function openBasket(){location.href=venues[venue].easy+'#list';}
 function photo(item,full=false){
-  if(venue==='bakery'){
-    const row=shop.manifest?.items?.['bakery/'+item.id];
+  if(venue!=='urc'){
+    const row=shop.manifest?.items?.[venue+'/'+item.id];
     return row && row.name===item.name && row.original===(item.photo||null) && /^[a-f0-9]{20}\.webp$/.test(row.file)?'../easy-products/'+row.file:null;
   }
   const path=EasyCore.photo(item,shop.manifest,full);
@@ -40,6 +41,21 @@ function photo(item,full=false){
 function productImage(path,cls){
   if(!path)return node('span','Photo unavailable','placeholder');
   const img=node('img',null,cls);img.src=path;img.alt='';img.loading='lazy';img.onerror=()=>img.replaceWith(node('span','Photo unavailable','placeholder'));return img;
+}
+function weightLabel(kg){return kg<1?Math.round(kg*1000)+' g':kg+' kg';}
+function weightChoice(item){
+  const group=node('fieldset',null,'weight-choice');
+  group.append(node('legend','Choose weight'));
+  const total=node('output');total.setAttribute('aria-live','polite');
+  function refresh(kg){
+    total.textContent=Number.isFinite(item.price)?weightLabel(kg)+' · '+rupees(Math.round(item.price*100*kg)/100):'Price at counter';
+  }
+  for(const kg of [.25,.5,1]){
+    const label=node('label'),radio=node('input');
+    radio.type='radio';radio.name='weight';radio.value=String(kg);radio.checked=kg===.25;
+    radio.onchange=()=>refresh(kg);label.append(radio,weightLabel(kg));group.append(label);
+  }
+  group.append(total);refresh(.25);return group;
 }
 async function pick(id,illustration){
   const atVenue=venue;
@@ -52,14 +68,16 @@ async function pick(id,illustration){
   else{
     const illustrated=Number.isInteger(illustration);
     let picture;
-    if(illustrated && venue==='bakery'){
-      picture=node('div',null,'pack bread-closeup');
-      picture.style.backgroundPosition=[18,54,92][illustration]+'% 62%';
+    if(illustrated && venue!=='urc'){
+      picture=node('div',null,venue==='sabzi'?'pack produce-closeup':'pack bread-closeup');
+      picture.style.backgroundPosition=venue==='sabzi'?[2,48,95][illustration]+'% 45%':[18,54,92][illustration]+'% 62%';
     }else{
       picture=productImage(illustrated?'pack-'+illustration+'.webp':photo(item,true),'pack'+(illustrated?'':' reference'));
     }
-    detail.append(picture,node('h2',item.name),node('p',rupees(item.price)+(venue==='bakery'&&item.unit?' / '+item.unit:''),'price'),node('p',venue==='bakery'?'Sample bakery menu. Confirm the price and availability at the counter.':'Catalogue reference. Confirm price and availability at the counter.','note'));
-    const add=button(item.status==='out'?'Currently unavailable':'Add to basket',()=>addItem(item),'primary');
+    detail.append(picture,node('h2',item.name),node('p',rupees(item.price)+(venue!=='urc'&&item.unit?' / '+item.unit:''),'price'),node('p',venue==='sabzi'?'Sample produce prices. Confirm at the stall.':venue==='bakery'?'Sample bakery menu. Confirm the price and availability at the counter.':'Catalogue reference. Confirm price and availability at the counter.','note'));
+    const weights=venue==='sabzi'&&item.unit==='kg'?weightChoice(item):null;
+    if(weights)detail.append(weights);
+    const add=button(item.status==='out'?'Currently unavailable':'Add to basket',()=>addItem(item,weights?Number(weights.querySelector(':checked').value):item.unit==='kg'&&venue==='bakery'?.25:1),'primary');
     add.disabled=item.status==='out';detail.append(add);
   }
   const list=node('a','View basket →');list.href=venues[venue].easy+'#list';list.style.marginLeft='12px';detail.append(list);
@@ -73,7 +91,7 @@ function drawCards(){
   const cards=$('#cards');cards.replaceChildren();
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
-    card.append(productImage(photo(item)),node('strong',item.name),node('span',rupees(item.price)));
+    card.append(productImage(photo(item)),node('strong',item.name),node('span',rupees(item.price)+(venue==='sabzi'?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);
   }
@@ -93,20 +111,21 @@ async function readJSON(path){
 async function loadVenue(name){
   const config=venues[name];
   const [raw,manifest]=await Promise.all([readJSON(config.menu),readJSON(config.images).catch(()=>null)]);
-  const data=name==='bakery'?EasyCore.normalizeShop(raw):raw;
+  const data=name==='urc'?raw:EasyCore.normalizeShop(raw);
   return {items:data.items,groups:data.groups,byId:new Map(data.items.map(i=>[i.id,i])),
     departments:new Map(data.categories.map(c=>[c.id,c.group])),manifest,limit:18};
 }
 async function showVenue(name){
   if(name===venue && (shop||catalogues.has(name)))return;
   venue=name;shop=null;
-  const bakery=name==='bakery';
+  const bakery=name==='bakery',produce=name==='sabzi';
   $('#catalogue-title').textContent=venues[name].title;
   $('.sectionhead a').href=venues[name].easy;
-  $('#sample-note').hidden=!bakery;
-  $('#search').value='';$('#search').placeholder=bakery?'Search bread, cake, biscuits…':'Search tea, soap, a watch…';
-  $('#search').setAttribute('aria-label',bakery?'Search the bakery menu':'Search the canteen catalogue');
-  $('#group').replaceChildren(new Option(bakery?'All sections':'All departments',''));
+  $('#sample-note').hidden=name==='urc';
+  $('#sample-note').textContent=produce?'Sample produce prices. Confirm at the stall.':'Sample bakery menu. Confirm prices and availability at the counter.';
+  $('#search').value='';$('#search').placeholder=produce?'Search tomatoes, iskus, greens…':bakery?'Search bread, cake, biscuits…':'Search tea, soap, a watch…';
+  $('#search').setAttribute('aria-label',produce?'Search the produce stall':bakery?'Search the bakery menu':'Search the canteen catalogue');
+  $('#group').replaceChildren(new Option(name!=='urc'?'All sections':'All departments',''));
   $('#matches').textContent='Opening the catalogue…';$('#cards').replaceChildren();$('#more').hidden=true;updateCount();
   if(!catalogues.has(name))catalogues.set(name,loadVenue(name));
   try{

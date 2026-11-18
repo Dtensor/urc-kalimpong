@@ -1,13 +1,15 @@
 const $ = selector => document.querySelector(selector);
 const scenes = [
-  {id:'plaza',crumb:'Plaza',name:'Station Plaza',hint:'Visit the bakery window or step through the canteen doors.',alt:'Wet cobbles, the plaza clock and the red bakery awning to its left.',trail:[0],points:[
-    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3]]},
+  {id:'plaza',crumb:'Plaza',name:'Station Plaza',hint:'Choose a shop around the clock courtyard.',alt:'Wet cobbles, the plaza clock and the red bakery awning to its left.',trail:[0],points:[
+    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5]]},
   {id:'hall',crumb:'Hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',trail:[0,1],points:[['Walk to the shelf',50,50,2]]},
   {id:'shelf',crumb:'Shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',trail:[0,1,2],points:[
     ['Darjeeling tea',17,65,featured[0]],['Coffee',47,65,featured[1]],['Parle-G',80,65,featured[2]]]},
   {id:'bakery',crumb:'Bakery window',venue:'bakery',name:'Station Bakehouse',hint:'Three breads sit in the window. The open door is just to their right.',alt:'A striped awning above the arched window. A round sourdough sits on blue cloth and a brass bell hangs inside the door.',trail:[0,3],points:[['Step inside',72,49,4]]},
   {id:'counter',crumb:'Bread counter',venue:'bakery',name:'At the bread counter',hint:'Choose a loaf, or a pack of six pav. The clock is just across the glass.',alt:'Through the bakery window, the plaza clock. Pav rolls, milk bread and a sourdough boule line the counter from left to right.',trail:[0,3,4],points:[
-    ['Ladi pav',31,61,'ladi-pav-6'],['Milk bread',53,58,'milk-bread-400g'],['Hill sourdough',79,56,'hill-sourdough']]}
+    ['Ladi pav',31,61,'ladi-pav-6'],['Milk bread',53,58,'milk-bread-400g'],['Hill sourdough',79,56,'hill-sourdough']]},
+  {id:'sabzi',crumb:'Produce stall',venue:'sabzi',name:'Sabzi Mandi',hint:'Choose tomatoes or iskus by weight, or pick up a bunch of spinach.',alt:'Cane baskets of tomatoes, pale green iskus squash and tied spinach beside a brass balance overlooking terraced hills.',trail:[0,5],points:[
+    ['Tomatoes',16,46,'tomato'],['Iskus squash',48,46,'iskus'],['Spinach',81,46,'spinach']]}
 ];
 let place=0, motion=!matchMedia('(prefers-reduced-motion: reduce)').matches, walkAnimation;
 const world=$('#world'), viewport=$('#viewport'), sheet=$('#sheet'), detail=$('#detail');
@@ -86,8 +88,8 @@ function tuneAmbience(){
   clearTimeout(birdTimer);
   if(!audio)return;
   const active=soundOn&&!document.hidden, now=audio.currentTime;
-  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012][place]:0,now,.15);
-  filter.frequency.setTargetAtTime([850,1600,500,800,470][place],now,.22);
+  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012,.018][place]:0,now,.15);
+  filter.frequency.setTargetAtTime([850,1600,500,800,470,950][place],now,.22);
   function birdsong(){
     if(!soundOn || document.hidden || place!==0)return;
     const t=audio.currentTime, f=1900+Math.random()*350;
