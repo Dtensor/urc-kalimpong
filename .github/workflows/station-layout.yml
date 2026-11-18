@@ -1,0 +1,41 @@
+name: Station shopping layout
+on:
+  pull_request:
+    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/station-browser.py', '.github/workflows/station-layout.yml']
+  push:
+    branches: [main]
+    paths: ['index.html', 'mall/index.html', 'complex/shared/station/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shopping:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: |
+          pip install playwright==1.59.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Check both storefronts and the shared shopping basket
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+            export KALIMPONG_REVIEW=https://dtensor.github.io/urc-kalimpong/
+            for attempt in {1..36}; do
+              if curl -fsS --max-time 8 "${KALIMPONG_REVIEW}index.html" | cmp -s index.html -; then break; fi
+              sleep 5
+            done
+            curl -fsS --max-time 10 "${KALIMPONG_REVIEW}index.html" | cmp -s index.html -
+          else
+            python -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/station.log" 2>&1 &
+            curl --fail --retry 8 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/ --output /dev/null
+          fi
+          python .github/scripts/station-browser.py
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: station-screenshots
+          path: station-evidence
+          retention-days: 5
