@@ -1,0 +1,81 @@
+from pathlib import Path
+from playwright.sync_api import sync_playwright, expect
+import os
+
+root = os.environ.get('KALIMPONG_REVIEW', 'http://127.0.0.1:8765').rstrip('/') + '/'
+out = Path('station-evidence')
+out.mkdir(exist_ok=True)
+expect.set_options(timeout=20000)
+
+with sync_playwright() as pw:
+    for engine, width, height in [('chromium', 1440, 920), ('webkit', 390, 844)]:
+        browser = getattr(pw, engine).launch()
+        page = browser.new_page(viewport={'width': width, 'height': height})
+        errors = []
+        page.on('pageerror', lambda e: errors.append(str(e)))
+        page.route('https://shala-stats.shalas.workers.dev/**', lambda r: r.fulfill(body=''))
+        page.route('https://fonts.googleapis.com/**', lambda r: r.abort())
+        frame = page.frame_locator('#km-trip-dialog iframe')
+        launcher = page.locator('.km-basket-button')
+        def click_button(name):
+            page.get_by_role('button', name=name, exact=True).click()
+        def close_panel():
+            page.get_by_role('button', name='Close my basket').click()
+            expect(page.locator('#km-trip-dialog')).to_be_hidden()
+        def add_product(button, grams=None):
+            click_button(button)
+            if grams:
+                page.get_by_role('radio', name=grams, exact=True).check()
+            click_button('Add to basket')
+            click_button('Close')
+        page.goto(root+'complex/shared/station/#counter',wait_until='domcontentloaded')
+        expect(launcher).to_be_in_viewport()
+        launcher.click()
+        expect(frame.get_by_text('Your basket is empty.',exact=False)).to_be_visible()
+        close_panel()
+        add_product('Milk bread')
+        click_button('Plaza')
+        click_button('Visit Sabzi Mandi')
+        add_product('Tomatoes','500 g')
+        click_button('Plaza')
+        click_button('Visit Station Grocery')
+        click_button('First-flush tea')
+        click_button('Add to basket')
+        page.locator('#sheet').get_by_role('button',name='My basket',exact=True).click()
+        expect(frame.locator('#total')).to_have_text('₹385')
+        close_panel()
+        expect(page.locator('#sheet')).to_be_visible()
+        click_button('Close')
+        click_button('Plaza')
+        click_button('Visit Sabzi Mandi')
+        page.locator('#explore-3d').click()
+        page.wait_for_url('**/sabzi/?view=hall',wait_until='domcontentloaded')
+        quiet = page.locator('#intro').get_by_role('button',name='Enter quietly',exact=True)
+        if quiet.count():
+            quiet.click()
+        launcher.click()
+        tomato = frame.locator('[data-item="tomato"]')
+        expect(tomato.locator('output')).to_have_text('500 g')
+        frame.get_by_role('button',name='Increase Tomato',exact=True).click()
+        expect(tomato.locator('output')).to_have_text('750 g')
+        frame.get_by_role('button',name='Increase Tomato',exact=True).click()
+        expect(tomato.locator('output')).to_have_text('1 kg')
+        expect(frame.locator('#total')).to_have_text('₹405')
+        expect(frame.get_by_text('Milk Bread 400 g',exact=True)).to_be_visible()
+        expect(frame.get_by_text('Darjeeling Tea, first flush 100 g',exact=True)).to_be_visible()
+        page.screenshot(path=out/f'{engine}-three-counter-basket.jpg',type='jpeg',quality=85)
+        close_panel()
+        expect(page.locator('#bt')).to_contain_text('40')
+        page.locator('#km-classic-switch a').click()
+        expect(page.locator('#world')).to_have_attribute('data-scene','sabzi')
+        page.reload(wait_until='domcontentloaded')
+        launcher.click()
+        expect(frame.locator('#total')).to_have_text('₹405')
+        frame.get_by_role('button',name='Remove Tomato',exact=True).click()
+        expect(frame.locator('#total')).to_have_text('₹365')
+        expect(frame.locator('[data-counter="sabzi"]')).to_have_count(0)
+        close_panel()
+        expect(page.locator('#basket')).to_have_text('Produce list · 0')
+        assert not errors, errors
+        print(engine, 'passed the three-counter trip, edit in 3D, same-scene return and saved total', flush=True)
+        browser.close()

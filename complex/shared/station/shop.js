@@ -82,7 +82,8 @@ async function pick(id,illustration){
     const add=button(item.status==='out'?'Currently unavailable':'Add to basket',()=>addItem(item,weights?Number(weights.querySelector(':checked').value):item.unit==='kg'&&venue==='bakery'?.25:1),'primary');
     add.disabled=item.status==='out';detail.append(add);
   }
-  const list=node('a','View basket →');list.href=venues[venue].easy+'#list';list.style.marginLeft='12px';detail.append(list);
+  const all=button('My basket',()=>window.dispatchEvent(new Event('km-open-basket')));detail.append(all);
+  const list=node('a','View shop list →');list.href=venues[venue].easy+'#list';list.style.marginLeft='12px';detail.append(list);
   sheet.showModal();
 }
 function drawCards(){

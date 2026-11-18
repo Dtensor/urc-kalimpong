@@ -17,6 +17,44 @@
     if (scene === 'counter' || scene === 'shelf') url.searchParams.set('photo', scene);
     return url;
   }
+  const modes = document.querySelector('.km-modes');
+  const basketButton = document.createElement('button');
+  basketButton.type = 'button';
+  basketButton.className = 'km-basket-button';
+  basketButton.textContent = 'My basket';
+  basketButton.setAttribute('aria-haspopup', 'dialog');
+  modes.append(basketButton);
+
+  let drawer, frame, opener;
+  function openTripBasket() {
+    if (drawer?.open) return;
+    opener = document.activeElement;
+    if (!drawer) {
+      drawer = document.createElement('dialog');
+      drawer.id = 'km-trip-dialog';
+      drawer.setAttribute('aria-label', 'My basket');
+      frame = document.createElement('iframe');
+      frame.title = 'Shopping basket by counter';
+      drawer.append(frame);
+      document.body.append(drawer);
+      drawer.addEventListener('click', e => {
+        if (e.target === drawer) drawer.close();
+      });
+      drawer.addEventListener('close', () => {
+        frame.src = 'about:blank';
+        if (opener?.isConnected) opener.focus({preventScroll:true});
+      });
+      window.addEventListener('message', e => {
+        if (drawer.open && e.origin === location.origin && e.source === frame.contentWindow && e.data === 'km-close-basket') drawer.close();
+      });
+    }
+    if (document.pointerLockElement) document.exitPointerLock();
+    frame.src = new URL('trip-basket.html', station);
+    drawer.showModal();
+    frame.focus();
+  }
+  basketButton.addEventListener('click', e => {e.stopPropagation();openTripBasket();});
+  window.addEventListener('km-open-basket', openTripBasket);
   if (screen === 'station') {
     window.setStationView = scene => { const url = classic(scene); if (scene === 'cinema') url.searchParams.set('photo', scene); document.querySelector('#explore-3d').href = url; };
     return;

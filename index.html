@@ -604,6 +604,14 @@ async function want(it, h, c) {
 /* ---------- basket bar & sheet ---------- */
 function basketRows() { const m = byId(); return Object.entries(BASKET).map(([id, q]) => ({ it: m[id], q })).filter(r => r.it); }
 function basketTotal(rows) { if (!priced()) return null; let t = 0; for (const r of rows) { if (r.it.price == null) return null; t += r.it.price * r.q; } return t; }
+window.addEventListener('storage', event => {
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== 'bhandar.basket')) return;
+    BASKET = store.get('basket', {});
+    if (DATA) {
+      paintShelves(); paintBar();
+      if ($('#sheetbg').dataset.on === 'true') paintSheet();
+    }
+});
 function paintBar(bump) {
   const rows = basketRows(), n = rows.reduce((a, r) => a + r.q, 0);
   $("#bn").textContent = n; $("#bopen").dataset.empty = n === 0;

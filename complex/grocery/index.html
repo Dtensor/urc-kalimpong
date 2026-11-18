@@ -555,6 +555,13 @@ const unitShort=it=>({kg:'/kg',each:'each',pack:'/pack',box:'/box',jar:'/jar',bo
 function fmtQty(it,q){if(!loose(it))return String(q);return q<1?Math.round(q*1000)+' g':(Math.round(q*100)/100)+' kg'}
 function loadBasket(){let o={};try{o=JSON.parse(LS.get(CART_KEY)||'{}')||{}}catch(e){o={}}
   basket={};for(const k in o){const v=+o[k];if(BYID[k]&&v>0)basket[k]=v}}
+window.addEventListener('storage', event => {
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== 'complex.cart.grocery')) return;
+    loadBasket();
+    paintTrolley(); paintLedgerFoot();
+    if (!$('#ledger').hidden) renderLedgerRows();
+    if (!$('#sheetbg').hidden) openSheet();
+});
 function saveBasket(){LS.set(CART_KEY,JSON.stringify(basket))}
 function basketTotal(){let t=0,n=0;for(const k in basket){const it=BYID[k];if(!it)continue;t+=it.price*basket[k];n+=loose(it)?1:basket[k]}return{t,n,lines:Object.keys(basket).length}}
 

@@ -1,0 +1,23 @@
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;color:#26392f;background:#fbf7ed;font:16px/1.45 system-ui,sans-serif}
+body{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+header,footer,main{padding:16px clamp(14px,5vw,26px)}
+header,footer>div,.counter-title,.item-controls,.item-head,.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px}
+header{background:#18392e;color:#fff6df}
+h1,h2,p{margin:0}h1,h2{font:normal 32px/1.2 Georgia,serif}h2{font-size:23px}
+main{overflow-y:auto;overscroll-behavior:contain}
+footer{background:#eee8d8;border-top:1px solid #cec9b8;padding-bottom:max(15px,env(safe-area-inset-bottom))}
+footer output{font:bold 24px Georgia,serif}small,.price-note{font-size:13px;color:#576458}
+.counter-title{border-bottom:1px solid #879a85;padding-bottom:7px}
+.counter-title>span{font-weight:600;white-space:nowrap}
+section+section{margin-top:22px}
+article{padding:12px 0;border-bottom:1px solid #e1ddd0}
+.item-head{align-items:baseline}.item-head strong{overflow-wrap:anywhere}.item-head span{white-space:nowrap}
+.item-controls{margin-top:7px}
+button{font:inherit;cursor:pointer;min-height:44px;border:1px solid #bac2b3;border-radius:7px;background:#fffdf6;color:#254432;padding:0 12px}
+button:focus-visible{outline:3px solid #b56e22;outline-offset:1px}
+button:disabled{opacity:.45;cursor:default}
+header button{color:#fff6df;background:transparent;border-color:#9cab9d}
+.stepper{gap:5px}.stepper button{min-width:44px;font-size:18px}.stepper output{min-width:66px;text-align:center;font-weight:600}
+.remove{border:0;background:transparent;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+#notice:not(:empty){margin-top:12px;color:#754b24}
