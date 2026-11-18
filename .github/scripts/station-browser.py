@@ -128,9 +128,20 @@ with sync_playwright() as pw:
             if not back.count():
                 print(page.url,page.title(),page.locator('script[data-screen]').count(),errors[-3:],flush=True)
             expect(back).to_be_in_viewport()
-            if scene=='counter': page.screenshot(path=out/f'{engine}-classic-switch.jpg',type='jpeg',quality=80)
+            if scene=='counter':
+                page.screenshot(path=out/f'{engine}-classic-switch.jpg',type='jpeg',quality=80)
+                page.get_by_role('button',name='Enter quietly',exact=True).click()
+                expect(page.locator('#hud')).to_be_visible()
+                expect(page.locator('#gl')).to_be_visible()
+                expect(back).to_be_in_viewport()
+                page.screenshot(path=out/f'{engine}-bakery-walkthrough.jpg',type='jpeg',quality=80)
             back.click()
             expect(page.locator('#world')).to_have_attribute('data-scene',scene)
+        page.goto(root+'?view=list',wait_until='domcontentloaded')
+        page.get_by_role('link',name='Explore in 3D',exact=True).first.click()
+        expect(page.locator('#km-classic-switch a')).to_have_text('2D catalogue')
+        page.locator('#km-classic-switch a').click()
+        assert 'view=list' in page.url
         for venue,path in [('cinema','complex/cinema/'),('sabzi','complex/sabzi/')]:
             page.goto(root+'complex/shared/easy.html?venue='+venue,wait_until='domcontentloaded')
             forward=page.get_by_role('link',name='Explore in 3D',exact=True).first
