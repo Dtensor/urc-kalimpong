@@ -30,8 +30,8 @@ with sync_playwright() as pw:
         page.locator('#search').fill('zzzzzz');expect(page.locator('.card')).to_have_count(0)
         page.goto(root+'complex/');expect(page.locator('h1')).to_have_text('Station Plaza')
         page.get_by_role('button',name='Motion on').click();expect(page.locator('#motion')).to_have_attribute('aria-pressed','false')
-        for selector in ['a[href="../../bakery/?view=hall"]','a[href="../../grocery/"]','a[href="../../sabzi/?view=hall"]','a[href="../../cinema/"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
-            link=page.locator(selector).evaluate('(el)=>el.href')
+        for selector in ['a[href="../../bakery/?view=hall"]','a[href="#grocery"]','a[href="../../sabzi/?view=hall"]','a[href="../easy.html?venue=cinema"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
+            link=page.locator(selector).first.evaluate('(el)=>el.href')
             assert page.request.get(link).ok,link
         assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
         page.get_by_role('button',name='Visit the bakery',exact=True).click()
@@ -98,6 +98,41 @@ with sync_playwright() as pw:
         assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
         page.get_by_role('button',name='Plaza',exact=True).click()
         expect(page.locator('#basket')).to_have_text('Basket · 1')
+        page.get_by_role('button',name='Visit Station Grocery',exact=True).click()
+        expect(page.locator('h1')).to_have_text('Station Grocery')
+        page.locator('#scene').evaluate('(img)=>img.decode()')
+        page.screenshot(path=out/f'{engine}-grocery.jpg',type='jpeg',quality=80)
+        for label in ['Loose rice','Hill red rice','First-flush tea']:
+            page.get_by_role('button',name=label+' in scene',exact=True).click()
+            if label=='Loose rice':page.get_by_role('radio',name='500 g',exact=True).check()
+            page.get_by_role('button',name='Add to basket').click()
+            page.get_by_role('button',name='Close',exact=True).click()
+        page.locator('#basket').click()
+        total=page.locator('#main .panel').filter(has_text='Estimated total').locator('.price')
+        expect(total).to_contain_text('₹471')
         assert not errors,errors
+        for scene,path in [('plaza','complex/'),('hall','mall/'),('shelf','mall/'),('bakery','complex/bakery/'),('counter','complex/bakery/'),('sabzi','complex/sabzi/'),('grocery','complex/grocery/')]:
+            page.goto(root+'complex/shared/station/#'+scene,wait_until='domcontentloaded')
+            switch=page.locator('#explore-3d')
+            expect(switch).to_be_in_viewport()
+            assert switch.bounding_box()['y']<110
+            page.evaluate('window.scrollTo(0, 800)')
+            expect(switch).to_be_in_viewport()
+            switch.click()
+            assert page.url.startswith(root+path+'?view=hall'),page.url
+            back=page.locator('#intro .km-modes a')
+            expect(back).to_be_in_viewport()
+            if scene=='counter': page.screenshot(path=out/f'{engine}-classic-switch.jpg',type='jpeg',quality=80)
+            back.click()
+            expect(page.locator('#world')).to_have_attribute('data-scene',scene)
+        for venue,path in [('cinema','complex/cinema/'),('sabzi','complex/sabzi/')]:
+            page.goto(root+'complex/shared/easy.html?venue='+venue,wait_until='domcontentloaded')
+            forward=page.get_by_role('link',name='Explore in 3D',exact=True).first
+            expect(forward).to_be_in_viewport()
+            forward.click()
+            assert page.url.startswith(root+path+'?view=hall')
+            page.locator('#intro .km-modes a').click()
+            assert 'easy.html?venue='+venue in page.url
+
         print(engine,'passed public entry, hall, shelf, search, shared basket, shop links, classic routes and motion')
         b.close()

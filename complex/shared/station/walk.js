@@ -1,7 +1,7 @@
 const $ = selector => document.querySelector(selector);
 const scenes = [
   {id:'plaza',crumb:'Plaza',name:'Station Plaza',hint:'Choose a shop around the clock courtyard.',alt:'Wet cobbles, the plaza clock and the red bakery awning to its left.',trail:[0],points:[
-    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5]]},
+    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5],['Visit Station Grocery',76,51,6]]},
   {id:'hall',crumb:'Hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',trail:[0,1],points:[['Walk to the shelf',50,50,2]]},
   {id:'shelf',crumb:'Shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',trail:[0,1,2],points:[
     ['Darjeeling tea',17,65,featured[0]],['Coffee',47,65,featured[1]],['Parle-G',80,65,featured[2]]]},
@@ -9,7 +9,9 @@ const scenes = [
   {id:'counter',crumb:'Bread counter',venue:'bakery',name:'At the bread counter',hint:'Choose a loaf, or a pack of six pav. The clock is just across the glass.',alt:'Through the bakery window, the plaza clock. Pav rolls, milk bread and a sourdough boule line the counter from left to right.',trail:[0,3,4],points:[
     ['Ladi pav',31,61,'ladi-pav-6'],['Milk bread',53,58,'milk-bread-400g'],['Hill sourdough',79,56,'hill-sourdough']]},
   {id:'sabzi',crumb:'Produce stall',venue:'sabzi',name:'Sabzi Mandi',hint:'Choose tomatoes or iskus by weight, or pick up a bunch of spinach.',alt:'Cane baskets of tomatoes, pale green iskus squash and tied spinach beside a brass balance overlooking terraced hills.',trail:[0,5],points:[
-    ['Tomatoes',16,46,'tomato'],['Iskus squash',48,46,'iskus'],['Spinach',81,46,'spinach']]}
+    ['Tomatoes',16,46,'tomato'],['Iskus squash',48,46,'iskus'],['Spinach',81,46,'spinach']]},
+  {id:'grocery',crumb:'Grocery',venue:'grocery',name:'Station Grocery',hint:'Scoop loose rice, pick a pack of hill red rice or take home a tin of first-flush tea.',alt:'A wooden scoop rests in loose white rice beside a bag of hill red rice and a green tea tin. A grocer packs orders behind the counter.',trail:[0,6],points:[
+    ['Loose rice',26,60,'sona-masoori-loose'],['Hill red rice',56,49,'hill-red-rice-1kg'],['First-flush tea',78,61,'darjeeling-first-flush-100g']]}
 ];
 let place=0, motion=!matchMedia('(prefers-reduced-motion: reduce)').matches, walkAnimation;
 const world=$('#world'), viewport=$('#viewport'), sheet=$('#sheet'), detail=$('#detail');
@@ -18,7 +20,7 @@ function button(text,fn,cls='action'){
 }
 function visit(index,animate=true){
   if(sheet.open)sheet.close();
-  place=index;const s=scenes[index];world.dataset.scene=s.id;$('#scene').src=s.id+'.webp';$('#scene').alt=s.alt;
+  place=index;const s=scenes[index];world.dataset.scene=s.id;setStationView(s.id);$('#scene').src=s.id+'.webp';$('#scene').alt=s.alt;
   $('h1').textContent=s.name;$('#hint').textContent=s.hint;
   const nav=$('nav');nav.replaceChildren();
   for(const j of s.trail){
@@ -88,8 +90,8 @@ function tuneAmbience(){
   clearTimeout(birdTimer);
   if(!audio)return;
   const active=soundOn&&!document.hidden, now=audio.currentTime;
-  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012,.018][place]:0,now,.15);
-  filter.frequency.setTargetAtTime([850,1600,500,800,470,950][place],now,.22);
+  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012,.018,.013][place]:0,now,.15);
+  filter.frequency.setTargetAtTime([850,1600,500,800,470,950,550][place],now,.22);
   function birdsong(){
     if(!soundOn || document.hidden || place!==0)return;
     const t=audio.currentTime, f=1900+Math.random()*350;
