@@ -6,3 +6,7 @@ a{color:inherit;text-underline-offset:4px}header .wordmark{color:#fcf7e4;text-de
 #world[data-scene="plaza"]{top:min(0px,max(-3vw,calc(50cqh - 33.3333cqw)))}
 .pill{white-space:nowrap}
 @media(max-width:420px){header{gap:8px;padding-inline:12px}header .wordmark{font-size:21px}header .links{gap:10px}header .links a{font-size:13px}.pill{padding:7px 10px;font-size:14px}}
+
+.bread-closeup{background-image:url('counter.webp');background-size:330% auto}
+#sample-note{color:#635840;font-size:14px}
+@media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world[data-scene="counter"]) .links a:first-child{display:none}}

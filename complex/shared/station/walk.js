@@ -1,8 +1,13 @@
 const $ = selector => document.querySelector(selector);
 const scenes = [
-  {id:'plaza',name:'Station Plaza',hint:'The canteen doors are open, just beyond the clock.',alt:'Shoppers cross the wet cobbles beneath prayer flags, in front of the canteen.',points:[['Enter the canteen',50,53]]},
-  {id:'hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',points:[['Walk to the shelf',50,50]]},
-  {id:'shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',points:[['Darjeeling tea',17,65],['Coffee',47,65],['Parle-G',80,65]]}
+  {id:'plaza',crumb:'Plaza',name:'Station Plaza',hint:'Visit the bakery window or step through the canteen doors.',alt:'Wet cobbles, the plaza clock and the red bakery awning to its left.',trail:[0],points:[
+    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3]]},
+  {id:'hall',crumb:'Hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',trail:[0,1],points:[['Walk to the shelf',50,50,2]]},
+  {id:'shelf',crumb:'Shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',trail:[0,1,2],points:[
+    ['Darjeeling tea',17,65,featured[0]],['Coffee',47,65,featured[1]],['Parle-G',80,65,featured[2]]]},
+  {id:'bakery',crumb:'Bakery window',venue:'bakery',name:'Station Bakehouse',hint:'Three breads sit in the window. The open door is just to their right.',alt:'A striped awning above the arched window. A round sourdough sits on blue cloth and a brass bell hangs inside the door.',trail:[0,3],points:[['Step inside',72,49,4]]},
+  {id:'counter',crumb:'Bread counter',venue:'bakery',name:'At the bread counter',hint:'Choose a loaf, or a pack of six pav. The clock is just across the glass.',alt:'Through the bakery window, the plaza clock. Pav rolls, milk bread and a sourdough boule line the counter from left to right.',trail:[0,3,4],points:[
+    ['Ladi pav',31,61,'ladi-pav-6'],['Milk bread',53,58,'milk-bread-400g'],['Hill sourdough',79,56,'hill-sourdough']]}
 ];
 let place=0, motion=!matchMedia('(prefers-reduced-motion: reduce)').matches, walkAnimation;
 const world=$('#world'), viewport=$('#viewport'), sheet=$('#sheet'), detail=$('#detail');
@@ -10,24 +15,29 @@ function button(text,fn,cls='action'){
   const b=document.createElement('button'); b.textContent=text; b.className=cls; b.onclick=fn; return b;
 }
 function visit(index,animate=true){
+  if(sheet.open)sheet.close();
   place=index;const s=scenes[index];world.dataset.scene=s.id;$('#scene').src=s.id+'.webp';$('#scene').alt=s.alt;
   $('h1').textContent=s.name;$('#hint').textContent=s.hint;
   const nav=$('nav');nav.replaceChildren();
-  for(let j=0;j<=index;j++){
-    if(j)nav.append(document.createTextNode(' / '));
-    if(j===index)nav.append(document.createTextNode(['Plaza','Hall','Shelf'][j]));
-    else nav.append(button(['Plaza','Hall'][j],()=>navigate(j),''));
+  for(const j of s.trail){
+    if(nav.childNodes.length)nav.append(document.createTextNode(' / '));
+    nav.append(j===index?document.createTextNode(s.crumb):button(scenes[j].crumb,()=>navigate(j),''));
   }
+  showVenue(s.venue || 'urc');
   $('#pins').replaceChildren();$('#actions').replaceChildren();
-  s.points.forEach(([label,x,y],i)=>{
-    const act=()=>index===2?pick(featured[i],i):navigate(index+1);
-    const pin=button(index===2?'+':'↑',act,'pin');pin.setAttribute('aria-label',label+' in scene');pin.style.left=x+'%';pin.style.top=y+'%';$('#pins').append(pin);
+  s.points.forEach(([label,x,y,target],i)=>{
+    const doorway=typeof target==='number';
+    const act=doorway?()=>navigate(target):()=>pick(target,i);
+    const pin=button(doorway?'↑':'+',act,'pin');
+    pin.setAttribute('aria-label',label+' in scene');
+    pin.style.left=x+'%';pin.style.top=y+'%';$('#pins').append(pin);
     $('#actions').append(button(label,act));
   });
   viewport.scrollLeft=(world.offsetWidth-viewport.offsetWidth)/2;
   walkAnimation?.cancel();
   if(animate){$('h1').focus({preventScroll:true});if(motion)walkAnimation=world.animate([{opacity:.55,transform:'scale(1.045)'},{opacity:1,transform:'scale(1)'}],{duration:600,easing:'ease-out'});}
-  if(index<2){const next=new Image();next.src=scenes[index+1].id+'.webp';}
+  if(index===1 || index===3){const next=new Image();next.src=scenes[index+1].id+'.webp';}
+  if(index===4 && animate && audio && soundOn){tone(audio.currentTime,890,884,.25,.027);tone(audio.currentTime+.015,1670,1660,.34,.012);}
   refreshLife();
   tuneAmbience();
 }
@@ -76,8 +86,8 @@ function tuneAmbience(){
   clearTimeout(birdTimer);
   if(!audio)return;
   const active=soundOn&&!document.hidden, now=audio.currentTime;
-  ambience.gain.setTargetAtTime(active?[.022,.043,.009][place]:0,now,.15);
-  filter.frequency.setTargetAtTime([850,1600,500][place],now,.22);
+  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012][place]:0,now,.15);
+  filter.frequency.setTargetAtTime([850,1600,500,800,470][place],now,.22);
   function birdsong(){
     if(!soundOn || document.hidden || place!==0)return;
     const t=audio.currentTime, f=1900+Math.random()*350;
@@ -102,8 +112,8 @@ document.addEventListener('visibilitychange',tuneAmbience);
 function navigate(index){ location.hash=scenes[index].id; }
 function followHash(animate){
   const index=scenes.findIndex(s=>s.id===location.hash.slice(1));
-  if(index>=0){visit(index,animate);window.scrollTo(0,0);}
+  if(index>=0 || !location.hash){visit(Math.max(0,index),animate);window.scrollTo(0,0);}
 }
 window.addEventListener('hashchange',()=>followHash(true));
-visit(location.hash==='#hall'?1:location.hash==='#shelf'?2:0,false);
 startShop();
+visit(Math.max(0,scenes.findIndex(s=>s.id===location.hash.slice(1))),false);
