@@ -4,6 +4,6 @@
 <title>My basket · Station Plaza</title><link rel="stylesheet" href="trip-basket.css">
 <script defer src="../easy-core.js"></script><script defer src="../easy-lists-core.js"></script><script defer src="trip-basket.js"></script>
 </head><body>
-<main><div id="counters" tabindex="-1"></div><p id="notice" role="status"></p></main>
-<footer><div><strong id="total-label">Estimated total</strong><output id="total">—</output></div><small>Confirm prices and availability at each counter.</small></footer>
+<main><div id="counter-picker" hidden><label for="counter-choice">Show counter</label><select id="counter-choice"></select></div><div id="counters" tabindex="-1"></div><p id="notice" role="status"></p></main>
+<footer><div><strong id="total-label">Estimated total</strong><output id="total">—</output></div><small>Confirm prices and availability at each counter.</small><nav id="trip-actions" aria-label="Shopping list actions" hidden><button type="button" id="toggle-slip">Show at counter</button><a id="save-trip" href="../easy.html?venue=plaza#trip" target="_blank" rel="noopener">Save or copy trip ↗</a></nav></footer>
 </body></html>
