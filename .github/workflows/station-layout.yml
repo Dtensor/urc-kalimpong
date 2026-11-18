@@ -11,6 +11,7 @@ permissions:
 jobs:
   shopping:
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/playwright/python:v1.59.0-noble
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v6
@@ -18,7 +19,6 @@ jobs:
           persist-credentials: false
       - run: |
           pip install playwright==1.59.0
-          python -m playwright install --with-deps chromium webkit
       - name: Check both storefronts and the shared shopping basket
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
