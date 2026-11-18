@@ -18,6 +18,7 @@ function readBasket(){
   return EasyCore.cleanBasket(JSON.parse(localStorage.getItem(venues[venue].key)||'{}'),venue!=='urc');
 }
 function updateCount(){
+  if (!venue || document.querySelector('#basket').hidden) return;
   let count=0;try{const bag=readBasket();count=['sabzi','grocery'].includes(venue)?Object.keys(bag).length:Object.values(bag).reduce((a,b)=>a+b,0);}catch{}
   document.querySelector('#basket').textContent=({grocery:'Grocery list · ',bakery:'Bakery basket · ',sabzi:'Produce list · ',urc:'Basket · '}[venue])+count;
 }
@@ -117,7 +118,7 @@ async function loadVenue(name){
     departments:new Map(data.categories.map(c=>[c.id,c.group])),manifest,limit:18};
 }
 async function showVenue(name){
-  if(name===venue && (shop||catalogues.has(name)))return;
+  if(name===venue && (shop||catalogues.has(name))){updateCount();return;}
   venue=name;shop=null;
   const bakery=name==='bakery',produce=name==='sabzi';
   $('#catalogue-title').textContent=venues[name].title;
