@@ -41,6 +41,11 @@ with sync_playwright() as pw:
         expect(page.locator('h1')).to_have_text('At the bread counter')
         expect(page.locator('#basket')).to_have_text('Bakery basket · 0')
         page.locator('#scene').evaluate('(img)=>img.decode()')
+        for pin in page.locator('#pins .pin').all():
+            assert pin.evaluate('''button=>{
+              const r=button.getBoundingClientRect(), x=r.left+r.width/2, y=r.top+r.height/2;
+              return document.elementFromPoint(x,y)===button;
+            }'''), 'A bread hotspot is clipped or covered'
         page.screenshot(path=out/f'{engine}-bakery-counter.jpg',type='jpeg',quality=82)
         for label,title in [('Ladi pav','Ladi Pav (6)'),('Milk bread','Milk Bread 400 g'),('Hill sourdough','Hill Sourdough Boule')]:
             page.get_by_role('button',name=label,exact=True).click()

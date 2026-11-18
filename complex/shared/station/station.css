@@ -10,3 +10,12 @@ a{color:inherit;text-underline-offset:4px}header .wordmark{color:#fcf7e4;text-de
 .bread-closeup{background-image:url('counter.webp');background-size:330% auto}
 #sample-note{color:#635840;font-size:14px}
 @media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world[data-scene="counter"]) .links a:first-child{display:none}}
+@media(max-width:700px){
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) #viewport{
+    height:66.666667vw;min-height:0;overflow:hidden
+  }
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) #controls{
+    position:static;padding:16px 18px 20px;background:#432c24
+  }
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) h1{font-size:34px}
+}
