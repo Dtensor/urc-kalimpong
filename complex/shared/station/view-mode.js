@@ -65,7 +65,12 @@
       });
     }
     if (document.pointerLockElement) document.exitPointerLock();
-    frame.src = new URL('trip-basket.html', station);
+    const basketUrl = new URL('trip-basket.html', station);
+    const scene = screen === 'station' ? document.querySelector('#world')?.dataset.scene
+      : screen === 'easy' ? query.get('venue') || 'urc' : screen;
+    const counter = ({hall:'urc', shelf:'urc', catalogue:'urc', counter:'bakery'})[scene] || scene;
+    if (['urc','bakery','sabzi','grocery'].includes(counter)) basketUrl.searchParams.set('counter', counter);
+    frame.src = basketUrl;
     drawer.showModal();
     drawer.querySelector('button').focus({preventScroll:true});
   }

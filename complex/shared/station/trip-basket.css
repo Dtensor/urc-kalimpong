@@ -19,3 +19,19 @@ button:disabled{opacity:.45;cursor:default}
 .stepper{gap:5px}.stepper button{min-width:44px;font-size:18px}.stepper output{min-width:66px;text-align:center;font-weight:600}
 .remove{border:0;background:transparent;text-decoration:underline;text-underline-offset:3px;font-size:14px}
 #notice:not(:empty){margin-top:12px;color:#754b24}
+
+#trip-actions:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+#toggle-slip{font-weight:650;background:#234737;color:#fff8e4;border-color:#234737}
+#save-trip{font-size:14px;color:#274737;text-underline-offset:3px}
+#counter-picker:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+#counter-picker label{font-size:14px}
+#counter-choice{font:inherit;max-width:70%;min-height:44px;border:1px solid #9bab98;border-radius:7px;background:#fffdf6;color:#253c30;padding:6px}
+.showing-slip main{background:#e9e4d7}
+.showing-slip section{padding:18px clamp(12px,4vw,24px) 22px;background:#fffdf4;border:1px solid #c7bdab;border-top:4px solid #4b614a;box-shadow:0 2px 5px #433d2812}
+.showing-slip h2{font-size:clamp(28px,7vw,36px)}
+.showing-slip .counter-title{border-bottom:1px dashed #9e9a86;padding-bottom:14px}
+.showing-slip .item-head strong{font-size:19px}
+.showing-slip .item-head span{color:#536052}
+.showing-slip article{padding:14px 0;border-bottom:1px dashed #c4beae}
+.slip-quantity{font:600 25px/1.25 system-ui,sans-serif;margin-top:5px}
+@media(max-height:430px){footer{padding-block:6px}#trip-actions:not([hidden]){margin-top:3px}}
