@@ -21,23 +21,7 @@
     window.setStationView = scene => { document.querySelector('#explore-3d').href = classic(scene); };
     return;
   }
-  const style = document.createElement('link');
-  style.rel = 'stylesheet';
-  style.href = new URL('view-mode.css', station);
-  document.head.append(style);
-  function bar(current, action, href) {
-    const group = document.createElement('div');
-    group.className = 'km-modes';
-    group.setAttribute('role', 'group');
-    group.setAttribute('aria-label', 'Shopping view');
-    const state = document.createElement('span');
-    state.textContent = current;
-    const link = document.createElement('a');
-    link.href = href;
-    link.textContent = action;
-    group.append(state, link);
-    return group;
-  }
+  const link = document.querySelector('.km-modes-strip a');
   if (screen === 'easy' || screen === 'catalogue') {
     const venue = query.get('venue');
     const scene = screen === 'easy' && valid(venue) ? venue : 'hall';
@@ -45,11 +29,9 @@
     if (screen === 'easy') {
       url.searchParams.set('from', 'easy');
       url.hash = location.hash;
-      window.addEventListener('hashchange', () => {url.hash = location.hash; group.querySelector('a').href = url;});
+      window.addEventListener('hashchange', () => {url.hash = location.hash; link.href = url;});
     } else url.searchParams.set('from', 'catalogue');
-    const group = bar('2D shopping', 'Explore in 3D', url);
-    group.classList.add('km-modes-strip');
-    document.querySelector('header').before(group);
+    link.href = url;
     return;
   }
   if (!valid(screen)) return;
@@ -67,8 +49,6 @@
     label = '2D catalogue';
   }
   document.body.classList.add('km-classic-view');
-  const group = bar('Classic 3D', label, back);
-  group.id = 'km-classic-switch';
-  group.classList.add('km-modes-strip');
-  document.body.prepend(group);
+  link.href = back;
+  link.textContent = label;
 })();

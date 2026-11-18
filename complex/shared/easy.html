@@ -16,10 +16,11 @@
 .trip-items{list-style:none;padding:0;margin:1rem 0}.trip-items li{padding:.85rem 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.trip-items li:last-child{border-bottom:0}.trip-items p{margin:.4rem 0}.list-input{display:block;width:100%;min-height:3rem;padding:.7rem;border:1px solid #69786d;border-radius:.65rem;margin:.6rem 0 1rem;background:white;color:#202b27}.repeat-choice{display:flex;align-items:center;gap:.7rem;min-height:3rem;padding:.35rem 0;cursor:pointer}.repeat-choice input{width:1.7rem;height:1.7rem;flex-shrink:0;accent-color:var(--green)}.repeat-choice strong{min-width:0;overflow-wrap:anywhere}summary{cursor:pointer;min-height:3rem;overflow-wrap:anywhere}.repeat-shop,.trip-shop{overflow-wrap:anywhere}
 </style>
 <script src="easy-core.js" defer></script><script src="easy-lists-core.js" defer></script><script src="easy-lists.js" defer></script><script src="easy.js" defer></script>
-<script defer data-screen="easy" src="station/view-mode.js"></script>
 <script defer src="contact.js"></script>
+<link rel="stylesheet" href="station/view-mode.css">
 </head>
 <body>
+<div id="km-shopping-switch" class="km-modes km-modes-strip" role="group" aria-label="Shopping view"><span>2D shopping</span><a href="station/../../../mall/?view=hall">Explore in 3D</a></div><script data-screen="easy" src="station/view-mode.js"></script>
 <a class="skip" href="#main">Skip to shopping</a>
 <header class="top"><div class="identity"><div class="seal" aria-hidden="true">URC</div><div><strong>URC Kalimpong</strong><span id="top-sub">YOUR CANTEEN · AT YOUR PACE</span></div></div><button id="language" type="button" lang="hi">हिन्दी</button></header>
 <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></div>

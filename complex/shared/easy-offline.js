@@ -1,6 +1,6 @@
 /* Only the Easy shopping shell is cached. Catalogue/API/media requests pass through. */
 'use strict';
-const CACHE='kalimpong-easy-shell-3689438673308cafdcfc';
+const CACHE='kalimpong-easy-shell-7f803e49c9ffe7b76956';
 const FILES=['easy.html','easy-core.js','easy-lists-core.js','easy-lists.js','easy.js'];
 const base=new URL('./',self.location.href),urls=FILES.map(f=>new URL(f,base).href);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(urls.map(url=>new Request(url,{cache:'reload'}))))));

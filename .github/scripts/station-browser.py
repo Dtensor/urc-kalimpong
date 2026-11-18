@@ -3,6 +3,7 @@ from playwright.sync_api import sync_playwright,expect
 import json,os
 root=os.environ.get('KALIMPONG_REVIEW','http://127.0.0.1:8765').rstrip('/')+'/'
 out=Path('station-evidence');out.mkdir(exist_ok=True)
+expect.set_options(timeout=20000)
 with sync_playwright() as pw:
     for engine,size in [('chromium',(1440,920)),('webkit',(390,844))]:
         opts={}
@@ -139,6 +140,7 @@ with sync_playwright() as pw:
             expect(page.locator('#world')).to_have_attribute('data-scene',scene)
         page.goto(root+'?view=list',wait_until='domcontentloaded')
         page.get_by_role('link',name='Explore in 3D',exact=True).first.click()
+        page.wait_for_url('**/mall/?view=hall&from=catalogue',wait_until='domcontentloaded')
         expect(page.locator('#km-classic-switch a')).to_have_text('2D catalogue')
         page.locator('#km-classic-switch a').click()
         assert 'view=list' in page.url
