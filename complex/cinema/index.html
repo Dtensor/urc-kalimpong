@@ -212,7 +212,7 @@ body.seated #wings,body.seated #map,body.seated #where,body.seated #tickets,body
 <link rel="stylesheet" href="../shared/station/view-mode.css">
 </head>
 <body data-venue="cinema" data-material-root="../shared/">
-<div id="km-classic-switch" class="km-modes km-modes-strip" role="group" aria-label="Shopping view"><span>Classic 3D</span><a href="../shared/easy.html?venue=cinema">2D shopping</a></div><script data-screen="cinema" src="../shared/station/view-mode.js"></script>
+<div id="km-classic-switch" class="km-modes km-modes-strip" role="group" aria-label="Shopping view"><span>Classic 3D</span><a href="../shared/station/#cinema">2D photo view</a></div><script data-screen="cinema" src="../shared/station/view-mode.js"></script>
 <canvas id="gl" aria-label="The cinema, in 3D. Drag to look around, tap the floor to walk, tap a poster, the ticket window or a seat."></canvas>
 
 <div id="top">
@@ -1531,6 +1531,13 @@ async function boot() {
   if (!GL_OK) { $("#intro").hidden = true; document.querySelectorAll("#top,#where,#map,#credit,#tickets,#wings,#stick,#gl").forEach(el => el.hidden = true); openList(true); return; }
   try { build(); } catch (e) { console.warn("3D failed, showing the list", e); $("#intro").hidden = true; openList(true); return; }
   buildChips(); updateWhere();
+  const arrival = new URLSearchParams(location.search);
+  if (arrival.get("photo") === "cinema") {
+    const selected = FILMS.find(f => f.id === arrival.get("film"));
+    if (selected) setFilm(selected);
+    hideIntro();
+    enterHall();
+  }
   const pref = store.get("complex.music");
   $("#enter").textContent = "Enter, with music"; $("#enter").disabled = false; $("#quiet").disabled = false;
   if (pref === "0") { $("#quiet").classList.add("pri"); $("#enter").classList.remove("pri"); }

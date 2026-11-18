@@ -1,7 +1,7 @@
 const $ = selector => document.querySelector(selector);
 const scenes = [
   {id:'plaza',crumb:'Plaza',name:'Station Plaza',hint:'Choose a shop around the clock courtyard.',alt:'Wet cobbles, the plaza clock and the red bakery awning to its left.',trail:[0],points:[
-    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5],['Visit Station Grocery',76,51,6]]},
+    ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5],['Visit Station Grocery',76,51,6],['Visit Station Cinema',96,49,7]]},
   {id:'hall',crumb:'Hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',trail:[0,1],points:[['Walk to the shelf',50,50,2]]},
   {id:'shelf',crumb:'Shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',trail:[0,1,2],points:[
     ['Darjeeling tea',17,65,featured[0]],['Coffee',47,65,featured[1]],['Parle-G',80,65,featured[2]]]},
@@ -11,7 +11,9 @@ const scenes = [
   {id:'sabzi',crumb:'Produce stall',venue:'sabzi',name:'Sabzi Mandi',hint:'Choose tomatoes or iskus by weight, or pick up a bunch of spinach.',alt:'Cane baskets of tomatoes, pale green iskus squash and tied spinach beside a brass balance overlooking terraced hills.',trail:[0,5],points:[
     ['Tomatoes',16,46,'tomato'],['Iskus squash',48,46,'iskus'],['Spinach',81,46,'spinach']]},
   {id:'grocery',crumb:'Grocery',venue:'grocery',name:'Station Grocery',hint:'Scoop loose rice, pick a pack of hill red rice or take home a tin of first-flush tea.',alt:'A wooden scoop rests in loose white rice beside a bag of hill red rice and a green tea tin. A grocer packs orders behind the counter.',trail:[0,6],points:[
-    ['Loose rice',26,60,'sona-masoori-loose'],['Hill red rice',56,49,'hill-red-rice-1kg'],['First-flush tea',78,61,'darjeeling-first-flush-100g']]}
+    ['Loose rice',26,60,'sona-masoori-loose'],['Hill red rice',56,49,'hill-red-rice-1kg'],['First-flush tea',78,61,'darjeeling-first-flush-100g']]},
+  {id:'cinema',crumb:'Ticket window',name:'Station Cinema',hint:'Read the programme by the ticket window, or step through the red curtain.',alt:'At dusk a brass-framed film board glows to the left of the ticket window. Red curtains open onto the aisle on the right.',trail:[0,7],points:[
+    ['Read the programme',30,49,readProgramme],['Enter the auditorium',85,54,()=>location.assign($('#explore-3d').href)]]}
 ];
 let place=0, motion=!matchMedia('(prefers-reduced-motion: reduce)').matches, walkAnimation;
 const world=$('#world'), viewport=$('#viewport'), sheet=$('#sheet'), detail=$('#detail');
@@ -27,11 +29,22 @@ function visit(index,animate=true){
     if(nav.childNodes.length)nav.append(document.createTextNode(' / '));
     nav.append(j===index?document.createTextNode(s.crumb):button(scenes[j].crumb,()=>navigate(j),''));
   }
-  showVenue(s.venue || 'urc');
+  const cinema = s.id === 'cinema';
+  $('#programme').hidden = !cinema;
+  $('#catalogue').hidden = cinema;
+  $('#basket').hidden = cinema;
+  const sectionLink = $('header .links a:last-child');
+  sectionLink.textContent = cinema ? 'Programme' : 'Catalogue';
+  sectionLink.href = cinema ? '#programme' : '#catalogue';
+  if (cinema) showProgramme();
+  else {
+    filmBoard.querySelectorAll('iframe').forEach(frame => frame.remove());
+    showVenue(s.venue || 'urc');
+  }
   $('#pins').replaceChildren();$('#actions').replaceChildren();
   s.points.forEach(([label,x,y,target],i)=>{
     const doorway=typeof target==='number';
-    const act=doorway?()=>navigate(target):()=>pick(target,i);
+    const act=typeof target==='function'?target:doorway?()=>navigate(target):()=>pick(target,i);
     const pin=button(doorway?'↑':'+',act,'pin');
     pin.setAttribute('aria-label',label+' in scene');
     pin.style.left=x+'%';pin.style.top=y+'%';$('#pins').append(pin);
@@ -90,8 +103,8 @@ function tuneAmbience(){
   clearTimeout(birdTimer);
   if(!audio)return;
   const active=soundOn&&!document.hidden, now=audio.currentTime;
-  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012,.018,.013][place]:0,now,.15);
-  filter.frequency.setTargetAtTime([850,1600,500,800,470,950,550][place],now,.22);
+  ambience.gain.setTargetAtTime(active?[.022,.043,.009,.018,.012,.018,.013,.011][place]:0,now,.15);
+  filter.frequency.setTargetAtTime([850,1600,500,800,470,950,550,440][place],now,.22);
   function birdsong(){
     if(!soundOn || document.hidden || place!==0)return;
     const t=audio.currentTime, f=1900+Math.random()*350;
@@ -115,9 +128,11 @@ $('#sound').onclick=async()=>{
 document.addEventListener('visibilitychange',tuneAmbience);
 function navigate(index){ location.hash=scenes[index].id; }
 function followHash(animate){
-  const index=scenes.findIndex(s=>s.id===location.hash.slice(1));
-  if(index>=0 || !location.hash){visit(Math.max(0,index),animate);window.scrollTo(0,0);}
+  const index=scenes.findIndex(s=>s.id===(location.hash==='#programme'?'cinema':location.hash.slice(1)));
+  if(index>=0 || !location.hash){visit(Math.max(0,index),animate);if(location.hash==='#programme')readProgramme();else window.scrollTo(0,0);}
 }
 window.addEventListener('hashchange',()=>followHash(true));
 startShop();
-visit(Math.max(0,scenes.findIndex(s=>s.id===location.hash.slice(1))),false);
+visit(Math.max(0,scenes.findIndex(s=>s.id===(location.hash==='#programme'?'cinema':location.hash.slice(1)))),false);
+
+if(location.hash==='#programme')readProgramme();

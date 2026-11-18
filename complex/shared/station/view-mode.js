@@ -18,7 +18,7 @@
     return url;
   }
   if (screen === 'station') {
-    window.setStationView = scene => { document.querySelector('#explore-3d').href = classic(scene); };
+    window.setStationView = scene => { const url = classic(scene); if (scene === 'cinema') url.searchParams.set('photo', scene); document.querySelector('#explore-3d').href = url; };
     return;
   }
   const link = document.querySelector('.km-modes-strip a');
@@ -39,7 +39,7 @@
   const scene = valid(requested) && routes[requested] === routes[screen] ? requested : screen;
   let back = new URL('#' + scene, station);
   let label = '2D photo view';
-  if (query.get('from') === 'easy' || screen === 'cinema') {
+  if (query.get('from') === 'easy') {
     back = new URL('easy.html', shared);
     back.searchParams.set('venue', screen === 'hall' ? 'urc' : screen);
     back.hash = location.hash;
