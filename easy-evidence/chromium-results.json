@@ -1,0 +1,465 @@
+[
+  {
+    "name": "shopping",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "mobileRequests": 16,
+        "resourcePaths": [
+          "/mall/",
+          "/k.js",
+          "/css2",
+          "/complex/shared/contact.js",
+          "/complex/shared/easy.html",
+          "/k.js",
+          "/complex/shared/easy-core.js",
+          "/complex/shared/easy-lists-core.js",
+          "/complex/shared/easy-lists.js",
+          "/complex/shared/easy.js",
+          "/complex/shared/contact.js",
+          "/menu.json",
+          "/complex/shared/urc-products/manifest.json",
+          "/complex/shared/urc-products/9ddfa970a665fb061b40.webp",
+          "/complex/shared/urc-products/2afb6daaf27e37f0b2ab.webp",
+          "/complex/shared/urc-products/e1ed3c10e34405e6ac94.webp"
+        ],
+        "heavyRequests": []
+      },
+      {
+        "axe": "welcome",
+        "violations": []
+      },
+      {
+        "axe": "phrase",
+        "violations": []
+      },
+      {
+        "axe": "list",
+        "violations": []
+      },
+      {
+        "axe": "detail",
+        "violations": []
+      },
+      {
+        "axe": "help",
+        "violations": []
+      },
+      {
+        "axe": "large-help",
+        "violations": []
+      },
+      {
+        "axe": "hindi-products",
+        "violations": []
+      },
+      {
+        "phrase": true,
+        "sharedBasket": true,
+        "undo": true,
+        "reload": true,
+        "copyFallback": true,
+        "favourites": true,
+        "hindi": true,
+        "largeText": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "resilience",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "blockedStorage": true,
+        "photoFailures": true,
+        "noSpeechAPI": true,
+        "networkRetry": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "voice-keyboard",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "keyboard-results",
+        "violations": []
+      },
+      {
+        "voiceConsent": true,
+        "editableTranscript": true,
+        "noAutomaticAdd": true,
+        "keyboardSubmit": true,
+        "focusHeading": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "saved-lists",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "saved lists",
+        "violations": []
+      },
+      {
+        "axe": "repeat review",
+        "violations": []
+      },
+      {
+        "axe": "saved lists Hindi",
+        "violations": []
+      },
+      {
+        "namedList": true,
+        "missingAmountsOnly": true,
+        "noDuplicate": true,
+        "undo": true,
+        "concurrentUndoGuard": true,
+        "removeConfirmation": true,
+        "hindi": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "repeat-changes",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "changed prices",
+        "violations": []
+      },
+      {
+        "changedPriceExplicit": true,
+        "unavailableBlocked": true,
+        "packIdentityBlocked": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "plaza-trip",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "whole trip",
+        "violations": []
+      },
+      {
+        "axe": "multi shop repeat",
+        "violations": []
+      },
+      {
+        "separateShopTotals": true,
+        "fractionalUnits": true,
+        "wholeTripTemplate": true,
+        "copyFallback": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "offline-lists",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "offline trip",
+        "violations": []
+      },
+      {
+        "realOfflineReload": true,
+        "newOfflineTab": true,
+        "offlineRepeatReadOnly": true,
+        "reconnect": true,
+        "shellOnlyCache": true,
+        "originServerStopped": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "list-storage-failure",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "quotaFailureHonest": true,
+        "cartPreserved": true,
+        "malformedSnapshotSafe": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "stalled-body",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "noAbortController": true,
+        "stalledResponseBody": true,
+        "savedListRecovered": true,
+        "elapsedMs": 12449
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-hall",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "easy-desktop",
+        "violations": []
+      },
+      {
+        "desktopHall": true,
+        "desktopEasyLink": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "slow-network",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "enlargedGeometry": {
+          "innerWidth": 320,
+          "scrollX": 0,
+          "viewport": {
+            "width": 320,
+            "offsetLeft": 0,
+            "scale": 1
+          },
+          "nav": {
+            "left": 0,
+            "right": 320,
+            "height": 149.625
+          }
+        }
+      },
+      {
+        "simulatedNetwork": "150ms, 1.5Mbps, 4x CPU throttle",
+        "catalogueReadyMs": 5424,
+        "existingBasket": true,
+        "text200Percent": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "legacy-entry",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "oldMobileBookmark": true,
+        "noCounterRequests": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "legacy-desktop",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "legacyDesktop": true,
+        "localListOnly": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "plaza-directory",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "plaza",
+        "violations": []
+      },
+      {
+        "routing": true,
+        "separateLists": true,
+        "noHeavyAssets": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "bakery",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "bakery home",
+        "violations": []
+      },
+      {
+        "axe": "bakery list",
+        "violations": []
+      },
+      {
+        "phrase": true,
+        "units": true,
+        "separateBasket": true,
+        "sampleDisclosure": true,
+        "noHeavyAssets": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "sabzi",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "sabzi home",
+        "violations": []
+      },
+      {
+        "axe": "sabzi list",
+        "violations": []
+      },
+      {
+        "phrase": true,
+        "units": true,
+        "separateBasket": true,
+        "sampleDisclosure": true,
+        "noHeavyAssets": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "grocery",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "grocery home",
+        "violations": []
+      },
+      {
+        "axe": "grocery list",
+        "violations": []
+      },
+      {
+        "phrase": true,
+        "units": true,
+        "separateBasket": true,
+        "sampleDisclosure": true,
+        "noHeavyAssets": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "cinema",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "axe": "cinema films",
+        "violations": []
+      },
+      {
+        "axe": "cinema detail",
+        "violations": []
+      },
+      {
+        "languageSearch": true,
+        "sampleTimes": true,
+        "shortlist": true,
+        "noVideoOr3DDownload": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "phone-hall-opt-in",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "phoneHallOptIn": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-plaza",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "captureRetry": "retained"
+      },
+      {
+        "desktopRetained": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-bakery",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "desktopRetained": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-sabzi",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "desktopRetained": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-grocery",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "desktopRetained": true
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "desktop-cinema",
+    "engine": "chromium",
+    "errors": [],
+    "checks": [
+      {
+        "desktopRetained": true
+      }
+    ],
+    "pass": true
+  }
+]
