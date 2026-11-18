@@ -30,7 +30,7 @@ with sync_playwright() as pw:
         page.locator('#search').fill('zzzzzz');expect(page.locator('.card')).to_have_count(0)
         page.goto(root+'complex/');expect(page.locator('h1')).to_have_text('Station Plaza')
         page.get_by_role('button',name='Motion on').click();expect(page.locator('#motion')).to_have_attribute('aria-pressed','false')
-        for selector in ['a[href="../../bakery/?view=hall"]','a[href="../../grocery/"]','a[href="../../sabzi/"]','a[href="../../cinema/"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
+        for selector in ['a[href="../../bakery/?view=hall"]','a[href="../../grocery/"]','a[href="../../sabzi/?view=hall"]','a[href="../../cinema/"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
             link=page.locator(selector).evaluate('(el)=>el.href')
             assert page.request.get(link).ok,link
         assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
@@ -65,6 +65,39 @@ with sync_playwright() as pw:
         page.get_by_role('button',name='Plaza',exact=True).click()
         expect(page.locator('#basket')).to_have_text('Basket · 1')
         expect(page.locator('#matches')).to_have_text('1,715 items')
+        page.get_by_role('button',name='Visit Sabzi Mandi',exact=True).click()
+        expect(page.locator('h1')).to_have_text('Sabzi Mandi')
+        expect(page.locator('#basket')).to_have_text('Produce list · 0')
+        page.locator('#scene').evaluate('(img)=>img.decode()')
+        for pin in page.locator('#pins .pin').all():
+            assert pin.evaluate('el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===el}')
+        page.screenshot(path=out/f'{engine}-produce.jpg',type='jpeg',quality=82)
+        page.get_by_role('button',name='Iskus squash in scene',exact=True).click()
+        expect(page.locator('dialog h2')).to_have_text('Iskus (Squash)')
+        expect(page.locator('.weight-choice output')).to_have_text('250 g · ₹7.50')
+        page.get_by_role('button',name='Close',exact=True).click()
+        page.get_by_role('button',name='Tomatoes in scene',exact=True).click()
+        for amount,subtotal in [('500 g','₹20.00'),('1 kg','₹40.00'),('250 g','₹10.00')]:
+            page.get_by_role('radio',name=amount,exact=True).check()
+            expect(page.locator('.weight-choice output')).to_have_text(amount+' · '+subtotal)
+        page.get_by_role('button',name='Add to basket').click()
+        expect(page.locator('dialog [role=status]')).to_have_text('In your basket · 250 g')
+        page.get_by_role('button',name='Close',exact=True).click()
+        page.get_by_role('button',name='Spinach in scene',exact=True).click()
+        expect(page.locator('.weight-choice')).to_have_count(0)
+        page.get_by_role('button',name='Add to basket').click()
+        expect(page.locator('#basket')).to_have_text('Produce list · 2')
+        page.get_by_role('link',name='View basket').click()
+        expect(page.locator('.list-row').filter(has_text='Tomato')).to_contain_text('250 g')
+        expect(page.locator('.list-row').filter(has_text='Spinach')).to_contain_text('1 bunch')
+        total=page.locator('#main .panel').filter(has_text='Estimated total').locator('.price')
+        expect(total).to_contain_text('₹40')
+        assert float((total.inner_text()).replace('₹','').strip())==40
+        page.goto(root+'complex/shared/station/#sabzi')
+        expect(page.locator('#basket')).to_have_text('Produce list · 2')
+        assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
+        page.get_by_role('button',name='Plaza',exact=True).click()
+        expect(page.locator('#basket')).to_have_text('Basket · 1')
         assert not errors,errors
         print(engine,'passed public entry, hall, shelf, search, shared basket, shop links, classic routes and motion')
         b.close()

@@ -9,13 +9,21 @@ a{color:inherit;text-underline-offset:4px}header .wordmark{color:#fcf7e4;text-de
 
 .bread-closeup{background-image:url('counter.webp');background-size:330% auto}
 #sample-note{color:#635840;font-size:14px}
-@media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world[data-scene="counter"]) .links a:first-child{display:none}}
+@media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world:is([data-scene="counter"],[data-scene="sabzi"])) .links a:first-child{display:none}}
 @media(max-width:700px){
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) #viewport{
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) #viewport{
     height:66.666667vw;min-height:0;overflow:hidden
   }
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) #controls{
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) #controls{
     position:static;padding:16px 18px 20px;background:#432c24
   }
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"])) h1{font-size:34px}
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) h1{font-size:34px}
 }
+
+.produce-closeup{background-image:url('sabzi.webp');background-size:330% auto}
+.weight-choice{border:0;padding:0;margin:14px 0}
+.weight-choice legend{font-weight:600;margin-bottom:6px}
+.weight-choice label{display:inline-flex;align-items:center;gap:5px;margin:0 7px 4px 0;padding:8px;border:1px solid #afb9a9;border-radius:5px;cursor:pointer}
+.weight-choice label:has(:checked){background:#e4eedf;border-color:#4a7054}
+.weight-choice input{accent-color:#28543e;flex:none;margin:0}
+.weight-choice output{display:block;margin-top:6px;font-size:16px}

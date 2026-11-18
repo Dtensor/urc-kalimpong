@@ -24,10 +24,10 @@ jobs:
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             export KALIMPONG_REVIEW=https://dtensor.github.io/urc-kalimpong/
             for attempt in {1..36}; do
-              if curl -fsS --max-time 8 "${KALIMPONG_REVIEW}index.html" | cmp -s index.html -; then break; fi
+              if curl -fsS --max-time 8 "${KALIMPONG_REVIEW}complex/shared/station/shop.js" | cmp -s complex/shared/station/shop.js -; then break; fi
               sleep 5
             done
-            curl -fsS --max-time 10 "${KALIMPONG_REVIEW}index.html" | cmp -s index.html -
+            curl -fsS --max-time 10 "${KALIMPONG_REVIEW}complex/shared/station/shop.js" | cmp -s complex/shared/station/shop.js -
           else
             python -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/station.log" 2>&1 &
             curl --fail --retry 8 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/ --output /dev/null
