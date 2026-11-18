@@ -10,6 +10,8 @@ with sync_playwright() as pw:
         page=b.new_page(viewport={'width':size[0],'height':size[1]})
         errors=[];page.on('pageerror',lambda err:errors.append(str(err)))
         page.route('https://shala-stats.shalas.workers.dev/**',lambda r:r.fulfill(status=200,content_type='application/javascript',body=''))
+        page.route('https://fonts.googleapis.com/**',lambda r:r.abort())
+        page.route('https://fonts.gstatic.com/**',lambda r:r.abort())
         page.goto(root,wait_until='domcontentloaded')
         expect(page.locator('#matches')).to_have_text('1,715 items')
         page.locator('#scene').evaluate('(img)=>img.decode()')
@@ -118,9 +120,13 @@ with sync_playwright() as pw:
             assert switch.bounding_box()['y']<110
             page.evaluate('window.scrollTo(0, 800)')
             expect(switch).to_be_in_viewport()
+            print(engine,'opening classic',scene,flush=True)
             switch.click()
+            page.wait_for_load_state('domcontentloaded')
             assert page.url.startswith(root+path+'?view=hall'),page.url
-            back=page.locator('#intro .km-modes a')
+            back=page.locator('#km-classic-switch a')
+            if not back.count():
+                print(page.url,page.title(),page.locator('script[data-screen]').count(),errors[-3:],flush=True)
             expect(back).to_be_in_viewport()
             if scene=='counter': page.screenshot(path=out/f'{engine}-classic-switch.jpg',type='jpeg',quality=80)
             back.click()
@@ -131,7 +137,7 @@ with sync_playwright() as pw:
             expect(forward).to_be_in_viewport()
             forward.click()
             assert page.url.startswith(root+path+'?view=hall')
-            page.locator('#intro .km-modes a').click()
+            page.locator('#km-classic-switch a').click()
             assert 'easy.html?venue='+venue in page.url
 
         print(engine,'passed public entry, hall, shelf, search, shared basket, shop links, classic routes and motion')

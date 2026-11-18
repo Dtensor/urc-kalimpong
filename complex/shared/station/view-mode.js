@@ -66,13 +66,9 @@
     back = new URL('../../../?view=list', station);
     label = '2D catalogue';
   }
-  const intro = document.querySelector('#intro');
-  const hud = document.querySelector('#top > :first-child');
-  for (const container of [intro, hud]) {
-    if (!container) continue;
-    const group = bar('Classic 3D', label, back);
-    group.classList.add(container === intro ? 'km-modes-welcome' : 'km-modes-hud');
-    if (container === hud) container.style.position = 'relative';
-    container.append(group);
-  }
+  document.body.classList.add('km-classic-view');
+  const group = bar('Classic 3D', label, back);
+  group.id = 'km-classic-switch';
+  group.classList.add('km-modes-strip');
+  document.body.prepend(group);
 })();

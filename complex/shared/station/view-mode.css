@@ -4,8 +4,10 @@
 .km-modes>a:hover{background:#ffe8b5;color:#132b21}
 .km-modes>a:focus-visible{outline:3px solid #fff;outline-offset:1px}
 .km-modes-strip{position:sticky;top:0;z-index:25;display:flex;width:100%;max-width:none;justify-content:center;border:0;border-radius:0;padding:4px 12px}
-.km-modes-welcome{position:absolute;z-index:2;top:max(8px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left))}
-#intro:has(.km-modes-welcome){padding-top:max(64px,calc(env(safe-area-inset-top) + 60px))}
-.km-modes-hud{position:absolute;top:calc(100% + 5px);left:0;z-index:2;max-width:none}
-.km-modes-hud>span{display:none}
-.km-modes-hud>a{padding-inline:12px}
+
+/* Reserve a header row across the welcome screen, walkthrough and classic list. */
+.km-classic-view{--km-row:calc(52px + env(safe-area-inset-top,0px))}
+#km-classic-switch{position:fixed;inset:0 0 auto;z-index:1000;padding-top:calc(4px + env(safe-area-inset-top,0px))}
+.km-classic-view :is(#intro,#list,#ledger,#board){top:var(--km-row)}
+.km-classic-view :is(#top,#where,#mapw,#dirw){margin-top:var(--km-row)}
+@media(min-width:761px){.km-classic-view #map{margin-top:var(--km-row)}}
