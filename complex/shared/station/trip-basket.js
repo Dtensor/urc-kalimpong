@@ -124,11 +124,10 @@
       const section = counters.querySelector('[data-counter="'+focus[0]+'"]');
       const article = [...(section?.querySelectorAll('article') || [])].find(a=>a.dataset.item===focus[1]);
       const btn = [...(article?.querySelectorAll('button:enabled') || [])].find(b=>b.getAttribute('aria-label')===focus[2]);
-      (btn || article?.querySelector('button:enabled') || section?.querySelector('button:enabled') || document.querySelector('#close')).focus({preventScroll:true});
+      (btn || article?.querySelector('button:enabled') || section?.querySelector('button:enabled') || counters).focus({preventScroll:true});
     }
   }
   function close() { parent.postMessage('km-close-basket',location.origin); }
-  document.querySelector('#close').onclick = close;
   document.addEventListener('keydown', e=>{if(e.key==='Escape'){e.preventDefault();close();}});
   window.addEventListener('storage',render);
   window.addEventListener('pageshow',render);

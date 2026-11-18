@@ -32,11 +32,27 @@
     if (!drawer) {
       drawer = document.createElement('dialog');
       drawer.id = 'km-trip-dialog';
-      drawer.setAttribute('aria-label', 'My basket');
+      drawer.setAttribute('aria-labelledby', 'km-trip-title');
+      const head = document.createElement('div');
+      head.className = 'km-trip-head';
+      const title = document.createElement('h2');
+      title.id = 'km-trip-title';
+      title.textContent = 'My basket';
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.textContent = 'Close';
+      close.setAttribute('aria-label','Close my basket');
+      close.onclick = () => drawer.close();
+      head.append(title,close);
       frame = document.createElement('iframe');
       frame.title = 'Shopping basket by counter';
-      drawer.append(frame);
+      drawer.append(head,frame);
       document.body.append(drawer);
+      drawer.addEventListener('keydown', e => {
+        e.stopPropagation();
+        if (e.key === 'Escape') { e.preventDefault(); drawer.close(); }
+      });
+      drawer.addEventListener('keyup', e => e.stopPropagation());
       drawer.addEventListener('click', e => {
         if (e.target === drawer) drawer.close();
       });
@@ -51,7 +67,7 @@
     if (document.pointerLockElement) document.exitPointerLock();
     frame.src = new URL('trip-basket.html', station);
     drawer.showModal();
-    frame.focus();
+    drawer.querySelector('button').focus({preventScroll:true});
   }
   basketButton.addEventListener('click', e => {e.stopPropagation();openTripBasket();});
   window.addEventListener('km-open-basket', openTripBasket);
