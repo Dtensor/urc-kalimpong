@@ -134,6 +134,10 @@ with sync_playwright() as pw:
                 page.get_by_role('button',name='Enter quietly',exact=True).click()
                 expect(page.locator('#hud')).to_be_visible()
                 expect(page.locator('#gl')).to_be_visible()
+                if size[0] < 761:
+                    search=page.locator('#q').bounding_box()
+                    mini_map=page.locator('#map').bounding_box()
+                    assert mini_map['y'] >= search['y']+search['height'], 'Map overlaps bakery search'
                 expect(back).to_be_in_viewport()
                 page.screenshot(path=out/f'{engine}-bakery-walkthrough.jpg',type='jpeg',quality=80)
             back.click()
