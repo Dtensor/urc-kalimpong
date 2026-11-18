@@ -3,6 +3,7 @@ from playwright.sync_api import sync_playwright,expect
 import json,os
 root=os.environ.get('KALIMPONG_REVIEW','http://127.0.0.1:8765').rstrip('/')+'/'
 out=Path('station-evidence');out.mkdir(exist_ok=True)
+expect.set_options(timeout=20000)
 with sync_playwright() as pw:
     for engine,size in [('chromium',(1440,920)),('webkit',(390,844))]:
         opts={}
@@ -10,6 +11,8 @@ with sync_playwright() as pw:
         page=b.new_page(viewport={'width':size[0],'height':size[1]})
         errors=[];page.on('pageerror',lambda err:errors.append(str(err)))
         page.route('https://shala-stats.shalas.workers.dev/**',lambda r:r.fulfill(status=200,content_type='application/javascript',body=''))
+        page.route('https://fonts.googleapis.com/**',lambda r:r.abort())
+        page.route('https://fonts.gstatic.com/**',lambda r:r.abort())
         page.goto(root,wait_until='domcontentloaded')
         expect(page.locator('#matches')).to_have_text('1,715 items')
         page.locator('#scene').evaluate('(img)=>img.decode()')
@@ -30,8 +33,8 @@ with sync_playwright() as pw:
         page.locator('#search').fill('zzzzzz');expect(page.locator('.card')).to_have_count(0)
         page.goto(root+'complex/');expect(page.locator('h1')).to_have_text('Station Plaza')
         page.get_by_role('button',name='Motion on').click();expect(page.locator('#motion')).to_have_attribute('aria-pressed','false')
-        for selector in ['a[href="../../bakery/?view=hall"]','a[href="../../grocery/"]','a[href="../../sabzi/?view=hall"]','a[href="../../cinema/"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
-            link=page.locator(selector).evaluate('(el)=>el.href')
+        for selector in ['a[href="../../bakery/?view=hall"]','a[href="#grocery"]','a[href="../../sabzi/?view=hall"]','a[href="../easy.html?venue=cinema"]','a[href="../../?view=hall"]','a[href="../../../?view=list"]']:
+            link=page.locator(selector).first.evaluate('(el)=>el.href')
             assert page.request.get(link).ok,link
         assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
         page.get_by_role('button',name='Visit the bakery',exact=True).click()
@@ -98,6 +101,57 @@ with sync_playwright() as pw:
         assert page.evaluate('document.documentElement.scrollWidth===innerWidth')
         page.get_by_role('button',name='Plaza',exact=True).click()
         expect(page.locator('#basket')).to_have_text('Basket · 1')
+        page.get_by_role('button',name='Visit Station Grocery',exact=True).click()
+        expect(page.locator('h1')).to_have_text('Station Grocery')
+        page.locator('#scene').evaluate('(img)=>img.decode()')
+        page.screenshot(path=out/f'{engine}-grocery.jpg',type='jpeg',quality=80)
+        for label in ['Loose rice','Hill red rice','First-flush tea']:
+            page.get_by_role('button',name=label+' in scene',exact=True).click()
+            if label=='Loose rice':page.get_by_role('radio',name='500 g',exact=True).check()
+            page.get_by_role('button',name='Add to basket').click()
+            page.get_by_role('button',name='Close',exact=True).click()
+        page.locator('#basket').click()
+        total=page.locator('#main .panel').filter(has_text='Estimated total').locator('.price')
+        expect(total).to_contain_text('₹471')
         assert not errors,errors
+        for scene,path in [('plaza','complex/'),('hall','mall/'),('shelf','mall/'),('bakery','complex/bakery/'),('counter','complex/bakery/'),('sabzi','complex/sabzi/'),('grocery','complex/grocery/')]:
+            page.goto(root+'complex/shared/station/#'+scene,wait_until='domcontentloaded')
+            switch=page.locator('#explore-3d')
+            expect(switch).to_be_in_viewport()
+            assert switch.bounding_box()['y']<110
+            page.evaluate('window.scrollTo(0, 800)')
+            expect(switch).to_be_in_viewport()
+            print(engine,'opening classic',scene,flush=True)
+            switch.click()
+            page.wait_for_load_state('domcontentloaded')
+            assert page.url.startswith(root+path+'?view=hall'),page.url
+            back=page.locator('#km-classic-switch a')
+            if not back.count():
+                print(page.url,page.title(),page.locator('script[data-screen]').count(),errors[-3:],flush=True)
+            expect(back).to_be_in_viewport()
+            if scene=='counter':
+                page.screenshot(path=out/f'{engine}-classic-switch.jpg',type='jpeg',quality=80)
+                page.get_by_role('button',name='Enter quietly',exact=True).click()
+                expect(page.locator('#hud')).to_be_visible()
+                expect(page.locator('#gl')).to_be_visible()
+                expect(back).to_be_in_viewport()
+                page.screenshot(path=out/f'{engine}-bakery-walkthrough.jpg',type='jpeg',quality=80)
+            back.click()
+            expect(page.locator('#world')).to_have_attribute('data-scene',scene)
+        page.goto(root+'?view=list',wait_until='domcontentloaded')
+        page.get_by_role('link',name='Explore in 3D',exact=True).first.click()
+        page.wait_for_url('**/mall/?view=hall&from=catalogue',wait_until='domcontentloaded')
+        expect(page.locator('#km-classic-switch a')).to_have_text('2D catalogue')
+        page.locator('#km-classic-switch a').click()
+        assert 'view=list' in page.url
+        for venue,path in [('cinema','complex/cinema/'),('sabzi','complex/sabzi/')]:
+            page.goto(root+'complex/shared/easy.html?venue='+venue,wait_until='domcontentloaded')
+            forward=page.get_by_role('link',name='Explore in 3D',exact=True).first
+            expect(forward).to_be_in_viewport()
+            forward.click()
+            assert page.url.startswith(root+path+'?view=hall')
+            page.locator('#km-classic-switch a').click()
+            assert 'easy.html?venue='+venue in page.url
+
         print(engine,'passed public entry, hall, shelf, search, shared basket, shop links, classic routes and motion')
         b.close()

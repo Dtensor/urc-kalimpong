@@ -9,15 +9,15 @@ a{color:inherit;text-underline-offset:4px}header .wordmark{color:#fcf7e4;text-de
 
 .bread-closeup{background-image:url('counter.webp');background-size:330% auto}
 #sample-note{color:#635840;font-size:14px}
-@media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world:is([data-scene="counter"],[data-scene="sabzi"])) .links a:first-child{display:none}}
+@media(max-width:510px){header:has(~ main #world[data-scene="bakery"]) .links a:first-child,header:has(~ main #world:is([data-scene="counter"],[data-scene="sabzi"],[data-scene="grocery"])) .links a:first-child{display:none}}
 @media(max-width:700px){
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) #viewport{
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"],[data-scene="grocery"])) #viewport{
     height:66.666667vw;min-height:0;overflow:hidden
   }
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) #controls{
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"],[data-scene="grocery"])) #controls{
     position:static;padding:16px 18px 20px;background:#432c24
   }
-  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"])) h1{font-size:34px}
+  .hero:has(#world:is([data-scene="bakery"],[data-scene="counter"],[data-scene="sabzi"],[data-scene="grocery"])) h1{font-size:34px}
 }
 
 .produce-closeup{background-image:url('sabzi.webp');background-size:330% auto}
@@ -27,3 +27,19 @@ a{color:inherit;text-underline-offset:4px}header .wordmark{color:#fcf7e4;text-de
 .weight-choice label:has(:checked){background:#e4eedf;border-color:#4a7054}
 .weight-choice input{accent-color:#28543e;flex:none;margin:0}
 .weight-choice output{display:block;margin-top:6px;font-size:16px}
+
+.grocery-closeup{background-image:url('grocery.webp');background-size:330% auto}
+header{position:sticky;top:0;z-index:20;height:auto;min-height:60px;padding-block:4px}
+header .km-modes{margin-left:12px;flex-shrink:0}
+#explore-3d::after{content:"↗";font-size:17px}
+#shops,#catalogue{scroll-margin-top:64px}
+@media(max-width:860px){
+  header{display:grid;grid-template-columns:auto 1fr auto;gap:3px 10px;padding:5px 14px 7px}
+  header .sub{display:none}
+  header .links{grid-column:2;grid-row:1;justify-self:end}
+  header #basket{grid-column:3;grid-row:1;justify-self:end}
+  header .km-modes{grid-column:1/-1;grid-row:2;justify-self:center;margin:0;width:100%;justify-content:center}
+  header .km-modes>a,header .km-modes>span{flex:1}
+  #shops,#catalogue{scroll-margin-top:100px}
+}
+@media(max-width:380px){header .links a:first-child{display:none}header{padding-inline:8px;column-gap:6px}}

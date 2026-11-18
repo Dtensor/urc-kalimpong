@@ -229,8 +229,10 @@ body.nogl #map,body.nogl #where,body.nogl #ret,body.nogl #gaze,body.nogl #wings,
 #wings button{min-height:44px;touch-action:manipulation}
 </style>
 <script defer src="../shared/contact.js"></script>
+<link rel="stylesheet" href="../shared/station/view-mode.css">
 </head>
 <body data-venue="grocery" data-material-root="../shared/">
+<div id="km-classic-switch" class="km-modes km-modes-strip" role="group" aria-label="Shopping view"><span>Classic 3D</span><a href="../shared/station/#grocery">2D photo view</a></div><script data-screen="grocery" src="../shared/station/view-mode.js"></script>
 <canvas id="gl" aria-label="3D view of Station Grocery"></canvas>
 <header id="top">
   <div class="brand glass" id="brand"><b>Station Grocery</b><small>Station Complex · Kalimpong</small></div>

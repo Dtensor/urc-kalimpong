@@ -286,8 +286,10 @@ body.nogl #list .close{display:none}
 #wings{max-width:calc(100vw - 32px);scroll-padding:8px}
 </style>
 <script defer src="../shared/contact.js"></script>
+<link rel="stylesheet" href="../shared/station/view-mode.css">
 </head>
 <body data-venue="bakery" data-material-root="../shared/">
+<div id="km-classic-switch" class="km-modes km-modes-strip" role="group" aria-label="Shopping view"><span>Classic 3D</span><a href="../shared/station/#bakery">2D photo view</a></div><script data-screen="bakery" src="../shared/station/view-mode.js"></script>
 <canvas id="gl" tabindex="0" aria-label="3D walk-through of Station Bakehouse"></canvas>
 
 <div id="hud" hidden>
