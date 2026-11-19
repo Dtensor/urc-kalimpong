@@ -8,3 +8,5 @@ button:focus-visible,input:focus-visible{outline:3px solid #b66f20;outline-offse
 #actions{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 0}#actions .primary,#send{background:#254e3b;border-color:#254e3b;color:#fff9eb}#status:not(:empty){margin-top:10px;color:#524830}
 footer{padding:10px 16px max(8px,env(safe-area-inset-bottom));border-top:1px solid #d2c9b3;background:#f0eadb}label{font-size:14px;font-weight:650}input{width:100%;min-width:0;min-height:44px;padding:6px 9px;border:1px solid #899786;border-radius:7px;background:#fffdf8;color:#26382b}.entry{gap:6px}.voice{gap:3px}.voice button{font-size:14px}.voice:empty,[hidden]{display:none!important}
 @media(max-height:450px){header{padding:4px 12px}header img{width:42px;height:42px}main{padding-block:5px}footer{padding-block:3px}.voice{display:inline-flex}}
+body{grid-template-rows:auto auto minmax(0,1fr) auto}
+.place{margin:0 18px;padding:3px 0}

@@ -96,7 +96,10 @@
     }
     const suggested=history.at(-1)?.scene;
     if(Object.hasOwn(scenes,suggested)&&!Array.from($('actions').children).some(b=>b.textContent.endsWith(name(suggested))))openShop(suggested);
-    $('conversation').lastElementChild?.scrollIntoView({block:'nearest'});
+    if(history.length){
+      const main=document.querySelector('main');
+      main.scrollTop=main.scrollHeight;
+    }
   }
   async function catalogue(scene) {
     if(!cache.has(scene)){
