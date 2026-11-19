@@ -27,7 +27,7 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             export KALIMPONG_REVIEW=https://dtensor.github.io/urc-kalimpong/
-            for file in complex/shared/station/shop.js complex/shared/station/trip-basket.js; do
+            for file in complex/shared/station/shop.js complex/shared/station/trip-basket.js complex/shared/station/view-mode.css complex/shared/station/view-mode.js; do
               attempt=0
               until curl -fsS --max-time 8 "${KALIMPONG_REVIEW}${file}" | cmp -s "$file" -; do
                 attempt=$((attempt + 1))

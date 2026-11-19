@@ -87,8 +87,15 @@
     const url = classic(scene);
     if (screen === 'easy') {
       url.searchParams.set('from', 'easy');
-      url.hash = location.hash;
-      window.addEventListener('hashchange', () => {url.hash = location.hash; link.href = url;});
+      const syncReturnPage = () => {
+        url.hash = location.hash;
+        link.href = url.href;
+      };
+      syncReturnPage();
+      window.navigation?.addEventListener('currententrychange',syncReturnPage);
+      window.addEventListener('hashchange',syncReturnPage);
+      link.addEventListener('click',syncReturnPage);
+      link.addEventListener('contextmenu',syncReturnPage);
     } else url.searchParams.set('from', 'catalogue');
     link.href = url;
     return;
