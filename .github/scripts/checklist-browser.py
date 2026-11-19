@@ -60,5 +60,23 @@ with sync_playwright() as pw:
         expect(frame.locator('#total')).to_have_text('₹239.98')
         frame.get_by_role('button', name='Shop this list').click()
         expect(frame.locator('input:checked')).to_have_count(0)
+        frame.get_by_role('button', name='Edit basket').click()
+        easy_url = frame.locator('#save-trip').evaluate('(a) => a.href')
+        page.set_viewport_size({'width':320, 'height':640})
+        page.goto(easy_url, wait_until='domcontentloaded')
+        page.locator('[data-list-action=new]').first.click()
+        page.locator('#repeat-name').fill('Market day')
+        page.locator('#repeat-save button[type=submit]').click()
+        expect(page.get_by_text('Market day', exact=True)).to_be_visible()
+        header = page.locator('#km-shopping-switch')
+        assert page.evaluate('document.documentElement.scrollWidth') == 320
+        for control in [header.get_by_role('link'), header.get_by_role('button')]:
+            expect(control).to_be_in_viewport(ratio=1)
+            assert control.bounding_box()['height'] >= 52
+        header.get_by_role('link', name='Explore in 3D').click()
+        page.locator('#km-classic-switch a').click()
+        expect(page.get_by_text('Market day', exact=True)).to_be_visible()
+        header.get_by_role('button', name='My basket').click()
+        expect(frame.locator('#total')).to_have_text('₹239.98')
         browser.close()
         print(engine, 'passed the four-counter checklist, tab closure, quantity change and finish', flush=True)
