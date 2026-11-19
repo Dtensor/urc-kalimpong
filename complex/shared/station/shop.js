@@ -29,6 +29,7 @@ function addItem(item,amount=1){
     if(qty+amount>99){msg.textContent='This amount would exceed the basket limit.';return;}
     basket[item.id]=qty+amount;localStorage.setItem(venues[venue].key,JSON.stringify(basket));updateCount();
     msg.textContent=item.unit==='kg'?'In your basket · '+weightLabel(basket[item.id]):'Added to your basket · '+basket[item.id]+' of this item';
+    if(item.unit==='bunch')msg.textContent='In your basket · '+basket[item.id]+(basket[item.id]===1?' bunch':' bunches');
   }catch{msg.textContent='Your browser could not save this item.';}
 }
 function openBasket(){location.href=venues[venue].easy+'#list';}
@@ -45,39 +46,53 @@ function productImage(path,cls){
   const img=node('img',null,cls);img.src=path;img.alt='';img.loading='lazy';img.onerror=()=>img.replaceWith(node('span','Photo unavailable','placeholder'));return img;
 }
 function weightLabel(kg){return kg<1?Math.round(kg*1000)+' g':kg+' kg';}
-const bakeryViews=new Map([
-  ['ladi-pav-6',[
+const inspectionViews=new Map([
+  ['bakery/ladi-pav-6',[
     ['Pack of six','ladi-pav-whole','Six joined golden pav rolls sit on brown bakery paper.'],
     ['Pull one apart','ladi-pav-pulled','The baker holds one roll beside the other five, showing the soft threads at the join.']
   ]],
-  ['milk-bread-400g',[
+  ['bakery/milk-bread-400g',[
     ['Whole loaf','milk-bread-whole','A golden milk loaf with three domes rests on a wooden board.'],
     ['See a slice','milk-bread-sliced','A single slice rests against the loaf, showing its fine, even crumb.']
   ]],
-  ['hill-sourdough',[
+  ['bakery/hill-sourdough',[
     ['Whole loaf','hill-sourdough-whole','The baker holds a round loaf with a wheat sprig scored into its crust.'],
     ['See inside','hill-sourdough-cut','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
+  ]],
+  ['sabzi/spinach',[
+    ['Whole bunch','spinach-bunch','The vendor holds a tied bunch of spinach with its roots visible.'],
+    ['Inspect leaves','spinach-leaf','The vendor turns a leaf over to show its veins and beads of water.']
+  ]],
+  ['grocery/darjeeling-first-flush-100g',[
+    ['Closed tin','first-flush-tin','A closed green 100 g Darjeeling First Flush tea tin sits on the counter.'],
+    ['Open tin','first-flush-open','The lid rests beside the open tin, with curled tea leaves and silvery tips visible.']
   ]]
 ]);
-function breadPreview(views){
+function productPreview(views){
   const figure=node('figure',null,'loaf-preview');
-  const frame=node('div',null,'loaf-frame');
+  const frame=node('button',null,'loaf-frame photo-switch');
+  frame.type='button';
   const controls=node('div',null,'loaf-views');
   controls.setAttribute('role','group');
-  controls.setAttribute('aria-label','Bread view');
-  for(const [label,file,description] of views){
+  controls.setAttribute('aria-label','Product view');
+  let selected=0;
+  function show(index){
+    selected=index;
+    for(let i=0;i<views.length;i++){
+      frame.children[i].hidden=i!==index;
+      controls.children[i].setAttribute('aria-pressed',String(i===index));
+    }
+    frame.setAttribute('aria-label','Change photograph · '+views[(index+1)%views.length][0]);
+  }
+  views.forEach(([label,file,description],i)=>{
     const image=node('img');
     image.alt=description;
-    image.hidden=frame.childElementCount>0;
     image.src=file+'.webp';
-    const choice=button(label,()=>{
-      for(const view of frame.children)view.hidden=view!==image;
-      for(const control of controls.children)control.setAttribute('aria-pressed',String(control===choice));
-    },'loaf-view');
-    choice.setAttribute('aria-pressed',String(!image.hidden));
     frame.append(image);
-    controls.append(choice);
-  }
+    controls.append(button(label,()=>show(i),'loaf-view'));
+  });
+  frame.onclick=()=>show((selected+1)%views.length);
+  show(0);
   figure.append(frame,controls);
   return figure;
 }
@@ -122,17 +137,12 @@ async function pick(id,illustration){
   else{
     const illustrated=Number.isInteger(illustration);
     const scale=venue==='sabzi' && weighedProduce.has(id) && item.unit==='kg'?produceScale(id):null;
+    const views=inspectionViews.get(venue+'/'+id);
     let picture;
     if(scale){
       picture=scale;
-    }else if(venue==='sabzi' && id==='spinach'){
-      picture=node('div',null,'produce-photo');
-      const bunch=node('img');
-      bunch.src='spinach-bunch.webp';
-      bunch.alt='The vendor holds one bunch of spinach tied at the stems, with leaves and roots in view.';
-      picture.append(bunch);
-    }else if(venue==='bakery' && bakeryViews.has(id)){
-      picture=breadPreview(bakeryViews.get(id));
+    }else if(views){
+      picture=productPreview(views);
     }else if(illustrated && venue!=='urc'){
       picture=node('div',null,'pack '+({sabzi:'produce-closeup',bakery:'bread-closeup',grocery:'grocery-closeup'}[venue]));
       picture.style.backgroundPosition=venue==='grocery'?[15,59,90][illustration]+'% 56%':venue==='sabzi'?[2,48,95][illustration]+'% 45%':[18,54,92][illustration]+'% 62%';
@@ -157,10 +167,9 @@ function drawCards(){
   const cards=$('#cards');cards.replaceChildren();
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
-    const bread=venue==='bakery' && bakeryViews.get(item.id);
-    let thumbnail=bread?bread[0][1]+'.webp':photo(item);
+    const views=inspectionViews.get(venue+'/'+item.id);
+    let thumbnail=views?views[0][1]+'.webp':photo(item);
     if(venue==='sabzi' && weighedProduce.has(item.id))thumbnail=item.id+'-250g.webp';
-    if(venue==='sabzi' && item.id==='spinach')thumbnail='spinach-bunch.webp';
     card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);

@@ -46,6 +46,10 @@ function visit(index,animate=true){
     const doorway=typeof target==='number';
     const act=typeof target==='function'?target:doorway?()=>navigate(target):()=>pick(target,i);
     const pin=button(doorway?'↑':'+',act,'pin');
+    if(target==='spinach' || target==='darjeeling-first-flush-100g'){
+      pin.classList.add('product-area');
+      pin.dataset.product=target;
+    }
     pin.setAttribute('aria-label',label+' in scene');
     pin.style.left=x+'%';pin.style.top=y+'%';$('#pins').append(pin);
     $('#actions').append(button(label,act));
