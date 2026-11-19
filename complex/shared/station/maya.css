@@ -1,0 +1,12 @@
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{display:grid;grid-template-rows:auto minmax(0,1fr) auto;color:#203a2e;background:#fcf9f1;font:16px/1.45 system-ui,sans-serif}header,.place,.entry,.voice{display:flex;align-items:center;gap:10px}
+header{padding:14px 18px;background:#193b30;color:#fff8e7}header img{border:2px solid #d9c7a1;border-radius:50%;object-fit:cover}h1{margin:0;font:normal 32px/1.08 Georgia,serif}p{margin:0}header p{color:#efe3cc;font-size:14px}
+button,input{font:inherit}button{min-height:44px;padding:6px 12px;cursor:pointer;border:1px solid #b6bfad;border-radius:9px;color:#284334;background:#fffcf5}
+button:focus-visible,input:focus-visible{outline:3px solid #b66f20;outline-offset:1px}button:disabled{opacity:.55;cursor:default}
+#close{margin-left:auto;color:inherit;border:1px solid #8b9b8c;background:transparent;min-width:44px;font-size:24px}main{overflow-y:auto;overscroll-behavior:contain;padding:14px 18px 18px}
+.place{justify-content:space-between;margin-bottom:13px;border-bottom:1px solid #d2cebd;padding-bottom:8px}.place strong{font:normal 22px Georgia,serif}.place button,.voice button{border:0;background:transparent;text-decoration:underline;text-underline-offset:3px}
+#conversation p{margin:.45rem 0;white-space:pre-line;overflow-wrap:anywhere}.question{margin-left:16%!important;padding:7px 10px;background:#e9eddf;border-radius:10px;color:#304735}
+#actions{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 0}#actions .primary,#send{background:#254e3b;border-color:#254e3b;color:#fff9eb}#status:not(:empty){margin-top:10px;color:#524830}
+footer{padding:10px 16px max(8px,env(safe-area-inset-bottom));border-top:1px solid #d2c9b3;background:#f0eadb}label{font-size:14px;font-weight:650}input{width:100%;min-width:0;min-height:44px;padding:6px 9px;border:1px solid #899786;border-radius:7px;background:#fffdf8;color:#26382b}.entry{gap:6px}.voice{gap:3px}.voice button{font-size:14px}.voice:empty,[hidden]{display:none!important}
+@media(max-height:450px){header{padding:4px 12px}header img{width:42px;height:42px}main{padding-block:5px}footer{padding-block:3px}.voice{display:inline-flex}}
+body{grid-template-rows:auto auto minmax(0,1fr) auto}
+.place{margin:0 18px;padding:3px 0}

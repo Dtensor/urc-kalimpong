@@ -1,0 +1,77 @@
+"""Maya stays quiet until invited and remembers the shopper across plaza views."""
+import os
+from pathlib import Path
+from playwright.sync_api import sync_playwright, expect
+
+root=os.environ.get('KALIMPONG_REVIEW','http://127.0.0.1:8765').rstrip('/')+'/'
+out=Path('station-evidence')
+out.mkdir(exist_ok=True)
+expect.set_options(timeout=20000)
+with sync_playwright() as pw:
+    for engine,width,height in [('chromium',1440,900),('webkit',320,690)]:
+        browser=getattr(pw,engine).launch()
+        page=browser.new_page(viewport={'width':width,'height':height},has_touch=engine=='webkit',reduced_motion='reduce')
+        page.route('https://shala-stats.shalas.workers.dev/**',lambda r:r.fulfill(body=''))
+        requests=[]
+        page.on('request',lambda r:requests.append(r.url))
+        station=root+'complex/shared/station/'
+        launch=page.get_by_role('button',name='Ask Maya',exact=True)
+        guide=page.frame_locator('#km-maya iframe')
+        def opened(place):
+            expect(page.locator('#km-maya[open]')).to_have_count(0)
+            expect(launch).to_be_in_viewport(ratio=1)
+            launch.click()
+            expect(guide.locator('#place')).to_have_text(place)
+        page.goto(station+'#plaza',wait_until='domcontentloaded')
+        expect(launch).to_be_visible()
+        assert not any('/maya.' in u for u in requests)
+        opened('Station Plaza')
+        expect(guide.locator('#conversation')).to_contain_text('Where would you like to start')
+        guide.locator('header img').evaluate('img=>img.decode()')
+        page.screenshot(path=out/f'{engine}-maya.jpg',type='jpeg')
+        guide.locator('#question').fill('सौ रुपये में ब्रेड, पालक और टमाटर मिल जाएंगे?')
+        guide.locator('#send').click()
+        expect(guide.locator('#conversation p').last).to_contain_text('₹85')
+        assert page.evaluate("localStorage.getItem('complex.cart.sabzi')") is None
+        guide.get_by_role('button',name='चलें · सब्ज़ी मंडी',exact=True).click()
+        expect(page.locator('#world')).to_have_attribute('data-scene','sabzi')
+        opened('सब्ज़ी मंडी')
+        expect(guide.locator('#conversation')).to_contain_text('₹85')
+        guide.locator('#question').fill('टमाटर आधा किलो')
+        guide.locator('#send').click()
+        expect(guide.locator('#conversation p').last).to_contain_text('₹95')
+        guide.get_by_role('button',name='बाकी सामान जोड़ें').click()
+        expect(guide.locator('#conversation p').last).to_contain_text('टोकरी')
+        guide.get_by_role('button',name='बाकी सामान जोड़ें').click()
+        expect(guide.locator('#conversation p').last).to_contain_text('टोकरी')
+        guide.locator('#close').click()
+        page.locator('.km-basket-button').click()
+        basket=page.frame_locator('#km-trip-dialog iframe')
+        expect(basket.locator('#total')).to_have_text('₹95')
+        expect(basket.locator('[data-item="tomato"] output')).to_have_text('500 g')
+        page.get_by_role('button',name='Close my basket').click()
+        for scene,label in [('counter','स्टेशन बेकहाउस'),('shelf','यूआरसी शेल्फ'),('grocery','स्टेशन किराना'),('cinema','स्टेशन सिनेमा')]:
+            page.goto(station+'#'+scene,wait_until='domcontentloaded')
+            opened(label)
+            expect(guide.locator('#conversation')).to_contain_text('₹95')
+            guide.locator('#close').click()
+        page.goto(station+'#sabzi',wait_until='domcontentloaded')
+        page.locator('#explore-3d').click(no_wait_after=True)
+        page.wait_for_url('**/sabzi/?view=hall*',wait_until='domcontentloaded')
+        opened('सब्ज़ी मंडी')
+        guide.get_by_role('button',name='चलें · स्टेशन बेकहाउस',exact=True).click()
+        page.wait_for_url('**/bakery/?view=hall*',wait_until='domcontentloaded')
+        opened('स्टेशन बेकहाउस')
+        guide.locator('#close').click()
+        page.goto(root+'complex/shared/easy.html?venue=bakery',wait_until='domcontentloaded')
+        opened('स्टेशन बेकहाउस')
+        expect(guide.locator('#conversation')).to_contain_text('₹95')
+        guide.get_by_role('button',name='चलें · सब्ज़ी मंडी',exact=True).click()
+        page.wait_for_url('**/easy.html?venue=sabzi*',wait_until='domcontentloaded')
+        opened('सब्ज़ी मंडी')
+        guide.locator('#close').click()
+        assert page.evaluate('document.documentElement.scrollWidth')==width
+        expect(page.locator('#km-shopping-switch a')).to_be_in_viewport(ratio=1)
+        expect(page.locator('.km-basket-button')).to_be_in_viewport(ratio=1)
+        browser.close()
+        print(engine,'verified quiet entry, continuity, Hindi ₹85 to ₹95 and shared basket',flush=True)

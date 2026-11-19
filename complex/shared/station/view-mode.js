@@ -24,6 +24,63 @@
   basketButton.textContent = 'My basket';
   basketButton.setAttribute('aria-haspopup', 'dialog');
   modes.append(basketButton);
+  const mayaButton = document.createElement('button');
+  mayaButton.type = 'button';
+  mayaButton.className = 'km-maya-button';
+  mayaButton.textContent = 'Ask Maya';
+  mayaButton.setAttribute('aria-haspopup','dialog');
+  modes.append(mayaButton);
+  let mayaPanel;
+  mayaButton.onclick = () => {
+    if (mayaPanel?.open) return;
+    if (document.pointerLockElement) document.exitPointerLock();
+    const panel = document.createElement('dialog');
+    mayaPanel = panel;
+    panel.id = 'km-maya';
+    panel.setAttribute('aria-label','Maya · Plaza shopping guide');
+    const frame = document.createElement('iframe');
+    frame.title = 'Ask Maya';
+    const url = new URL('maya.html',station);
+    const place = screen === 'station' ? document.querySelector('#world')?.dataset.scene
+      : screen === 'easy' ? query.get('venue') || 'urc' : screen;
+    url.searchParams.set('place',place || 'plaza');
+    if (document.documentElement.lang === 'hi') url.searchParams.set('lang','hi');
+    frame.src = url;
+    panel.append(frame);
+    document.body.append(panel);
+    const receive = event => {
+      if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+      if (event.data?.maya === 'close') panel.close();
+      if (event.data?.maya === 'visit' && valid(event.data.scene)) {
+        const scene = event.data.scene;
+        let next = new URL('#'+scene,station);
+        if (screen === 'easy' || screen === 'catalogue') {
+          next = new URL('easy.html',shared);
+          next.searchParams.set('venue',({shelf:'urc',counter:'bakery'})[scene] || scene);
+        } else if (valid(screen)) {
+          next = classic(scene);
+          const originView = query.get('from');
+          if (originView === 'easy' || originView === 'catalogue') next.searchParams.set('from',originView);
+        }
+        panel.close();
+        location.assign(next);
+      }
+    };
+    window.addEventListener('message',receive);
+    const dismiss = () => { if (panel.open) panel.close(); };
+    window.addEventListener('pagehide',dismiss);
+    window.addEventListener('hashchange',dismiss);
+    panel.onclick = e => { if (e.target === panel) dismiss(); };
+    panel.onclose = () => {
+      window.removeEventListener('message',receive);
+      window.removeEventListener('pagehide',dismiss);
+      window.removeEventListener('hashchange',dismiss);
+      panel.remove();
+      mayaButton.focus({preventScroll:true});
+    };
+    panel.showModal();
+    frame.focus();
+  };
 
   let drawer, frame, opener;
   function openTripBasket() {

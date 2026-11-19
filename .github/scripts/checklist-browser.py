@@ -70,7 +70,7 @@ with sync_playwright() as pw:
         expect(page.get_by_text('Market day', exact=True)).to_be_visible()
         header = page.locator('#km-shopping-switch')
         assert page.evaluate('document.documentElement.scrollWidth') == 320
-        for control in [header.get_by_role('link'), header.get_by_role('button')]:
+        for control in [header.get_by_role('link'), header.get_by_role('button',name='My basket')]:
             expect(control).to_be_in_viewport(ratio=1)
             assert control.bounding_box()['height'] >= 52
         header.get_by_role('link', name='Explore in 3D').click()
