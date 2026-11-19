@@ -40,6 +40,7 @@
     panel.setAttribute('aria-label','Maya · Plaza shopping guide');
     const frame = document.createElement('iframe');
     frame.title = 'Ask Maya';
+    frame.allow = 'microphone; autoplay';
     const url = new URL('maya.html',station);
     const place = screen === 'station' ? document.querySelector('#world')?.dataset.scene
       : screen === 'easy' ? query.get('venue') || 'urc' : screen;

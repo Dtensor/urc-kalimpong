@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Maya · Plaza shopping guide</title><link rel="stylesheet" href="maya.css">
-<script defer src="maya.js"></script></head><body>
+<script defer src="maya-search.js"></script><script defer src="maya-voice.js"></script><script defer src="maya.js?v=2"></script></head><body>
 <header><img src="maya.webp" width="62" height="62" alt=""><div><h1>Maya</h1><p id="identity">Virtual plaza guide</p></div>
 <button type="button" id="close" aria-label="Close Maya">×</button></header>
 <div class="place"><strong id="place"></strong><button type="button" id="language">हिन्दी</button></div>
 <main><div id="conversation" aria-live="polite"></div>
 <div id="actions"></div><p id="status" role="status"></p></main>
 <footer><form><label for="question" id="ask-label">Ask Maya</label><div class="entry"><input id="question" maxlength="240" autocomplete="off"><button id="send">Ask</button></div></form>
-<div class="voice"><button type="button" id="mic" hidden>Speak</button><button type="button" id="read" hidden>Read reply</button></div></footer>
+<div class="voice"><button type="button" id="mic" hidden>Speak</button><button type="button" id="read" hidden>Read reply</button><button type="button" id="voice-toggle" aria-pressed="true">Voice on</button></div></footer>
 </body></html>
