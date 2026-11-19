@@ -61,20 +61,20 @@ header .km-modes{margin-left:12px;flex-shrink:0}
 .counter-links{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}.counter-links #basket{color:#214336}
 @media(max-width:700px){.sectionhead{align-items:flex-start}.counter-links{gap:5px}.counter-links a{white-space:nowrap}}
 
-#sheet:has(.loaf-preview){width:min(510px,94vw);padding:0 20px 20px;overflow:auto}
-#sheet:has(.loaf-preview) .close{width:44px;height:44px;right:9px;top:9px;box-shadow:0 2px 8px #17150f40}
-.loaf-preview{margin:0 -20px 15px}
-.loaf-frame{background:#382e26;overflow:hidden}
-.loaf-frame img{display:block;width:100%;height:auto;max-height:36svh;object-fit:contain}
-.loaf-frame img[hidden]{display:none}
+#sheet:has(.loaf-preview,.scale-preview){width:min(510px,94vw);padding:0 20px 20px;overflow:auto}
+#sheet:has(.loaf-preview,.scale-preview) .close{width:44px;height:44px;right:9px;top:9px;box-shadow:0 2px 8px #17150f40}
+.loaf-preview,.scale-preview{margin:0 -20px 15px}
+.loaf-frame,.scale-preview{background:#382e26;overflow:hidden}
+.loaf-frame img,.scale-preview img{display:block;width:100%;height:auto;max-height:36svh;object-fit:contain}
+.loaf-frame img[hidden],.scale-preview img[hidden]{display:none}
 .loaf-views{display:flex;width:fit-content;gap:3px;padding:3px;margin:12px auto 0;border:1px solid #bbc3b7;background:#ecece1;border-radius:100px}
 .loaf-view{min-height:44px;border:0;padding:8px 16px;border-radius:100px;background:transparent;font-weight:600}
 .loaf-view[aria-pressed=true]{background:#234735;color:#fffaf0}
 .loaf-view:focus-visible{outline:3px solid #9c541a;outline-offset:2px}
-#detail:has(.loaf-preview) h2{font:600 clamp(1.5rem,5.8vw,2rem)/1.1 Georgia,serif;margin:0 0 6px}
-#detail:has(.loaf-preview) .price{margin:0}
-#detail:has(.loaf-preview) .note{margin:7px 0 13px}
-#detail:has(.loaf-preview) > a{display:inline-block;white-space:nowrap}
+#detail:has(.loaf-preview,.scale-preview) h2{font:600 clamp(1.5rem,5.8vw,2rem)/1.1 Georgia,serif;margin:0 0 6px}
+#detail:has(.loaf-preview,.scale-preview) .price{margin:0}
+#detail:has(.loaf-preview,.scale-preview) .note{margin:7px 0 13px}
+#detail:has(.loaf-preview,.scale-preview) > a{display:inline-block;white-space:nowrap}
 @media(max-width:480px){
-  #detail:has(.loaf-preview) > a{display:table;margin:10px 0 0!important}
+  #detail:has(.loaf-preview,.scale-preview) > a{display:table;margin:10px 0 0!important}
 }
