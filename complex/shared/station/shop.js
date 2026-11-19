@@ -45,21 +45,31 @@ function productImage(path,cls){
   const img=node('img',null,cls);img.src=path;img.alt='';img.loading='lazy';img.onerror=()=>img.replaceWith(node('span','Photo unavailable','placeholder'));return img;
 }
 function weightLabel(kg){return kg<1?Math.round(kg*1000)+' g':kg+' kg';}
-function sourdoughPreview(){
+const bakeryViews=new Map([
+  ['ladi-pav-6',[
+    ['Pack of six','ladi-pav-whole','Six joined golden pav rolls sit on brown bakery paper.'],
+    ['Pull one apart','ladi-pav-pulled','The baker holds one roll beside the other five, showing the soft threads at the join.']
+  ]],
+  ['milk-bread-400g',[
+    ['Whole loaf','milk-bread-whole','A golden milk loaf with three domes rests on a wooden board.'],
+    ['See a slice','milk-bread-sliced','A single slice rests against the loaf, showing its fine, even crumb.']
+  ]],
+  ['hill-sourdough',[
+    ['Whole loaf','hill-sourdough-whole','The baker holds a round loaf with a wheat sprig scored into its crust.'],
+    ['See inside','hill-sourdough-cut','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
+  ]]
+]);
+function breadPreview(views){
   const figure=node('figure',null,'loaf-preview');
   const frame=node('div',null,'loaf-frame');
   const controls=node('div',null,'loaf-views');
   controls.setAttribute('role','group');
-  controls.setAttribute('aria-label','Loaf view');
-  const views=[
-    ['Whole loaf','whole','The baker holds a round loaf with a wheat sprig scored into its crust.'],
-    ['See inside','cut','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
-  ];
+  controls.setAttribute('aria-label','Bread view');
   for(const [label,file,description] of views){
     const image=node('img');
     image.alt=description;
-    image.hidden=file!=='whole';
-    image.src='hill-sourdough-'+file+'.webp';
+    image.hidden=frame.childElementCount>0;
+    image.src=file+'.webp';
     const choice=button(label,()=>{
       for(const view of frame.children)view.hidden=view!==image;
       for(const control of controls.children)control.setAttribute('aria-pressed',String(control===choice));
@@ -96,8 +106,8 @@ async function pick(id,illustration){
   else{
     const illustrated=Number.isInteger(illustration);
     let picture;
-    if(venue==='bakery' && id==='hill-sourdough'){
-      picture=sourdoughPreview();
+    if(venue==='bakery' && bakeryViews.has(id)){
+      picture=breadPreview(bakeryViews.get(id));
     }else if(illustrated && venue!=='urc'){
       picture=node('div',null,'pack '+({sabzi:'produce-closeup',bakery:'bread-closeup',grocery:'grocery-closeup'}[venue]));
       picture.style.backgroundPosition=venue==='grocery'?[15,59,90][illustration]+'% 56%':venue==='sabzi'?[2,48,95][illustration]+'% 45%':[18,54,92][illustration]+'% 62%';
@@ -122,7 +132,8 @@ function drawCards(){
   const cards=$('#cards');cards.replaceChildren();
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
-    const thumbnail=venue==='bakery' && item.id==='hill-sourdough'?'hill-sourdough-whole.webp':photo(item);
+    const bread=venue==='bakery' && bakeryViews.get(item.id);
+    const thumbnail=bread?bread[0][1]+'.webp':photo(item);
     card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);

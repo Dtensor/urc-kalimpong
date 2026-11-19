@@ -65,7 +65,7 @@ header .km-modes{margin-left:12px;flex-shrink:0}
 #sheet:has(.loaf-preview) .close{width:44px;height:44px;right:9px;top:9px;box-shadow:0 2px 8px #17150f40}
 .loaf-preview{margin:0 -20px 15px}
 .loaf-frame{background:#382e26;overflow:hidden}
-.loaf-frame img{display:block;width:100%;height:min(33svh,310px);object-fit:cover}
+.loaf-frame img{display:block;width:100%;height:auto;max-height:36svh;object-fit:contain}
 .loaf-frame img[hidden]{display:none}
 .loaf-views{display:flex;width:fit-content;gap:3px;padding:3px;margin:12px auto 0;border:1px solid #bbc3b7;background:#ecece1;border-radius:100px}
 .loaf-view{min-height:44px;border:0;padding:8px 16px;border-radius:100px;background:transparent;font-weight:600}
