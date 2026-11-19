@@ -81,11 +81,26 @@ function breadPreview(views){
   figure.append(frame,controls);
   return figure;
 }
-function weightChoice(item){
+function tomatoScale(){
+  const frame=node('div',null,'scale-preview');
+  for(const grams of [250,500,1000]){
+    const image=node('img');
+    image.src='tomato-'+grams+'g.webp';
+    image.alt='Illustrated '+weightLabel(grams/1000)+' portion of tomatoes on the brass scale.';
+    image.dataset.grams=String(grams);
+    image.hidden=grams!==250;
+    frame.append(image);
+  }
+  return frame;
+}
+function weightChoice(item,scale){
   const group=node('fieldset',null,'weight-choice');
   group.append(node('legend','Choose weight'));
   const total=node('output');total.setAttribute('aria-live','polite');
   function refresh(kg){
+    if(scale){
+      for(const image of scale.children)image.hidden=Number(image.dataset.grams)!==kg*1000;
+    }
     total.textContent=Number.isFinite(item.price)?weightLabel(kg)+' · '+rupees(Math.round(item.price*100*kg)/100):'Price at counter';
   }
   for(const kg of [.25,.5,1]){
@@ -105,8 +120,11 @@ async function pick(id,illustration){
   if(!item){detail.append(node('h2',shop?'Item unavailable':'Catalogue unavailable'),node('p',shop?'This pack is absent from the current catalogue.':'Open Easy shopping for the catalogue and your saved basket.'));}
   else{
     const illustrated=Number.isInteger(illustration);
+    const scale=venue==='sabzi' && id==='tomato' && item.unit==='kg'?tomatoScale():null;
     let picture;
-    if(venue==='bakery' && bakeryViews.has(id)){
+    if(scale){
+      picture=scale;
+    }else if(venue==='bakery' && bakeryViews.has(id)){
       picture=breadPreview(bakeryViews.get(id));
     }else if(illustrated && venue!=='urc'){
       picture=node('div',null,'pack '+({sabzi:'produce-closeup',bakery:'bread-closeup',grocery:'grocery-closeup'}[venue]));
@@ -115,7 +133,7 @@ async function pick(id,illustration){
       picture=productImage(illustrated?'pack-'+illustration+'.webp':photo(item,true),'pack'+(illustrated?'':' reference'));
     }
     detail.append(picture,node('h2',item.name),node('p',rupees(item.price)+(venue!=='urc'&&item.unit?' / '+item.unit:''),'price'),node('p',venue==='sabzi'?'Sample produce prices. Confirm at the stall.':venue==='bakery'?'Sample bakery menu. Confirm the price and availability at the counter.':'Catalogue reference. Confirm price and availability at the counter.','note'));
-    const weights=['sabzi','grocery'].includes(venue)&&item.unit==='kg'?weightChoice(item):null;
+    const weights=['sabzi','grocery'].includes(venue)&&item.unit==='kg'?weightChoice(item,scale):null;
     if(weights)detail.append(weights);
     const add=button(item.status==='out'?'Currently unavailable':'Add to basket',()=>addItem(item,weights?Number(weights.querySelector(':checked').value):item.unit==='kg'&&venue==='bakery'?.25:1),'primary');
     add.disabled=item.status==='out';detail.append(add);
@@ -133,7 +151,8 @@ function drawCards(){
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
     const bread=venue==='bakery' && bakeryViews.get(item.id);
-    const thumbnail=bread?bread[0][1]+'.webp':photo(item);
+    let thumbnail=bread?bread[0][1]+'.webp':photo(item);
+    if(venue==='sabzi' && item.id==='tomato')thumbnail='tomato-250g.webp';
     card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);
