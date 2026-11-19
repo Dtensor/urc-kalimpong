@@ -21,7 +21,8 @@ button:disabled{opacity:.45;cursor:default}
 #notice:not(:empty){margin-top:12px;color:#754b24}
 
 #trip-actions:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
-#toggle-slip{font-weight:650;background:#234737;color:#fff8e4;border-color:#234737}
+#trip-actions{flex-wrap:wrap}#shop-list,.showing-slip #toggle-slip{font-weight:650;background:#234737;color:#fff8e4;border-color:#234737}
+#trip-actions #save-trip{flex-basis:100%}
 #save-trip{font-size:14px;color:#274737;text-underline-offset:3px}
 #counter-picker:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
 #counter-picker label{font-size:14px}
@@ -34,4 +35,13 @@ button:disabled{opacity:.45;cursor:default}
 .showing-slip .item-head span{color:#536052}
 .showing-slip article{padding:14px 0;border-bottom:1px dashed #c4beae}
 .slip-quantity{font:600 25px/1.25 system-ui,sans-serif;margin-top:5px}
+.shopping-list section{border-top:3px solid #50694d;padding-top:12px}
+#pick-progress{color:#34523c;font-weight:650;font-size:14px;margin-bottom:9px}
+.shopping-list article{padding:0}
+.pick-row{display:flex;gap:14px;align-items:center;padding:13px 3px;min-height:62px;cursor:pointer}
+.pick-row input{width:23px;height:23px;flex:none;accent-color:#24533b}
+.pick-row input:focus-visible{outline:3px solid #b56e22;outline-offset:3px}
+.pick-row strong,.pick-quantity{display:block;overflow-wrap:anywhere}
+.pick-quantity{color:#4b594d;font-size:15px}
+.pick-row input:checked+span strong{text-decoration:line-through;color:#536451}
 @media(max-height:430px){footer{padding-block:6px}#trip-actions:not([hidden]){margin-top:3px}}
