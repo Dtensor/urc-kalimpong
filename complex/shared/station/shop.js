@@ -45,6 +45,32 @@ function productImage(path,cls){
   const img=node('img',null,cls);img.src=path;img.alt='';img.loading='lazy';img.onerror=()=>img.replaceWith(node('span','Photo unavailable','placeholder'));return img;
 }
 function weightLabel(kg){return kg<1?Math.round(kg*1000)+' g':kg+' kg';}
+function sourdoughPreview(){
+  const figure=node('figure',null,'loaf-preview');
+  const frame=node('div',null,'loaf-frame');
+  const controls=node('div',null,'loaf-views');
+  controls.setAttribute('role','group');
+  controls.setAttribute('aria-label','Loaf view');
+  const views=[
+    ['Whole loaf','whole','The baker holds a round loaf with a wheat sprig scored into its crust.'],
+    ['See inside','cut','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
+  ];
+  for(const [label,file,description] of views){
+    const image=node('img');
+    image.alt=description;
+    image.hidden=file!=='whole';
+    image.src='hill-sourdough-'+file+'.webp';
+    const choice=button(label,()=>{
+      for(const view of frame.children)view.hidden=view!==image;
+      for(const control of controls.children)control.setAttribute('aria-pressed',String(control===choice));
+    },'loaf-view');
+    choice.setAttribute('aria-pressed',String(!image.hidden));
+    frame.append(image);
+    controls.append(choice);
+  }
+  figure.append(frame,controls);
+  return figure;
+}
 function weightChoice(item){
   const group=node('fieldset',null,'weight-choice');
   group.append(node('legend','Choose weight'));
@@ -70,7 +96,9 @@ async function pick(id,illustration){
   else{
     const illustrated=Number.isInteger(illustration);
     let picture;
-    if(illustrated && venue!=='urc'){
+    if(venue==='bakery' && id==='hill-sourdough'){
+      picture=sourdoughPreview();
+    }else if(illustrated && venue!=='urc'){
       picture=node('div',null,'pack '+({sabzi:'produce-closeup',bakery:'bread-closeup',grocery:'grocery-closeup'}[venue]));
       picture.style.backgroundPosition=venue==='grocery'?[15,59,90][illustration]+'% 56%':venue==='sabzi'?[2,48,95][illustration]+'% 45%':[18,54,92][illustration]+'% 62%';
     }else{
@@ -94,7 +122,8 @@ function drawCards(){
   const cards=$('#cards');cards.replaceChildren();
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
-    card.append(productImage(photo(item)),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
+    const thumbnail=venue==='bakery' && item.id==='hill-sourdough'?'hill-sourdough-whole.webp':photo(item);
+    card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);
   }
