@@ -81,12 +81,13 @@ function breadPreview(views){
   figure.append(frame,controls);
   return figure;
 }
-function tomatoScale(){
-  const frame=node('div',null,'scale-preview');
+const weighedProduce=new Map([['tomato','tomatoes'],['iskus','iskus squash']]);
+function produceScale(id){
+  const frame=node('div',null,'produce-photo scale-preview');
   for(const grams of [250,500,1000]){
     const image=node('img');
-    image.src='tomato-'+grams+'g.webp';
-    image.alt='Illustrated '+weightLabel(grams/1000)+' portion of tomatoes on the brass scale.';
+    image.src=id+'-'+grams+'g.webp';
+    image.alt='Illustrated '+weightLabel(grams/1000)+' portion of '+weighedProduce.get(id)+' on the brass scale.';
     image.dataset.grams=String(grams);
     image.hidden=grams!==250;
     frame.append(image);
@@ -120,10 +121,16 @@ async function pick(id,illustration){
   if(!item){detail.append(node('h2',shop?'Item unavailable':'Catalogue unavailable'),node('p',shop?'This pack is absent from the current catalogue.':'Open Easy shopping for the catalogue and your saved basket.'));}
   else{
     const illustrated=Number.isInteger(illustration);
-    const scale=venue==='sabzi' && id==='tomato' && item.unit==='kg'?tomatoScale():null;
+    const scale=venue==='sabzi' && weighedProduce.has(id) && item.unit==='kg'?produceScale(id):null;
     let picture;
     if(scale){
       picture=scale;
+    }else if(venue==='sabzi' && id==='spinach'){
+      picture=node('div',null,'produce-photo');
+      const bunch=node('img');
+      bunch.src='spinach-bunch.webp';
+      bunch.alt='The vendor holds one bunch of spinach tied at the stems, with leaves and roots in view.';
+      picture.append(bunch);
     }else if(venue==='bakery' && bakeryViews.has(id)){
       picture=breadPreview(bakeryViews.get(id));
     }else if(illustrated && venue!=='urc'){
@@ -152,7 +159,8 @@ function drawCards(){
     const card=button('',()=>pick(item.id),'card');
     const bread=venue==='bakery' && bakeryViews.get(item.id);
     let thumbnail=bread?bread[0][1]+'.webp':photo(item);
-    if(venue==='sabzi' && item.id==='tomato')thumbnail='tomato-250g.webp';
+    if(venue==='sabzi' && weighedProduce.has(item.id))thumbnail=item.id+'-250g.webp';
+    if(venue==='sabzi' && item.id==='spinach')thumbnail='spinach-bunch.webp';
     card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);
