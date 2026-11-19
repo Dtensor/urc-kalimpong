@@ -5,6 +5,13 @@
   const picker = document.querySelector('#counter-picker');
   const choice = document.querySelector('#counter-choice');
   const toggle = document.querySelector('#toggle-slip');
+  const shop = document.querySelector('#shop-list');
+  const progress = document.querySelector('#pick-progress');
+  const tripKey = 'complex.pickup.v1.counter';
+  const markPrefix = 'complex.pickup.v1.item.';
+  const markKey = (venue, id) => markPrefix + venue + '.' + id;
+  let shopping = false;
+  let nextCounter = null;
   let showingSlip = false;
   let selected = new URLSearchParams(location.search).get('counter');
   const names = {urc:'URC Kalimpong', bakery:'Station Bakehouse', sabzi:'Sabzi Mandi', grocery:'Station Grocery'};
@@ -52,6 +59,40 @@
     btn.onclick = action;
     return btn;
   }
+  function saveProgress(update) {
+    try { update(); notice.textContent = ''; }
+    catch { notice.textContent = 'This browser could not save your checklist.'; }
+    updatePresentation(false);
+  }
+  function switchCounter(venue) {
+    saveProgress(() => localStorage.setItem(tripKey,venue));
+    document.querySelector('main').scrollTop = 0;
+    counters.focus({preventScroll:true});
+  }
+  function checklistLine(venue,row,quantity) {
+    const label = element('label',null,'pick-row');
+    const input = element('input');
+    input.type = 'checkbox';
+    const key = markKey(venue,row.id);
+    input.checked = localStorage.getItem(key) === String(row.quantity);
+    input.setAttribute('aria-label',row.name + ', ' + quantity);
+    input.onchange = () => saveProgress(() => {
+      if (input.checked) localStorage.setItem(key,String(row.quantity));
+      else localStorage.removeItem(key);
+    });
+    const words = element('span');
+    words.append(element('strong',row.name),element('span',quantity,'pick-quantity'));
+    label.append(input,words);
+    return label;
+  }
+  function pickQuantity(row,known) {
+    if (!known) return 'Quantity ' + row.quantity + ' · unit unconfirmed';
+    if (row.unit === 'each') return 'Quantity ' + row.quantity;
+    if (/^\d+g$/.test(row.unit)) return row.quantity + ' × ' + row.unit.replace('g',' g');
+    const plurals = {bunch:'bunches', box:'boxes', pouch:'pouches', pack:'packs', piece:'pieces',
+      plate:'plates', bottle:'bottles', jar:'jars', sack:'sacks', tin:'tins'};
+    return qtyLabel(row.quantity,row.quantity > 1 ? plurals[row.unit] || row.unit : row.unit);
+  }
   async function change(venue, row, delta) {
     const key = core.key(venue);
     function save() {
@@ -79,6 +120,10 @@
     const amount = core.total([row]);
     heading.append(element('strong',row.name), element('span',amount.unknown ? 'Price at counter' : money(amount.paise)));
     const quantity = known ? qtyLabel(row.quantity,row.unit) : String(row.quantity);
+    if (shopping) {
+      article.append(checklistLine(venue,row,pickQuantity(row,known)));
+      return article;
+    }
     if (showingSlip) {
       const displayQuantity = !known ? 'Quantity ' + row.quantity + ' · unit unconfirmed'
         : row.unit === 'each' ? 'Quantity ' + row.quantity : quantity;
@@ -110,19 +155,63 @@
       } catch { carts.set(venue,null); }
     }
     const available = [...carts.keys()].filter(venue=>carts.get(venue));
+    const marks = new Set();
+    const remaining = new Map();
+    let savedCounter = null;
+    try {
+      savedCounter = localStorage.getItem(tripKey);
+      for (const key of Object.keys(localStorage).filter(k => k.startsWith(markPrefix))) {
+        const suffix = key.slice(markPrefix.length);
+        const dot = suffix.indexOf('.');
+        const venue = suffix.slice(0,dot);
+        if (carts.get(venue) === null) continue;
+        const quantity = carts.get(venue)?.[suffix.slice(dot+1)];
+        if (quantity && String(quantity) === localStorage.getItem(key)) marks.add(key);
+        else localStorage.removeItem(key);
+      }
+      if (!carts.size) { localStorage.removeItem(tripKey); savedCounter = null; }
+    } catch { notice.textContent = 'This browser could not read your checklist.'; }
+    for (const venue of available) {
+      remaining.set(venue,Object.keys(carts.get(venue)).filter(id=>!marks.has(markKey(venue,id))).length);
+    }
+    shopping = core.shops.includes(savedCounter) && !!available.length;
+    if (shopping) {
+      selected = available.includes(savedCounter) ? savedCounter : available.find(v=>remaining.get(v)) || available[0];
+      if (selected !== savedCounter) {
+        try { localStorage.setItem(tripKey,selected); } catch { /* Keep the current view usable. */ }
+      }
+      showingSlip = false;
+    }
     if (showingSlip && !available.includes(selected)) selected = available[0];
     if (!available.length) showingSlip = false;
     if (choice.options.length !== available.length || available.some((v,i)=>choice.options[i]?.value !== v)) {
       choice.replaceChildren(...available.map(v=>new Option(names[v],v)));
     }
     choice.value = selected || '';
-    picker.hidden = !showingSlip || available.length < 2;
+    picker.hidden = !(showingSlip || shopping) || available.length < 2;
+    document.body.classList.toggle('shopping-list',shopping);
     document.body.classList.toggle('showing-slip',showingSlip);
     document.querySelector('#trip-actions').hidden = !available.length;
-    document.querySelector('#save-trip').hidden = showingSlip;
-    toggle.textContent = showingSlip ? 'Edit basket' : 'Show at counter';
+    document.querySelector('#save-trip').hidden = showingSlip || shopping;
+    toggle.textContent = showingSlip || shopping ? 'Edit basket' : 'Show at counter';
+    shop.hidden = showingSlip;
+    progress.hidden = !shopping;
+    shop.disabled = false;
+    if (shopping) {
+      const count = Object.keys(carts.get(selected)).length;
+      const left = remaining.get(selected);
+      const after = available.indexOf(selected) + 1;
+      nextCounter = [...available.slice(after),...available.slice(0,after-1)].find(v=>remaining.get(v)) || null;
+      const complete = !left && !nextCounter && available.length === carts.size;
+      const message = complete ? 'Shopping complete · All items collected' : (count-left) + ' of ' + count + ' collected at this counter';
+      if (progress.textContent !== message) progress.textContent = message;
+      shop.textContent = nextCounter ? 'Next counter' : 'Finish trip';
+      shop.disabled = !complete && !nextCounter;
+    } else {
+      shop.textContent = savedCounter?.startsWith('paused.') ? 'Resume shopping' : 'Shop this list';
+    }
     for (const [venue, cart] of carts) {
-      if (showingSlip && venue !== selected) continue;
+      if ((showingSlip || shopping) && venue !== selected && cart) continue;
       const section = element('section');
       section.dataset.counter = venue;
       const heading = element('div',null,'counter-title');
@@ -137,7 +226,7 @@
       const rows = core.rows(items, cart, venue);
       const sum = core.total(rows);
       paise += sum.paise; partial ||= !!sum.unknown;
-      if (!showingSlip) heading.append(element('span',sum.unknown ? 'Price pending' : money(sum.paise)));
+      if (!showingSlip && !shopping) heading.append(element('span',sum.unknown ? 'Price pending' : money(sum.paise)));
       for (const row of rows) section.append(line(venue,row,ids.has(row.id)));
       if (!catalogues.has(venue)) {
         if (failed.has(venue)) {
@@ -149,21 +238,41 @@
     }
     if (!fragment.childElementCount) fragment.append(element('p','Your basket is empty. Choose something at a shop to start your trip.'));
     counters.replaceChildren(fragment);
-    document.querySelector('#total-label').textContent = partial ? 'Known subtotal' : showingSlip ? 'Counter estimate' : 'Estimated total';
+    document.querySelector('#total-label').textContent = partial ? 'Known subtotal' : showingSlip || shopping ? 'Counter estimate' : 'Estimated total';
     document.querySelector('#total').textContent = partial && !paise ? '—' : money(paise);
     if (focus) {
       const section = counters.querySelector('[data-counter="'+focus[0]+'"]');
       const article = [...(section?.querySelectorAll('article') || [])].find(a=>a.dataset.item===focus[1]);
-      const btn = [...(article?.querySelectorAll('button:enabled') || [])].find(b=>b.getAttribute('aria-label')===focus[2]);
+      const btn = [...(article?.querySelectorAll('button:enabled,input:enabled') || [])].find(b=>b.getAttribute('aria-label')===focus[2]);
       (btn || article?.querySelector('button:enabled') || section?.querySelector('button:enabled') || counters).focus({preventScroll:true});
     }
   }
-  function updatePresentation() {
+  function updatePresentation(scroll = true) {
     render();
-    document.querySelector('main').scrollTop = 0;
+    if (scroll) document.querySelector('main').scrollTop = 0;
   }
-  toggle.onclick = () => { showingSlip = !showingSlip; updatePresentation(); };
-  choice.onchange = () => { selected = choice.value; updatePresentation(); };
+  toggle.onclick = () => {
+    if (shopping) saveProgress(() => localStorage.setItem(tripKey,'paused.'+selected));
+    else { showingSlip = !showingSlip; updatePresentation(); }
+  };
+  shop.onclick = () => {
+    if (shopping && !nextCounter) {
+      saveProgress(() => {
+        for (const key of Object.keys(localStorage).filter(k=>k.startsWith(markPrefix))) localStorage.removeItem(key);
+        localStorage.removeItem(tripKey);
+      });
+      notice.textContent ||= 'Trip finished. Your basket is saved.';
+      return;
+    }
+    const saved = localStorage.getItem(tripKey) || '';
+    const options = [...choice.options].map(option=>option.value);
+    const last = saved.startsWith('paused.') ? saved.slice(7) : selected;
+    switchCounter(shopping ? nextCounter : options.includes(last) ? last : options[0]);
+  };
+  choice.onchange = () => {
+    if (shopping) switchCounter(choice.value);
+    else { selected = choice.value; updatePresentation(); }
+  };
   function close() { parent.postMessage('km-close-basket',location.origin); }
   document.addEventListener('keydown', e=>{if(e.key==='Escape'){e.preventDefault();close();}});
   window.addEventListener('storage',render);

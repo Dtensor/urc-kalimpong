@@ -1,7 +1,7 @@
 name: Station shopping layout
 on:
   pull_request:
-    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/station-browser.py', '.github/scripts/basket-browser.py', '.github/scripts/featured-browser.py', '.github/workflows/station-layout.yml']
+    paths: ['index.html', 'mall/index.html', 'complex/**', '.github/scripts/*-browser.py', '.github/workflows/station-layout.yml']
   push:
     branches: [main]
     paths: ['index.html', 'mall/index.html', 'complex/shared/station/**']
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [station, basket, featured]
+        suite: [station, basket, featured, checklist]
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/playwright/python:v1.59.0-noble
     timeout-minutes: 12
@@ -27,11 +27,14 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             export KALIMPONG_REVIEW=https://dtensor.github.io/urc-kalimpong/
-            for attempt in {1..36}; do
-              if curl -fsS --max-time 8 "${KALIMPONG_REVIEW}complex/shared/station/shop.js" | cmp -s complex/shared/station/shop.js -; then break; fi
-              sleep 5
+            for file in complex/shared/station/shop.js complex/shared/station/trip-basket.js; do
+              attempt=0
+              until curl -fsS --max-time 8 "${KALIMPONG_REVIEW}${file}" | cmp -s "$file" -; do
+                attempt=$((attempt + 1))
+                if [ "$attempt" -ge 36 ]; then echo "Pages still serves a different $file"; exit 1; fi
+                sleep 5
+              done
             done
-            curl -fsS --max-time 10 "${KALIMPONG_REVIEW}complex/shared/station/shop.js" | cmp -s complex/shared/station/shop.js -
           else
             python -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/station.log" 2>&1 &
             curl --fail --retry 8 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/ --output /dev/null
