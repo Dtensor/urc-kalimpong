@@ -4,14 +4,14 @@ const scenes = [
     ['Enter the canteen',50,53,1],['Visit the bakery',21,52,3],['Visit Sabzi Mandi',4,51,5],['Visit Station Grocery',76,51,6],['Visit Station Cinema',96,49,7]]},
   {id:'hall',crumb:'Hall',name:'The canteen hall',hint:'Walk around the fountain to the food and provisions counter.',alt:'A round fountain beneath brass chandeliers, with provisions shelves straight ahead.',trail:[0,1],points:[['Walk to the shelf',50,50,2]]},
   {id:'shelf',crumb:'Shelf',name:'The provisions shelf',hint:'Pick up a pack to see its size and catalogue price.',alt:'Darjeeling tea on the left, coffee jars in the middle and biscuits on the right.',trail:[0,1,2],points:[
-    ['Darjeeling tea',17,65,featured[0]],['Coffee',47,65,featured[1]],['Parle-G',80,65,featured[2]]]},
+    ['Darjeeling tea',17,48,featured[0],17,48],['Coffee',47,54,featured[1],36,35],['Parle-G',81,52,featured[2],30,38]]},
   {id:'bakery',crumb:'Bakery window',venue:'bakery',name:'Station Bakehouse',hint:'Three breads sit in the window. The open door is just to their right.',alt:'A striped awning above the arched window. A round sourdough sits on blue cloth and a brass bell hangs inside the door.',trail:[0,3],points:[['Step inside',72,49,4]]},
   {id:'counter',crumb:'Bread counter',venue:'bakery',name:'At the bread counter',hint:'Choose a loaf, or a pack of six pav. The clock is just across the glass.',alt:'Through the bakery window, the plaza clock. Pav rolls, milk bread and a sourdough boule line the counter from left to right.',trail:[0,3,4],points:[
-    ['Ladi pav',31,61,'ladi-pav-6'],['Milk bread',53,58,'milk-bread-400g'],['Hill sourdough',79,56,'hill-sourdough']]},
+    ['Ladi pav',31,61,'ladi-pav-6',19,13],['Milk bread',53,58,'milk-bread-400g',20,17],['Hill sourdough',79,56,'hill-sourdough',21,18]]},
   {id:'sabzi',crumb:'Produce stall',venue:'sabzi',name:'Sabzi Mandi',hint:'Choose tomatoes or iskus by weight, or pick up a bunch of spinach.',alt:'Cane baskets of tomatoes, pale green iskus squash and tied spinach beside a brass balance overlooking terraced hills.',trail:[0,5],points:[
-    ['Tomatoes',16,46,'tomato'],['Iskus squash',48,46,'iskus'],['Spinach',81,46,'spinach']]},
+    ['Tomatoes',16,46,'tomato',27,22],['Iskus squash',48,46,'iskus',35,21],['Spinach',81,46,'spinach',34,39]]},
   {id:'grocery',crumb:'Grocery',venue:'grocery',name:'Station Grocery',hint:'Scoop loose rice, pick a pack of hill red rice or take home a tin of first-flush tea.',alt:'A wooden scoop rests in loose white rice beside a bag of hill red rice and a green tea tin. A grocer packs orders behind the counter.',trail:[0,6],points:[
-    ['Loose rice',26,60,'sona-masoori-loose'],['Hill red rice',56,49,'hill-red-rice-1kg'],['First-flush tea',78,61,'darjeeling-first-flush-100g']]},
+    ['Loose rice',26,60,'sona-masoori-loose',33,18],['Hill red rice',56,49,'hill-red-rice-1kg',18,35],['First-flush tea',78,61,'darjeeling-first-flush-100g',14,28]]},
   {id:'cinema',crumb:'Ticket window',name:'Station Cinema',hint:'Read the programme by the ticket window, or step through the red curtain.',alt:'At dusk a brass-framed film board glows to the left of the ticket window. Red curtains open onto the aisle on the right.',trail:[0,7],points:[
     ['Read the programme',30,49,readProgramme],['Enter the auditorium',85,54,()=>location.assign($('#explore-3d').href)]]}
 ];
@@ -42,13 +42,14 @@ function visit(index,animate=true){
     showVenue(s.venue || 'urc');
   }
   $('#pins').replaceChildren();$('#actions').replaceChildren();
-  s.points.forEach(([label,x,y,target],i)=>{
+  s.points.forEach(([label,x,y,target,width,height],i)=>{
     const doorway=typeof target==='number';
     const act=typeof target==='function'?target:doorway?()=>navigate(target):()=>pick(target,i);
     const pin=button(doorway?'↑':'+',act,'pin');
-    if(target==='spinach' || target==='darjeeling-first-flush-100g'){
+    if(width && height){
       pin.classList.add('product-area');
-      pin.dataset.product=target;
+      pin.style.width=width+'%';
+      pin.style.height=height+'%';
     }
     pin.setAttribute('aria-label',label+' in scene');
     pin.style.left=x+'%';pin.style.top=y+'%';$('#pins').append(pin);
