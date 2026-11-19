@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [station, basket, featured, checklist, maya]
+        suite: [station, basket, featured, checklist, maya, maya-voice, maya-catalogue]
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/playwright/python:v1.59.0-noble
     timeout-minutes: 12
@@ -27,7 +27,7 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             export KALIMPONG_REVIEW=https://dtensor.github.io/urc-kalimpong/
-            for file in complex/shared/station/shop.js complex/shared/station/trip-basket.js complex/shared/station/view-mode.css complex/shared/station/view-mode.js; do
+            for file in complex/shared/station/shop.js complex/shared/station/trip-basket.js complex/shared/station/view-mode.css complex/shared/station/view-mode.js complex/shared/station/maya.js complex/shared/station/maya-voice.js complex/shared/station/maya-audio/clips.json; do
               attempt=0
               until curl -fsS --max-time 8 "${KALIMPONG_REVIEW}${file}" | cmp -s "$file" -; do
                 attempt=$((attempt + 1))
