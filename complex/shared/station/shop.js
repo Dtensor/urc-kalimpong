@@ -48,24 +48,28 @@ function productImage(path,cls){
 function weightLabel(kg){return kg<1?Math.round(kg*1000)+' g':kg+' kg';}
 const inspectionViews=new Map([
   ['bakery/ladi-pav-6',[
-    ['Pack of six','ladi-pav-whole','Six joined golden pav rolls sit on brown bakery paper.'],
-    ['Pull one apart','ladi-pav-pulled','The baker holds one roll beside the other five, showing the soft threads at the join.']
+    ['Pack of six','ladi-pav-whole.webp','Six joined golden pav rolls sit on brown bakery paper.'],
+    ['Pull one apart','ladi-pav-pulled.webp','The baker holds one roll beside the other five, showing the soft threads at the join.']
   ]],
   ['bakery/milk-bread-400g',[
-    ['Whole loaf','milk-bread-whole','A golden milk loaf with three domes rests on a wooden board.'],
-    ['See a slice','milk-bread-sliced','A single slice rests against the loaf, showing its fine, even crumb.']
+    ['Whole loaf','milk-bread-whole.webp','A golden milk loaf with three domes rests on a wooden board.'],
+    ['See a slice','milk-bread-sliced.webp','A single slice rests against the loaf, showing its fine, even crumb.']
   ]],
   ['bakery/hill-sourdough',[
-    ['Whole loaf','hill-sourdough-whole','The baker holds a round loaf with a wheat sprig scored into its crust.'],
-    ['See inside','hill-sourdough-cut','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
+    ['Whole loaf','hill-sourdough-whole.webp','The baker holds a round loaf with a wheat sprig scored into its crust.'],
+    ['See inside','hill-sourdough-cut.webp','The sliced loaf shows a golden crust around an airy, cream-coloured crumb.']
   ]],
   ['sabzi/spinach',[
-    ['Whole bunch','spinach-bunch','The vendor holds a tied bunch of spinach with its roots visible.'],
-    ['Inspect leaves','spinach-leaf','The vendor turns a leaf over to show its veins and beads of water.']
+    ['Whole bunch','spinach-bunch.webp','The vendor holds a tied bunch of spinach with its roots visible.'],
+    ['Inspect leaves','spinach-leaf.webp','The vendor turns a leaf over to show its veins and beads of water.']
+  ]],
+  ['grocery/hill-red-rice-1kg',[
+    ['Whole pack','hill-rice-pack.webp','A kraft bag of Hill Red Rice with a window showing the grains.'],
+    ['Inspect grains','hill-rice-grains.webp','A scoop of russet grains in front of the opened pack.']
   ]],
   ['grocery/darjeeling-first-flush-100g',[
-    ['Closed tin','first-flush-tin','A closed green 100 g Darjeeling First Flush tea tin sits on the counter.'],
-    ['Open tin','first-flush-open','The lid rests beside the open tin, with curled tea leaves and silvery tips visible.']
+    ['Closed tin','first-flush-tin.webp','A closed green 100 g Darjeeling First Flush tea tin sits on the counter.'],
+    ['Open tin','first-flush-open.webp','The lid rests beside the open tin, with curled tea leaves and silvery tips visible.']
   ]]
 ]);
 function productPreview(views){
@@ -87,7 +91,7 @@ function productPreview(views){
   views.forEach(([label,file,description],i)=>{
     const image=node('img');
     image.alt=description;
-    image.src=file+'.webp';
+    image.src=file;
     frame.append(image);
     controls.append(button(label,()=>show(i),'loaf-view'));
   });
@@ -96,13 +100,15 @@ function productPreview(views){
   figure.append(frame,controls);
   return figure;
 }
-const weighedProduce=new Map([['tomato','tomatoes'],['iskus','iskus squash']]);
-function produceScale(id){
+const weighedItems=new Map([
+  ['sabzi/tomato','tomatoes'],['sabzi/iskus','iskus squash'],['grocery/sona-masoori-loose','Sona Masoori rice']
+]);
+function portionPreview(id,description){
   const frame=node('div',null,'produce-photo scale-preview');
   for(const grams of [250,500,1000]){
     const image=node('img');
     image.src=id+'-'+grams+'g.webp';
-    image.alt='Illustrated '+weightLabel(grams/1000)+' portion of '+weighedProduce.get(id)+' on the brass scale.';
+    image.alt='Illustrated '+weightLabel(grams/1000)+' portion of '+description+' on the brass scale.';
     image.dataset.grams=String(grams);
     image.hidden=grams!==250;
     frame.append(image);
@@ -136,8 +142,17 @@ async function pick(id,illustration){
   if(!item){detail.append(node('h2',shop?'Item unavailable':'Catalogue unavailable'),node('p',shop?'This pack is absent from the current catalogue.':'Open Easy shopping for the catalogue and your saved basket.'));}
   else{
     const illustrated=Number.isInteger(illustration);
-    const scale=venue==='sabzi' && weighedProduce.has(id) && item.unit==='kg'?produceScale(id):null;
-    const views=inspectionViews.get(venue+'/'+id);
+    const key=venue+'/'+id;
+    const description=weighedItems.get(key);
+    const scale=description && item.unit==='kg'?portionPreview(id,description):null;
+    let views=inspectionViews.get(key);
+    if(venue==='urc' && featured.includes(id)){
+      const cataloguePhoto=photo(item,true);
+      if(cataloguePhoto)views=[
+        ['On the shelf','pack-'+featured.indexOf(id)+'.webp',item.name+' on the provisions shelf.'],
+        ['Catalogue photo',cataloguePhoto,'Supplied catalogue photograph for '+item.name+'.']
+      ];
+    }
     let picture;
     if(scale){
       picture=scale;
@@ -168,8 +183,8 @@ function drawCards(){
   for(const item of results.slice(0,shop.limit)){
     const card=button('',()=>pick(item.id),'card');
     const views=inspectionViews.get(venue+'/'+item.id);
-    let thumbnail=views?views[0][1]+'.webp':photo(item);
-    if(venue==='sabzi' && weighedProduce.has(item.id))thumbnail=item.id+'-250g.webp';
+    let thumbnail=views?views[0][1]:photo(item);
+    if(weighedItems.has(venue+'/'+item.id))thumbnail=item.id+'-250g.webp';
     card.append(productImage(thumbnail),node('strong',item.name),node('span',rupees(item.price)+(['sabzi','grocery'].includes(venue)?' / '+item.unit:'')));
     if(item.status==='out')card.append(node('span','Currently unavailable','unavailable'));
     cards.append(card);
