@@ -85,40 +85,49 @@ with sync_playwright() as pw:
               return document.elementFromPoint(x,y)===button;
             }'''), 'A bread hotspot is clipped or covered'
         page.screenshot(path=out/f'{engine}-bakery-counter.jpg',type='jpeg',quality=82)
-        for label,title in [('Ladi pav','Ladi Pav (6)'),('Milk bread','Milk Bread 400 g'),('Hill sourdough','Hill Sourdough Boule')]:
-            page.get_by_role('button',name=label,exact=True).click()
-            expect(page.locator('dialog h2')).to_have_text(title)
-            if label!='Hill sourdough': page.get_by_role('button',name='Close',exact=True).click()
         sheet=page.locator('#sheet')
-        def check_loaf(view):
+        breads=[
+            ('Ladi pav','Ladi Pav (6)','ladi-pav-6','ladi-pav','Pack of six','Pull one apart','pulled','₹40.00 / pack'),
+            ('Milk bread','Milk Bread 400 g','milk-bread-400g','milk-bread','Whole loaf','See a slice','sliced','₹45.00 / each'),
+            ('Hill sourdough','Hill Sourdough Boule','hill-sourdough','hill-sourdough','Whole loaf','See inside','cut','₹180.00 / each')
+        ]
+        def check_bread(file,price):
             image=sheet.locator('.loaf-frame img:visible')
-            expect(image).to_have_attribute('src','hill-sourdough-'+view+'.webp')
+            expect(image).to_have_attribute('src',file+'.webp')
             image.evaluate('(el)=>el.decode()')
             for control in [image,sheet.locator('.price'),sheet.locator('.loaf-views'),sheet.get_by_role('button',name='Add to basket')]:
                 expect(control).to_be_in_viewport(ratio=1)
-            expect(sheet.locator('.price')).to_have_text('₹180.00 / each')
-        check_loaf('whole')
-        page.screenshot(path=out/f'{engine}-loaf-whole.jpg',type='jpeg',quality=85)
-        inside=sheet.get_by_role('button',name='See inside')
-        inside.click()
-        expect(inside).to_have_attribute('aria-pressed','true')
-        check_loaf('cut')
-        page.screenshot(path=out/f'{engine}-loaf-cut.jpg',type='jpeg',quality=85)
-        expect(page.locator('#basket')).to_have_text('Bakery basket · 0')
-        page.get_by_role('button',name='Add to basket').click()
-        expect(page.locator('#basket')).to_have_text('Bakery basket · 1')
-        sheet.get_by_role('button',name='Whole loaf').click()
-        check_loaf('whole')
-        page.get_by_role('button',name='Close',exact=True).click()
-        expect(page.locator('#world')).to_have_attribute('data-scene','counter')
-        page.locator('#search').fill('hill sourdough')
-        page.locator('.card').click()
-        check_loaf('whole')
-        assert page.evaluate("JSON.parse(localStorage.getItem('complex.cart.bakery'))['hill-sourdough']") == 1
+            expect(sheet.locator('.price')).to_have_text(price)
+        for count,(label,title,item_id,stem,first,action,view,price) in enumerate(breads):
+            page.get_by_role('button',name=label,exact=True).click()
+            expect(sheet.locator('h2')).to_have_text(title)
+            check_bread(stem+'-whole',price)
+            page.screenshot(path=out/f'{engine}-{stem}-whole.jpg',type='jpeg',quality=85)
+            toggle=sheet.get_by_role('button',name=action)
+            toggle.click()
+            expect(toggle).to_have_attribute('aria-pressed','true')
+            check_bread(stem+'-'+view,price)
+            page.screenshot(path=out/f'{engine}-{stem}-{view}.jpg',type='jpeg',quality=85)
+            expect(page.locator('#basket')).to_have_text(f'Bakery basket · {count}')
+            sheet.get_by_role('button',name='Add to basket').click()
+            expect(page.locator('#basket')).to_have_text(f'Bakery basket · {count+1}')
+            sheet.get_by_role('button',name=first).click()
+            check_bread(stem+'-whole',price)
+            sheet.get_by_role('button',name='Close',exact=True).click()
+            expect(page.locator('#world')).to_have_attribute('data-scene','counter')
+            page.locator('#search').fill(title)
+            card=page.locator('.card')
+            expect(card.locator('img')).to_have_attribute('src',stem+'-whole.webp')
+            card.click()
+            check_bread(stem+'-whole',price)
+            assert page.evaluate("id=>JSON.parse(localStorage.getItem('complex.cart.bakery'))[id]",item_id) == 1
+            if item_id!='hill-sourdough':
+                sheet.get_by_role('button',name='Close',exact=True).click()
         page.get_by_role('link',name='View shop list').click()
-        expect(page.locator('#main')).to_contain_text('Hill Sourdough Boule')
+        for _,title,*_rest in breads:
+            expect(page.locator('#main')).to_contain_text(title)
         page.goto(root+'complex/shared/station/#counter')
-        expect(page.locator('#basket')).to_have_text('Bakery basket · 1')
+        expect(page.locator('#basket')).to_have_text('Bakery basket · 3')
         expect(page.locator('h1')).to_have_text('At the bread counter')
         page.locator('#search').fill('milk bread')
         expect(page.locator('.card')).to_have_count(1)
