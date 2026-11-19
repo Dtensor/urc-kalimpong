@@ -25,6 +25,8 @@ with sync_playwright() as pw:
         page = browser.new_page(viewport={'width': width, 'height': height},
                                 has_touch=engine == 'webkit', reduced_motion='reduce')
         page.route('https://shala-stats.shalas.workers.dev/**', lambda r: r.fulfill(body=''))
+        scene_requests = []
+        page.on('request', lambda req: scene_requests.append(req.url))
         sheet = page.locator('#sheet')
         button = lambda name: sheet.get_by_role('button', name=name, exact=True)
         for scene, products in scenes.items():
@@ -33,6 +35,8 @@ with sync_playwright() as pw:
             expect(page.locator('#explore-3d')).to_be_in_viewport()
             image = page.locator('#scene')
             image.evaluate('(el)=>el.decode()')
+            if scene == 'shelf':
+                assert not any(url.endswith('/station/plaza.webp') for url in scene_requests)
             for index, (name, x, y) in enumerate(products):
                 page.evaluate('window.scrollTo(0,0)')
                 r = image.bounding_box()
